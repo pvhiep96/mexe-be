@@ -10,5 +10,334 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 0) do
+ActiveRecord::Schema[7.2].define(version: 2024_12_20_000020) do
+  create_table "article_images", force: :cascade do |t|
+    t.integer "article_id", null: false
+    t.string "image_url", null: false
+    t.string "alt_text"
+    t.string "caption"
+    t.integer "sort_order", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["article_id"], name: "index_article_images_on_article_id"
+  end
+
+  create_table "articles", force: :cascade do |t|
+    t.string "title", null: false
+    t.string "slug", null: false
+    t.text "excerpt"
+    t.text "content", null: false
+    t.string "featured_image"
+    t.string "author", default: "Mexe Team"
+    t.string "category"
+    t.json "tags"
+    t.string "status", default: "draft"
+    t.datetime "published_at"
+    t.integer "view_count", default: 0
+    t.string "meta_title"
+    t.text "meta_description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_articles_on_slug", unique: true
+  end
+
+  create_table "brands", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.string "logo"
+    t.text "description"
+    t.integer "founded_year"
+    t.string "field"
+    t.text "story"
+    t.string "website"
+    t.boolean "is_active", default: true
+    t.integer "sort_order", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_brands_on_slug", unique: true
+  end
+
+  create_table "categories", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.text "description"
+    t.string "image"
+    t.integer "parent_id"
+    t.integer "sort_order", default: 0
+    t.boolean "is_active", default: true
+    t.string "meta_title"
+    t.text "meta_description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["parent_id"], name: "index_categories_on_parent_id"
+    t.index ["slug"], name: "index_categories_on_slug", unique: true
+  end
+
+  create_table "coupon_usage", force: :cascade do |t|
+    t.integer "coupon_id", null: false
+    t.integer "user_id", null: false
+    t.integer "order_id", null: false
+    t.decimal "discount_amount", precision: 10, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["coupon_id"], name: "index_coupon_usage_on_coupon_id"
+    t.index ["order_id"], name: "index_coupon_usage_on_order_id"
+    t.index ["user_id"], name: "index_coupon_usage_on_user_id"
+  end
+
+  create_table "coupons", force: :cascade do |t|
+    t.string "code", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.string "discount_type", null: false
+    t.decimal "discount_value", precision: 10, scale: 2, null: false
+    t.decimal "min_order_amount", precision: 10, scale: 2, default: "0.0"
+    t.decimal "max_discount_amount", precision: 10, scale: 2
+    t.integer "usage_limit"
+    t.integer "used_count", default: 0
+    t.integer "user_limit", default: 1
+    t.datetime "valid_from", null: false
+    t.datetime "valid_until", null: false
+    t.boolean "is_active", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_coupons_on_code", unique: true
+  end
+
+  create_table "notifications", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "title", null: false
+    t.text "message", null: false
+    t.string "type", null: false
+    t.boolean "is_read", default: false
+    t.json "data"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_notifications_on_user_id"
+  end
+
+  create_table "order_items", force: :cascade do |t|
+    t.integer "order_id", null: false
+    t.integer "product_id", null: false
+    t.string "product_name", null: false
+    t.string "product_sku"
+    t.string "product_image"
+    t.integer "quantity", null: false
+    t.decimal "unit_price", precision: 10, scale: 2, null: false
+    t.decimal "total_price", precision: 10, scale: 2, null: false
+    t.json "variant_info"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id"], name: "index_order_items_on_order_id"
+    t.index ["product_id"], name: "index_order_items_on_product_id"
+  end
+
+  create_table "orders", force: :cascade do |t|
+    t.string "order_number", null: false
+    t.integer "user_id"
+    t.string "guest_email"
+    t.string "guest_phone"
+    t.string "guest_name"
+    t.string "status", default: "pending"
+    t.decimal "subtotal", precision: 10, scale: 2, null: false
+    t.decimal "discount_amount", precision: 10, scale: 2, default: "0.0"
+    t.decimal "shipping_fee", precision: 10, scale: 2, default: "0.0"
+    t.decimal "tax_amount", precision: 10, scale: 2, default: "0.0"
+    t.decimal "total_amount", precision: 10, scale: 2, null: false
+    t.string "payment_method", null: false
+    t.string "payment_status", default: "pending"
+    t.string "delivery_type", default: "home"
+    t.text "delivery_address"
+    t.string "store_location"
+    t.text "notes"
+    t.string "coupon_code"
+    t.decimal "coupon_discount", precision: 10, scale: 2, default: "0.0"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_number"], name: "index_orders_on_order_number", unique: true
+    t.index ["user_id"], name: "index_orders_on_user_id"
+  end
+
+  create_table "product_images", force: :cascade do |t|
+    t.integer "product_id", null: false
+    t.string "image_url", null: false
+    t.string "alt_text"
+    t.integer "sort_order", default: 0
+    t.boolean "is_primary", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_product_images_on_product_id"
+  end
+
+  create_table "product_reviews", force: :cascade do |t|
+    t.integer "product_id", null: false
+    t.integer "user_id", null: false
+    t.integer "order_id", null: false
+    t.integer "rating", null: false
+    t.string "title"
+    t.text "comment"
+    t.boolean "is_verified_purchase", default: true
+    t.boolean "is_approved", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id"], name: "index_product_reviews_on_order_id"
+    t.index ["product_id"], name: "index_product_reviews_on_product_id"
+    t.index ["user_id"], name: "index_product_reviews_on_user_id"
+  end
+
+  create_table "product_specifications", force: :cascade do |t|
+    t.integer "product_id", null: false
+    t.string "spec_name", null: false
+    t.text "spec_value", null: false
+    t.integer "sort_order", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_product_specifications_on_product_id"
+  end
+
+  create_table "product_variants", force: :cascade do |t|
+    t.integer "product_id", null: false
+    t.string "variant_name", null: false
+    t.string "variant_value", null: false
+    t.decimal "price_adjustment", precision: 10, scale: 2, default: "0.0"
+    t.integer "stock_quantity", default: 0
+    t.string "sku"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_product_variants_on_product_id"
+  end
+
+  create_table "products", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.string "sku"
+    t.text "description"
+    t.string "short_description"
+    t.integer "brand_id"
+    t.integer "category_id"
+    t.decimal "price", precision: 10, scale: 2, null: false
+    t.decimal "original_price", precision: 10, scale: 2
+    t.decimal "discount_percent", precision: 5, scale: 2, default: "0.0"
+    t.decimal "cost_price", precision: 10, scale: 2
+    t.decimal "weight", precision: 8, scale: 2
+    t.string "dimensions"
+    t.integer "stock_quantity", default: 0
+    t.integer "min_stock_alert", default: 10
+    t.boolean "is_active", default: true
+    t.boolean "is_featured", default: false
+    t.boolean "is_new", default: false
+    t.boolean "is_hot", default: false
+    t.boolean "is_preorder", default: false
+    t.integer "preorder_quantity", default: 0
+    t.date "preorder_end_date"
+    t.integer "warranty_period"
+    t.string "meta_title"
+    t.text "meta_description"
+    t.integer "view_count", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["brand_id"], name: "index_products_on_brand_id"
+    t.index ["category_id"], name: "index_products_on_category_id"
+    t.index ["sku"], name: "index_products_on_sku", unique: true
+    t.index ["slug"], name: "index_products_on_slug", unique: true
+  end
+
+  create_table "settings", force: :cascade do |t|
+    t.string "setting_key", null: false
+    t.text "setting_value"
+    t.string "setting_type", default: "string"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["setting_key"], name: "index_settings_on_setting_key", unique: true
+  end
+
+  create_table "shipping_zones", force: :cascade do |t|
+    t.string "name", null: false
+    t.json "cities", null: false
+    t.decimal "shipping_fee", precision: 10, scale: 2, null: false
+    t.decimal "free_shipping_threshold", precision: 10, scale: 2
+    t.string "estimated_days"
+    t.boolean "is_active", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "stores", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "address", null: false
+    t.string "phone"
+    t.string "email"
+    t.string "city", null: false
+    t.boolean "is_active", default: true
+    t.json "opening_hours"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "user_addresses", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "full_name", null: false
+    t.string "phone", null: false
+    t.string "address_line1", null: false
+    t.string "address_line2"
+    t.string "city", null: false
+    t.string "state"
+    t.string "postal_code"
+    t.string "country", default: "Vietnam"
+    t.boolean "is_default", default: false
+    t.boolean "is_active", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_user_addresses_on_user_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "email", null: false
+    t.string "password_hash", null: false
+    t.string "full_name", null: false
+    t.string "phone"
+    t.string "avatar"
+    t.date "date_of_birth"
+    t.string "gender"
+    t.boolean "is_active", default: true
+    t.boolean "is_verified", default: false
+    t.datetime "email_verified_at"
+    t.datetime "phone_verified_at"
+    t.datetime "last_login_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_users_on_email", unique: true
+  end
+
+  create_table "wishlists", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "product_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_wishlists_on_product_id"
+    t.index ["user_id", "product_id"], name: "index_wishlists_on_user_id_and_product_id", unique: true
+    t.index ["user_id"], name: "index_wishlists_on_user_id"
+  end
+
+  add_foreign_key "article_images", "articles"
+  add_foreign_key "categories", "categories", column: "parent_id"
+  add_foreign_key "coupon_usage", "coupons"
+  add_foreign_key "coupon_usage", "orders"
+  add_foreign_key "coupon_usage", "users"
+  add_foreign_key "notifications", "users"
+  add_foreign_key "order_items", "orders"
+  add_foreign_key "order_items", "products"
+  add_foreign_key "orders", "users"
+  add_foreign_key "product_images", "products"
+  add_foreign_key "product_reviews", "orders"
+  add_foreign_key "product_reviews", "products"
+  add_foreign_key "product_reviews", "users"
+  add_foreign_key "product_specifications", "products"
+  add_foreign_key "product_variants", "products"
+  add_foreign_key "products", "brands"
+  add_foreign_key "products", "categories"
+  add_foreign_key "user_addresses", "users"
+  add_foreign_key "wishlists", "products"
+  add_foreign_key "wishlists", "users"
 end
