@@ -8,4 +8,12 @@ class Category < ApplicationRecord
 
   scope :active, -> { where(is_active: true) }
   scope :root_categories, -> { where(parent_id: nil) }
+
+  def self.ransackable_attributes(auth_object = nil)
+    %w[id name slug description is_active parent_id created_at updated_at]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w[parent subcategories products]
+  end
 end 

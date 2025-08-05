@@ -21,10 +21,10 @@ class Order < ApplicationRecord
   }
 
   enum payment_status: {
-    pending: 'pending',
+    payment_pending: 'pending',
     paid: 'paid',
     failed: 'failed',
-    refunded: 'refunded'
+    payment_refunded: 'refunded'
   }
 
   enum payment_method: {
@@ -35,6 +35,14 @@ class Order < ApplicationRecord
 
   enum delivery_type: {
     home: 'home',
-    store: 'store'
+    store_pickup: 'store'
   }
+
+  def self.ransackable_attributes(auth_object = nil)
+    %w[id order_number subtotal total_amount status payment_status payment_method delivery_type created_at updated_at]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w[user order_items products product_reviews coupon_usages]
+  end
 end 

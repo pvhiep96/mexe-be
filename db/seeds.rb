@@ -296,3 +296,8 @@ puts "- #{Store.count} stores"
 puts "- #{Coupon.count} coupons"
 puts "- #{Article.count} articles"
 puts "- #{ArticleImage.count} article images"
+
+# Create admin user
+puts "Creating admin user..."
+AdminUser.create!(email: 'admin@mexe.com', password: 'password123', password_confirmation: 'password123') unless AdminUser.exists?(email: 'admin@mexe.com')
+puts "Admin user created: admin@mexe.com / password123"

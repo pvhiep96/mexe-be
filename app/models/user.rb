@@ -12,4 +12,12 @@ class User < ApplicationRecord
   validates :password_hash, presence: true
 
   enum gender: { male: 'male', female: 'female', other: 'other' }
+
+  def self.ransackable_attributes(auth_object = nil)
+    %w[id email full_name phone date_of_birth gender is_active is_verified email_verified_at phone_verified_at last_login_at created_at updated_at]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w[user_addresses orders wishlists product_reviews notifications coupon_usages]
+  end
 end 
