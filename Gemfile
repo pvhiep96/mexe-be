@@ -23,7 +23,13 @@ gem "jbuilder"
 # gem "kredis"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
-# gem "bcrypt", "~> 3.1.7"
+gem "bcrypt", "~> 3.1.7"
+
+# JWT for API authentication
+gem "jwt", "~> 2.7"
+
+# CORS for API access from frontend
+gem "rack-cors", "~> 2.0"
 
 # ActiveAdmin for admin interface
 gem "activeadmin"

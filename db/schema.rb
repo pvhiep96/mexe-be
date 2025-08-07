@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_08_04_080736) do
+ActiveRecord::Schema[7.2].define(version: 2025_08_06_152531) do
   create_table "active_admin_comments", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
@@ -348,7 +348,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_04_080736) do
 
   create_table "users", force: :cascade do |t|
     t.string "email", null: false
-    t.string "password_hash", null: false
     t.string "full_name", null: false
     t.string "phone"
     t.string "avatar"
@@ -361,7 +360,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_04_080736) do
     t.datetime "last_login_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "password_digest"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["password_digest"], name: "index_users_on_password_digest"
   end
 
   create_table "wishlists", force: :cascade do |t|
