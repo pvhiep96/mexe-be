@@ -12,7 +12,7 @@ services:
       - bundle_cache:/usr/local/bundle
     environment:
       - RAILS_ENV=development
-      - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
+      - RAILS_MASTER_KEY="QdpQKkPGrP4+0c2xl1wBo5zG/jq68iG5jsZPCisf1IQ="
     depends_on:
       - db
     command: ./bin/rails server -b 0.0.0.0
@@ -20,15 +20,17 @@ services:
     tty: true
 
   db:
-    image: postgres:15-alpine
+    image: mysql:8.0
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mysql_data:/var/lib/mysql
     environment:
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_USER=postgres
-      - POSTGRES_DB=mexe_development
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=mexe_development
+      - MYSQL_USER=mexe
+      - MYSQL_PASSWORD=password
     ports:
-      - "5432:5432"
+      - "3306:3306"
+    command: --default-authentication-plugin=mysql_native_password
 
   redis:
     image: redis:7-alpine
@@ -38,6 +40,7 @@ services:
       - redis_data:/data
 
 volumes:
-  postgres_data:
+  mysql_data:
   redis_data:
-  bundle_cache: 
+  bundle_cache:
+

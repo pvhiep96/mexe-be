@@ -30,7 +30,7 @@ This directory contains Docker configurations for running the Rails application 
 
 4. **Access the application:**
    - Rails app: http://localhost:3000
-   - PostgreSQL: localhost:5432
+   - MySQL: localhost:3306
    - Redis: localhost:6379
 
 ### Production Environment
@@ -97,7 +97,7 @@ docker-compose -f docker-compose.prod.yml down
 
 ### Development
 
-The development environment uses PostgreSQL. The database will be automatically created when you first run the containers.
+The development environment uses MySQL. The database will be automatically created when you first run the containers.
 
 ```bash
 # Create database
@@ -137,18 +137,18 @@ mexe-be/
 
 ### Development
 - **web**: Rails application (port 3000)
-- **db**: PostgreSQL database (port 5432)
+- **db**: MySQL database (port 3306)
 - **redis**: Redis cache (port 6379)
 
 ### Production
 - **web**: Rails application
-- **db**: PostgreSQL database
+- **db**: MySQL database
 - **redis**: Redis cache
 - **nginx**: Reverse proxy and load balancer
 
 ## Volumes
 
-- `postgres_data`: PostgreSQL data persistence
+- `mysql_data`: MySQL data persistence
 - `redis_data`: Redis data persistence
 - `bundle_cache`: Ruby gems cache
 - `rails_storage`: Rails Active Storage files
