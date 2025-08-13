@@ -1,48 +1,138 @@
-# See https://docs.docker.com/engine/reference/builder/#dockerignore-file for more about ignoring files.
+# Git
+.git
+.gitignore
+.gitattributes
 
-# Ignore git directory.
-/.git/
-/.gitignore
+# Documentation
+README.md
+*.md
+docs/
 
-# Ignore bundler config.
-/.bundle
+# Logs
+log/*
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Ignore all environment files (except templates).
-/.env*
-!/.env*.erb
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
 
-# Ignore all default key files.
-/config/master.key
-/config/credentials/*.key
+# Coverage directory used by tools like istanbul
+coverage/
 
-# Ignore all logfiles and tempfiles.
-/log/*
-/tmp/*
-!/log/.keep
-!/tmp/.keep
+# nyc test coverage
+.nyc_output
 
-# Ignore pidfiles, but keep the directory.
-/tmp/pids/*
-!/tmp/pids/.keep
+# Grunt intermediate storage
+.grunt
 
-# Ignore storage (uploaded files in development and any SQLite databases).
-/storage/*
-!/storage/.keep
-/tmp/storage/*
-!/tmp/storage/.keep
+# Bower dependency directory
+bower_components
 
-# Ignore assets.
-/node_modules/
-/app/assets/builds/*
-!/app/assets/builds/.keep
-/public/assets
+# node_modules
+node_modules/
 
-# Ignore CI service files.
-/.github
+# Optional npm cache directory
+.npm
 
-# Ignore development files
-/.devcontainer
+# Optional REPL history
+.node_repl_history
 
-# Ignore Docker-related files
-/.dockerignore
-/Dockerfile*
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+.env.test
+.env.production
+
+# parcel-bundler cache
+.cache
+.parcel-cache
+
+# next.js build output
+.next
+
+# nuxt.js build output
+.nuxt
+
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# Temporary folders
+tmp/
+temp/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Test files
+test/
+spec/
+coverage/
+
+# Development files
+docker-compose*.yml
+Dockerfile.dev
+.dockerignore
+
+# Database files
+*.sqlite3
+*.db
+
+# Backup files
+*.bak
+*.backup
+
+# Environment files
+.env*
+!.env.example
+
+# Rails specific
+public/assets/
+public/packs/
+public/packs-test/
+node_modules/
+yarn-error.log
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
