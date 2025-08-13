@@ -15,11 +15,12 @@ services:
 
   db:
     environment:
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_USER=postgres
-      - POSTGRES_DB=mexe_development
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=mexe_development
+      - MYSQL_USER=mexe
+      - MYSQL_PASSWORD=password
     ports:
-      - "5432:5432"
+      - "3306:3306"
 
 volumes:
   node_modules: 
