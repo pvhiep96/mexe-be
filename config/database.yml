@@ -35,3 +35,5 @@ test:
 production:
   <<: *default
   # database: mexe_production
+  database: <%= ENV['DATABASE_NAME'] || 'mexe_production' %>
+  # database: path/to/persistent/storage/production.sqlite3
