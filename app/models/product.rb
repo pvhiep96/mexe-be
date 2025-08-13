@@ -8,6 +8,9 @@ class Product < ApplicationRecord
   has_many :wishlists, dependent: :destroy
   has_many :wished_by_users, through: :wishlists, source: :user
   has_many :product_reviews, dependent: :destroy
+  has_many :images, class_name: 'ProductImage'
+  has_many :variants, class_name: 'ProductVariant'
+  has_many :specifications, class_name: 'ProductSpecification'
 
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true
@@ -19,6 +22,8 @@ class Product < ApplicationRecord
   scope :new_products, -> { where(is_new: true) }
   scope :hot_products, -> { where(is_hot: true) }
   scope :preorder, -> { where(is_preorder: true) }
+  scope :filter_by_category, ->(category_id) { where(category_id: category_id) if category_id.present? }
+  scope :filter_by_brand, ->(brand_id) { where(brand_id: brand_id) if brand_id.present? }
 
   def self.ransackable_attributes(auth_object = nil)
     %w[id name slug sku description short_description brand_id category_id price original_price discount_percent cost_price weight dimensions stock_quantity min_stock_alert is_active is_featured is_new is_hot is_preorder preorder_quantity preorder_end_date warranty_period meta_title meta_description view_count created_at updated_at]
@@ -27,4 +32,4 @@ class Product < ApplicationRecord
   def self.ransackable_associations(auth_object = nil)
     %w[brand category product_images product_specifications product_variants order_items wishlists product_reviews]
   end
-end 
+end

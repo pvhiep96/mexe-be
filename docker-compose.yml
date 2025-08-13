@@ -12,7 +12,7 @@ services:
       - bundle_cache:/usr/local/bundle
     environment:
       - RAILS_ENV=development
-      - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
+      - RAILS_MASTER_KEY="QdpQKkPGrP4+0c2xl1wBo5zG/jq68iG5jsZPCisf1IQ="
     depends_on:
       - db
     command: ./bin/rails server -b 0.0.0.0
@@ -42,4 +42,4 @@ services:
 volumes:
   mysql_data:
   redis_data:
-  bundle_cache: 
+  bundle_cache:
