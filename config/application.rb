@@ -23,5 +23,7 @@ module MexeBe
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+    config.require_master_key = false
+    config.secret_key_base = "your_generated_secret"
   end
 end
