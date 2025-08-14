@@ -87,4 +87,10 @@ Rails.application.configure do
   
   # Allow all subdomains of trycloudflare.com for development
   config.hosts << ".trycloudflare.com"
+  
+  # Disable force SSL check for development
+  config.force_ssl = false
+  
+  # Allow all hosts in development
+  config.hosts.clear
 end

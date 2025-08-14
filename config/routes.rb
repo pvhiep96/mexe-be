@@ -16,6 +16,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       post 'auth/login', to: 'auth#login'
       post 'auth/register', to: 'auth#register'
+      post 'auth/logout', to: 'auth#logout'
       post 'auth/change_password', to: 'auth#change_password'
       get 'auth/profile', to: 'auth#profile'
       put 'auth/update_profile', to: 'auth#update_profile'
@@ -33,6 +34,9 @@ Rails.application.routes.draw do
       resources :products, only: [:index, :show]
       resources :orders, only: [:index, :show, :create]
       get 'users/me', to: 'users#show'
+      get 'users/orders', to: 'users#orders'
+      get 'users/favorites', to: 'users#favorites'
+      get 'users/addresses', to: 'users#addresses'
     end
   end
 end

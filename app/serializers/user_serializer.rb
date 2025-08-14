@@ -1,8 +1,23 @@
-# app/serializers/user_serializer.rb
 class UserSerializer < ActiveModel::Serializer
-  attributes :id, :email, :full_name, :phone, :avatar, :date_of_birth,
-             :gender, :is_active, :is_verified, :email_verified_at,
-             :phone_verified_at, :last_login_at
+  attributes :id, :email, :name, :phone, :avatar, :date_of_birth, :address, :created_at, :updated_at
 
-  has_many :addresses, serializer: UserAddressSerializer
+  def name
+    object.full_name || object.name || 'Unknown User'
+  end
+  
+  def phone
+    object.phone || ''
+  end
+  
+  def avatar
+    object.avatar || ''
+  end
+  
+  def date_of_birth
+    object.date_of_birth&.strftime('%Y-%m-%d') || ''
+  end
+  
+  def address
+    object.address || ''
+  end
 end
