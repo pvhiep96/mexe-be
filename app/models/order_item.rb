@@ -6,4 +6,16 @@ class OrderItem < ApplicationRecord
   validates :quantity, presence: true, numericality: { greater_than: 0 }
   validates :unit_price, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :total_price, presence: true, numericality: { greater_than_or_equal_to: 0 }
-end 
+
+  before_validation :set_product_details, on: :create
+
+  private
+
+  def set_product_details
+    self.product_name = product.name
+    self.product_sku = product.sku
+    self.unit_price = product.price
+    self.total_price = 0
+    # self.total_price = unit_price * quantity
+  end
+end

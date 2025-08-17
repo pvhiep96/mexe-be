@@ -7,7 +7,7 @@ services:
       - RAILS_LOG_TO_STDOUT=true
     volumes:
       - .:/rails
-      - bundle_cache:/usr/local/bundle
+      # - bundle_cache:/usr/local/bundle
       - node_modules:/rails/node_modules
     command: ./bin/rails server -b 0.0.0.0
     stdin_open: true
@@ -23,4 +23,4 @@ services:
       - "3306:3306"
 
 volumes:
-  node_modules: 
+  node_modules:

@@ -20,7 +20,7 @@ module Api
 
       def show
         product = Product.find_by(id: params[:id]) || Product.find_by!(slug: params[:id])
-        render json: ProductDetailSerializer.new(product)
+        render json: ProductDetailSerializer.new(product).as_json
       rescue ActiveRecord::RecordNotFound
         render json: { error: 'Product not found' }, status: :not_found
       end
