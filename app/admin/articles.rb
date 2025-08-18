@@ -27,7 +27,7 @@ ActiveAdmin.register Article do
       f.input :title
       f.input :slug
       f.input :excerpt
-      f.input :content, as: :text
+      f.input :content, as: :text, input_html: { rows: 10, class: 'ckeditor-apply' }
       f.input :featured_image
       f.input :author
       f.input :category
@@ -39,6 +39,10 @@ ActiveAdmin.register Article do
     end
     f.actions
   end
+
+
+
+
 
   show do
     attributes_table do

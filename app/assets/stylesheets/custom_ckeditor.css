@@ -1,18 +1,25 @@
-/*
- * This is a manifest file that'll be compiled into application.css, which will include all the files
- * listed below.
- *
- * Any CSS (and SCSS, if configured) file within this directory, lib/assets/stylesheets, or any plugin's
- * vendor/assets/stylesheets directory can be referenced here using a relative path.
- *
- * You're free to add application-wide styles to this file and they'll appear at the bottom of the
- * compiled file so the styles you add here take precedence over styles defined in any other CSS
- * files in this directory. Styles in this file should be added after the last require_* statement.
- * It is generally better to create a new file per style scope.
- *
- *= require_tree .
- *= require_self
- */
+/* CRITICAL: HIGHEST PRIORITY - Override ALL other CSS */
+html body #active_admin_content form .input.text.optional.article_content,
+html body #active_admin_content form .input.text.optional.article_content *,
+html body #active_admin_content form .input.text.optional.article_content .ck.ck-editor,
+html body #active_admin_content form .input.text.optional.article_content .ck.ck-editor * {
+  width: 700px !important;
+  max-width: 700px !important;
+  min-width: 700px !important;
+  box-sizing: border-box !important;
+}
+
+/* CRITICAL: Force width on ALL CKEditor elements */
+.ck.ck-editor,
+.ck.ck-editor__main,
+.ck.ck-editor__editable,
+.ck.ck-toolbar,
+.ck.ck-reset.ck-editor.ck-rounded-corners {
+  width: 700px !important;
+  max-width: 700px !important;
+  min-width: 700px !important;
+  box-sizing: border-box !important;
+}
 
 /* PERFECT ALIGNMENT: Force Content field to match all other form fields exactly */
 .input.text.optional.article_content {
@@ -23,9 +30,9 @@
   display: block !important;
 
   /* Force exact width matching with other form fields */
-  width: 500px !important;
-  max-width: 500px !important;
-  min-width: 500px !important;
+  width: 700px !important;
+  max-width: 700px !important;
+  min-width: 700px !important;
 
   /* Remove any margins/padding that could affect alignment - CRITICAL */
   margin: 0 !important;
@@ -54,8 +61,8 @@
 .input.text.optional.article_content .field_with_errors,
 .input.text.optional.article_content .input,
 .input.text.optional.article_content .input-label {
-  width: 500px !important;
-  max-width: 500px !important;
+  width: 700px !important;
+  max-width: 700px !important;
   margin: 0 !important;
   margin-top: 0 !important;
   margin-bottom: 0 !important;
@@ -78,9 +85,9 @@
   display: block !important;
 
   /* Force exact width matching with other form fields */
-  width: 500px !important;
-  max-width: 500px !important;
-  min-width: 500px !important;
+  width: 700px !important;
+  max-width: 700px !important;
+  min-width: 700px !important;
 
   /* Remove any margins/padding to align perfectly with other form fields - CRITICAL */
   margin: 0 !important;
@@ -113,9 +120,9 @@
 /* PERFECT: Force editor frame to match form field width exactly */
 .input.text.optional.article_content .ck.ck-editor__main {
   /* Force exact width matching */
-  width: 500px !important;
-  max-width: 500px !important;
-  min-width: 500px !important;
+  width: 700px !important;
+  max-width: 700px !important;
+  min-width: 700px !important;
 
   /* Remove any margins/padding - CRITICAL for perfect alignment */
   margin: 0 !important;
@@ -144,9 +151,9 @@
 /* PERFECT: Force editable area to match form field width exactly */
 .input.text.optional.article_content .ck.ck-editor__editable {
   /* Force exact width matching */
-  width: 500px !important;
-  max-width: 500px !important;
-  min-width: 500px !important;
+  width: 700px !important;
+  max-width: 700px !important;
+  min-width: 700px !important;
   
   /* CRITICAL: Force text wrapping within the fixed width */
   overflow-wrap: break-word !important;
@@ -181,9 +188,9 @@
 /* PERFECT: Force toolbar to match form field width exactly */
 .input.text.optional.article_content .ck.ck-toolbar {
   /* Force toolbar to match form field width exactly */
-  width: 500px !important;
-  max-width: 500px !important;
-  min-width: 500px !important;
+  width: 700px !important;
+  max-width: 700px !important;
+  min-width: 700px !important;
 
   /* Remove any default spacing - CRITICAL for perfect alignment */
   margin: 0 !important;
@@ -241,63 +248,38 @@
   padding-right: 0 !important;
 }
 
-/* CRITICAL: NEW CKEditor CSS with 700px width - Added after existing rules */
-/* PERFECT ALIGNMENT: Force Content field to match all other form fields exactly */
-.input.text.optional.article_content {
-  /* Reset all default positioning and sizing */
-  position: relative !important;
-  float: none !important;
-  clear: both !important;
-  display: block !important;
-
-  /* Force exact width matching with other form fields */
-  width: 700px !important;
-  max-width: 700px !important;
-  min-width: 700px !important;
-
-  /* Remove any margins/padding that could affect alignment - CRITICAL */
-  margin: 0 !important;
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
+/* CRITICAL: Override any other Active Admin CSS that might interfere */
+.input.text.optional.article_content,
+.input.text.optional.article_content * {
   margin-left: 0 !important;
   margin-right: 0 !important;
-  padding: 0 !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
   padding-left: 0 !important;
   padding-right: 0 !important;
-
-  /* Ensure proper box model */
-  box-sizing: border-box !important;
-
-  /* Force left/right boundaries to match form container */
-  left: 0 !important;
-  right: 0 !important;
-
-  /* Override any Active Admin default positioning */
-  transform: none !important;
-  translate: none !important;
 }
 
-/* CRITICAL: HIGHEST PRIORITY - Override ALL other CSS */
-html body #active_admin_content form .input.text.optional.article_content,
-html body #active_admin_content form .input.text.optional.article_content *,
-html body #active_admin_content form .input.text.optional.article_content .ck.ck-editor,
-html body #active_admin_content form .input.text.optional.article_content .ck.ck-editor * {
-  width: 700px !important;
-  max-width: 700px !important;
-  min-width: 700px !important;
-  box-sizing: border-box !important;
+/* CRITICAL: Remove border-radius and box-shadow from CKEditor container */
+.input.text.optional.article_content .ck.ck-reset.ck-editor.ck-rounded-corners {
+  border-radius: 0 !important;
+  box-shadow: none !important;
 }
 
-/* CRITICAL: Force width on ALL CKEditor elements */
-.ck.ck-editor,
-.ck.ck-editor__main,
-.ck.ck-editor__editable,
-.ck.ck-toolbar,
-.ck.ck-reset.ck-editor.ck-rounded-corners {
-  width: 700px !important;
-  max-width: 700px !important;
-  min-width: 700px !important;
-  box-sizing: border-box !important;
+/* CRITICAL: Remove border-radius and box-shadow from all CKEditor elements */
+.input.text.optional.article_content .ck.ck-editor {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.input.text.optional.article_content .ck.ck-editor__main {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.input.text.optional.article_content .ck.ck-editor__editable {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.input.text.optional.article_content .ck.ck-toolbar {
+  border-radius: 0 !important;
+  box-shadow: none !important;
 }

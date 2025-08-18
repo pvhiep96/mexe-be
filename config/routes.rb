@@ -1,4 +1,9 @@
 Rails.application.routes.draw do
+  mount Ckeditor::Engine => '/ckeditor'
+  
+  # CKEditor 5 Image Upload Route
+  post 'ckeditor/upload', to: 'ckeditor_uploads#create'
+  
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
@@ -14,12 +19,23 @@ Rails.application.routes.draw do
   # API Routes
   namespace :api do
     namespace :v1 do
+      # Auth routes
       post 'auth/login', to: 'auth#login'
       post 'auth/register', to: 'auth#register'
       post 'auth/logout', to: 'auth#logout'
       post 'auth/change_password', to: 'auth#change_password'
       get 'auth/profile', to: 'auth#profile'
       put 'auth/update_profile', to: 'auth#update_profile'
+      
+      # User routes
+      get 'users/me', to: 'users#show'
+      get 'users/orders', to: 'users#orders'
+      get 'users/favorites', to: 'users#favorites'
+      get 'users/addresses', to: 'users#addresses'
+      
+      # Resource routes
+      resources :products, only: [:index, :show]
+      resources :orders, only: [:index, :show, :create]
     end
   end
 
@@ -28,15 +44,4 @@ Rails.application.routes.draw do
 
   mount Rswag::Ui::Engine => '/api-docs'
   mount Rswag::Api::Engine => '/api-docs'
-
-  namespace :api do
-    namespace :v1 do
-      resources :products, only: [:index, :show]
-      resources :orders, only: [:index, :show, :create]
-      get 'users/me', to: 'users#show'
-      get 'users/orders', to: 'users#orders'
-      get 'users/favorites', to: 'users#favorites'
-      get 'users/addresses', to: 'users#addresses'
-    end
-  end
 end

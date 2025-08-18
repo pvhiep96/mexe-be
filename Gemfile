@@ -30,11 +30,12 @@ gem "bcrypt", "~> 3.1.7"
 gem "jwt"
 
 # ActiveAdmin for admin interface
-gem "activeadmin"
+gem "activeadmin", "~> 3.3.0"
+gem "arctic_admin"
 gem "devise"
 gem "sassc-rails"
-gem "arctic_admin"
-
+gem "activeadmin-ckeditor"
+gem "ckeditor", "~> 5.1.3"
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 
