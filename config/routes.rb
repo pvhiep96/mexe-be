@@ -33,6 +33,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :products, only: [:index, :show]
       resources :orders, only: [:index, :show, :create]
+      resources :categories, only: [:index, :show]
       get 'users/me', to: 'users#show'
       get 'users/orders', to: 'users#orders'
       get 'users/favorites', to: 'users#favorites'
