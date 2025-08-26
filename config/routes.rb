@@ -26,6 +26,13 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
+  
+  # Frontend routes
+  resources :products, only: [:index, :show] do
+    get :test, on: :member
+  end
+  resources :categories, only: [:index, :show]
+  resources :brands, only: [:index, :show]
 
   mount Rswag::Ui::Engine => '/api-docs'
   mount Rswag::Api::Engine => '/api-docs'

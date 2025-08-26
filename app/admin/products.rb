@@ -1,9 +1,11 @@
 ActiveAdmin.register Product do
+
+
   permit_params :name, :slug, :sku, :short_description, :brand_id, :category_id, 
                 :price, :original_price, :discount_percent, :cost_price, 
                 :stock_quantity, :min_stock_alert, :is_active, :is_featured, :is_new, :is_hot, 
                 :is_preorder, :preorder_quantity, :preorder_end_date, :warranty_period, 
-                :meta_title, :meta_description, :view_count, :main_image,
+                :view_count, :main_image,
                 product_specifications_attributes: [:id, :spec_name, :spec_value, :unit, :position, :is_active, :_destroy],
                 product_descriptions_attributes: [:id, :title, :content, :position, :is_active, :_destroy],
                 product_images_attributes: [:id, :image, :position, :is_active, :_destroy]
@@ -14,7 +16,7 @@ ActiveAdmin.register Product do
     selectable_column
     id_column
     column "Ảnh" do |product|
-      if product.main_image
+      if product.persisted? && product.main_image && product.main_image.attached?
         image_tag product.main_image, style: "width: 50px; height: 50px; object-fit: cover;"
       else
         "Không có ảnh"
@@ -67,8 +69,6 @@ ActiveAdmin.register Product do
       f.input :is_preorder, label: "Đặt trước"
       f.input :preorder_quantity, label: "Số lượng đặt trước"
       f.input :preorder_end_date, label: "Ngày kết thúc đặt trước"
-      f.input :meta_title, label: "Tiêu đề SEO"
-      f.input :meta_description, label: "Mô tả SEO"
     end
 
     f.inputs "Quản lý ảnh sản phẩm" do
@@ -76,7 +76,7 @@ ActiveAdmin.register Product do
               hint: "Chọn ảnh chính cho sản phẩm (JPG, PNG, GIF, tối đa 5MB)",
               input_html: { accept: 'image/*' }
       
-      if f.object.main_image.attached?
+      if f.object.persisted? && f.object.main_image.attached?
         div class: "current-main-image" do
           h4 "Ảnh chính hiện tại:"
           image_tag f.object.main_image, style: "width: 150px; height: 150px; object-fit: cover; margin: 10px;"
@@ -90,6 +90,32 @@ ActiveAdmin.register Product do
         img.input :position, label: "Vị trí", 
                   hint: "Số càng nhỏ càng hiển thị trước (để trống để tự động)"
         img.input :is_active, label: "Kích hoạt"
+        
+        # Preview ảnh đã upload (chỉ hiển thị cho record đã lưu)
+        if img.object.persisted? && img.object.image.attached?
+          div class: "image-preview" do
+            h5 "Preview ảnh:"
+            image_tag img.object.image, style: "width: 120px; height: 120px; object-fit: cover; margin: 5px; border: 1px solid #ddd; border-radius: 4px;"
+          end
+        end
+      end
+      
+      # Hiển thị tất cả ảnh bổ sung hiện tại
+      if f.object.persisted? && f.object.product_images.active.any?
+        div class: "current-additional-images" do
+          h4 "Ảnh bổ sung hiện tại:"
+          f.object.product_images.active.ordered.each do |product_image|
+            if product_image.persisted? && product_image.image.attached?
+              div class: "additional-image-item", style: "display: inline-block; margin: 10px; text-align: center; border: 1px solid #ddd; padding: 10px; border-radius: 5px;" do
+                image_tag product_image.image, style: "width: 100px; height: 100px; object-fit: cover;"
+                div class: "image-info" do
+                  p "Vị trí: #{product_image.position}"
+                  p "Trạng thái: #{product_image.is_active ? 'Kích hoạt' : 'Không kích hoạt'}"
+                end
+              end
+            end
+          end
+        end
       end
     end
 
@@ -127,7 +153,7 @@ ActiveAdmin.register Product do
     attributes_table do
       row :id
       row "Ảnh chính" do |product|
-        if product.main_image
+        if product.persisted? && product.main_image && product.main_image.attached?
           image_tag product.main_image, style: "width: 200px; height: 200px; object-fit: cover;"
         else
           "Không có ảnh"
@@ -157,8 +183,6 @@ ActiveAdmin.register Product do
       row :is_preorder
       row :preorder_quantity
       row :preorder_end_date
-      row :meta_title
-      row :meta_description
       row :view_count
       row :created_at
       row :updated_at
@@ -166,22 +190,28 @@ ActiveAdmin.register Product do
 
     if resource.has_images?
       panel "Thư viện ảnh" do
-        if resource.main_image.attached?
-          div class: "main-image" do
+        if resource.persisted? && resource.main_image.attached?
+          div class: "main-image-show" do
             h3 "Ảnh chính:"
-            image_tag resource.main_image, style: "width: 200px; height: 200px; object-fit: cover; margin: 10px;"
+            div class: "main-image-container" do
+              image_tag resource.main_image, style: "width: 250px; height: 250px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);"
+            end
           end
         end
         
         if resource.product_images.active.any?
-          div class: "gallery-images" do
+          div class: "gallery-images-show" do
             h3 "Ảnh bổ sung:"
-            resource.product_images.active.ordered.each do |product_image|
-              div class: "gallery-image", style: "display: inline-block; margin: 10px; text-align: center;" do
-                image_tag product_image.image, style: "width: 150px; height: 150px; object-fit: cover;"
-                div class: "image-meta" do
-                  span "Vị trí: #{product_image.position} | "
-                  span product_image.is_active ? "Kích hoạt" : "Không kích hoạt", class: "status_tag #{product_image.is_active ? 'ok' : 'error'}"
+            div class: "gallery-grid" do
+              resource.product_images.active.ordered.each do |product_image|
+                if product_image.persisted? && product_image.image.attached?
+                  div class: "gallery-item" do
+                    image_tag product_image.image, style: "width: 180px; height: 180px; object-fit: cover; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+                    div class: "item-meta" do
+                      span "Vị trí: #{product_image.position} | "
+                      span product_image.is_active ? "Kích hoạt" : "Không kích hoạt", class: "status_tag #{product_image.is_active ? 'ok' : 'error'}"
+                    end
+                  end
                 end
               end
             end
@@ -242,7 +272,7 @@ ActiveAdmin.register Product do
 
   # Action items
   action_item :view_product, only: :show do
-    link_to "Xem sản phẩm", product_path(resource), target: "_blank"
+    link_to "Xem sản phẩm", "/products/#{resource.slug}", target: "_blank"
   end
 
   # Sidebar thống kê
@@ -263,9 +293,13 @@ ActiveAdmin.register Product do
     def create
       @product = Product.new(permitted_params[:product])
       
+      # Debug logging
+      Rails.logger.info "Creating product with params: #{permitted_params[:product].inspect}"
+      
       if @product.save
         redirect_to resource_path(@product), notice: "Đã tạo sản phẩm thành công"
       else
+        Rails.logger.error "Failed to create product: #{@product.errors.full_messages}"
         render :new
       end
     end
@@ -273,11 +307,148 @@ ActiveAdmin.register Product do
     def update
       @product = Product.find(params[:id])
       
+      # Debug logging
+      Rails.logger.info "Updating product with params: #{permitted_params[:product].inspect}"
+      
       if @product.update(permitted_params[:product])
         redirect_to resource_path(@product), notice: "Đã cập nhật sản phẩm thành công"
       else
+        Rails.logger.error "Failed to update product: #{@product.errors.full_messages}"
         render :edit
       end
+    end
+  end
+
+
+
+  # CSS styles cho preview ảnh
+  config do
+    stylesheet do
+      %Q{
+        <style>
+          .image-preview {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            border-left: 3px solid #007cba;
+          }
+          
+          .image-preview h5 {
+            margin: 0 0 10px 0;
+            color: #007cba;
+            font-size: 14px;
+          }
+          
+          .current-additional-images {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+          }
+          
+          .current-additional-images h4 {
+            margin: 0 0 15px 0;
+            color: #333;
+            border-bottom: 2px solid #007cba;
+            padding-bottom: 5px;
+          }
+          
+          .additional-image-item {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+          }
+          
+          .additional-image-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+          }
+          
+          .image-info p {
+            margin: 2px 0;
+            font-size: 12px;
+            color: #666;
+          }
+          
+          .current-main-image {
+            margin: 15px 0;
+            padding: 15px;
+            background: #e8f4fd;
+            border-radius: 8px;
+            border: 1px solid #007cba;
+          }
+          
+          .current-main-image h4 {
+            margin: 0 0 10px 0;
+            color: #007cba;
+          }
+          
+          .main-image-show {
+            margin: 20px 0;
+            padding: 20px;
+            background: #e8f4fd;
+            border-radius: 10px;
+            border: 2px solid #007cba;
+          }
+          
+          .main-image-show h3 {
+            margin: 0 0 15px 0;
+            color: #007cba;
+            font-size: 18px;
+            border-bottom: 2px solid #007cba;
+            padding-bottom: 8px;
+          }
+          
+          .main-image-container {
+            text-align: center;
+          }
+          
+          .gallery-images-show {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+          }
+          
+          .gallery-images-show h3 {
+            margin: 0 0 20px 0;
+            color: #495057;
+            font-size: 18px;
+            border-bottom: 2px solid #6c757d;
+            padding-bottom: 8px;
+          }
+          
+          .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+          }
+          
+          .gallery-item {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+          }
+          
+          .gallery-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+          }
+          
+          .item-meta {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #6c757d;
+          }
+        </style>
+      }
     end
   end
 end

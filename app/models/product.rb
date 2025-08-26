@@ -13,6 +13,9 @@ class Product < ApplicationRecord
 
   # Active Storage for main image
   has_one_attached :main_image
+  
+  # Active Storage for multiple images (if needed)
+  has_many_attached :images
 
   # Nested attributes
   accepts_nested_attributes_for :product_specifications, 
@@ -77,7 +80,7 @@ class Product < ApplicationRecord
   end
 
   def self.ransackable_attributes(auth_object = nil)
-    %w[id name slug sku short_description brand_id category_id price original_price discount_percent cost_price stock_quantity min_stock_alert is_active is_featured is_new is_hot is_preorder preorder_quantity preorder_end_date warranty_period meta_title meta_description view_count created_at updated_at]
+    %w[id name slug sku short_description brand_id category_id price original_price discount_percent cost_price stock_quantity min_stock_alert is_active is_featured is_new is_hot is_preorder preorder_quantity preorder_end_date warranty_period view_count created_at updated_at]
   end
 
   def self.ransackable_associations(auth_object = nil)

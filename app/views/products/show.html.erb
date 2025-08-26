@@ -1,0 +1,116 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Product Images -->
+    <div>
+      <% if @product.respond_to?(:main_image) && @product.main_image.attached? %>
+        <%= image_tag @product.main_image, class: "w-full rounded-lg shadow-lg" %>
+      <% else %>
+        <div class="w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center">
+          <span class="text-gray-500 text-xl">Không có ảnh</span>
+        </div>
+      <% end %>
+      
+      <% if @product.product_images.any? %>
+        <div class="mt-4 grid grid-cols-4 gap-2">
+          <% @product.product_images.limit(4).each do |image| %>
+            <% if image.image.attached? %>
+              <%= image_tag image.image, class: "w-full h-20 object-cover rounded cursor-pointer" %>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+    
+    <!-- Product Info -->
+    <div>
+      <h1 class="text-3xl font-bold mb-4"><%= @product.name %></h1>
+      
+      <div class="mb-4">
+        <span class="text-2xl font-bold text-blue-600">
+          <%= number_to_currency(@product.price, unit: "₫", precision: 0) %>
+        </span>
+        <% if @product.original_price && @product.original_price > @product.price %>
+          <span class="text-lg text-gray-500 line-through ml-2">
+            <%= number_to_currency(@product.original_price, unit: "₫", precision: 0) %>
+          </span>
+        <% end %>
+      </div>
+      
+      <div class="mb-6">
+        <p class="text-gray-700"><%= @product.short_description %></p>
+      </div>
+      
+      <div class="mb-6">
+        <h3 class="font-semibold mb-2">Thông tin sản phẩm:</h3>
+        <ul class="space-y-2 text-sm text-gray-600">
+          <li><strong>SKU:</strong> <%= @product.sku %></li>
+          <li><strong>Thương hiệu:</strong> <%= @product.brand&.name %></li>
+          <li><strong>Danh mục:</strong> <%= @product.category&.name %></li>
+          <li><strong>Tình trạng:</strong> 
+            <% if @product.stock_quantity > 0 %>
+              <span class="text-green-600">Còn hàng</span>
+            <% else %>
+              <span class="text-red-600">Hết hàng</span>
+            <% end %>
+          </li>
+        </ul>
+      </div>
+      
+      <div class="mb-6">
+        <h3 class="font-semibold mb-2">Mô tả chi tiết:</h3>
+        <% @product.product_descriptions.active.ordered.each do |desc| %>
+          <div class="mb-4">
+            <h4 class="font-medium text-lg mb-2"><%= desc.title %></h4>
+            <div class="prose max-w-none"><%= desc.content.html_safe %></div>
+          </div>
+        <% end %>
+      </div>
+      
+      <% if @product.product_specifications.any? %>
+        <div class="mb-6">
+          <h3 class="font-semibold mb-2">Thông số kỹ thuật:</h3>
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <% @product.product_specifications.active.ordered.each do |spec| %>
+              <div class="flex justify-between py-2 border-b border-gray-200 last:border-b-0">
+                <span class="font-medium"><%= spec.spec_name %></span>
+                <span class="text-gray-600">
+                  <%= spec.spec_value %>
+                  <% if spec.unit.present? %>
+                    <span class="text-sm text-gray-500"><%= spec.unit %></span>
+                  <% end %>
+                </span>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  
+  <!-- Related Products -->
+  <% if @related_products.any? %>
+    <div class="mt-16">
+      <h2 class="text-2xl font-bold mb-6">Sản phẩm liên quan</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <% @related_products.each do |product| %>
+          <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <% if product.respond_to?(:main_image) && product.main_image.attached? %>
+              <%= image_tag product.main_image, class: "w-full h-48 object-cover" %>
+            <% else %>
+              <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                <span class="text-gray-500">Không có ảnh</span>
+              </div>
+            <% end %>
+            
+            <div class="p-4">
+              <h3 class="font-semibold text-lg mb-2"><%= product.name %></h3>
+              <p class="text-xl font-bold text-blue-600"><%= number_to_currency(product.price, unit: "₫", precision: 0) %></p>
+              
+              <%= link_to "Xem chi tiết", product_path(product.slug), class: "mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
