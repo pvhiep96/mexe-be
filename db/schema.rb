@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_08_14_000002) do
+ActiveRecord::Schema[7.2].define(version: 2025_08_24_150001) do
   create_table "active_admin_comments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
@@ -127,6 +127,17 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_14_000002) do
     t.index ["slug"], name: "index_categories_on_slug", unique: true
   end
 
+  create_table "ckeditor_assets", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "data_file_name", null: false
+    t.string "data_content_type"
+    t.integer "data_file_size"
+    t.string "data_fingerprint"
+    t.string "type", limit: 30
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["type"], name: "index_ckeditor_assets_on_type"
+  end
+
   create_table "coupon_usage", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "coupon_id", null: false
     t.bigint "user_id", null: false
@@ -212,14 +223,26 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_14_000002) do
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
-  create_table "product_images", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "product_descriptions", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "product_id", null: false
-    t.string "image_url", null: false
-    t.string "alt_text"
-    t.integer "sort_order", default: 0
-    t.boolean "is_primary", default: false
+    t.string "title"
+    t.text "content"
+    t.integer "position"
+    t.boolean "is_active"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_product_descriptions_on_product_id"
+  end
+
+  create_table "product_images", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "product_id", null: false
+    t.string "alt_text"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "position", null: false
+    t.boolean "is_active", default: true
+    t.index ["is_active"], name: "index_product_images_on_is_active"
+    t.index ["position"], name: "index_product_images_on_position"
     t.index ["product_id"], name: "index_product_images_on_product_id"
   end
 
@@ -243,9 +266,13 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_14_000002) do
     t.bigint "product_id", null: false
     t.string "spec_name", null: false
     t.text "spec_value", null: false
-    t.integer "sort_order", default: 0
+    t.integer "position", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "unit"
+    t.boolean "is_active", default: true
+    t.index ["is_active"], name: "index_product_specifications_on_is_active"
+    t.index ["position"], name: "index_product_specifications_on_position"
     t.index ["product_id"], name: "index_product_specifications_on_product_id"
   end
 
@@ -265,7 +292,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_14_000002) do
     t.string "name", null: false
     t.string "slug", null: false
     t.string "sku"
-    t.text "description"
     t.string "short_description"
     t.bigint "brand_id"
     t.bigint "category_id"
@@ -273,8 +299,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_14_000002) do
     t.decimal "original_price", precision: 10, scale: 2
     t.decimal "discount_percent", precision: 5, scale: 2, default: "0.0"
     t.decimal "cost_price", precision: 10, scale: 2
-    t.decimal "weight", precision: 8, scale: 2
-    t.string "dimensions"
     t.integer "stock_quantity", default: 0
     t.integer "min_stock_alert", default: 10
     t.boolean "is_active", default: true
@@ -387,6 +411,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_14_000002) do
   add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "products"
   add_foreign_key "orders", "users"
+  add_foreign_key "product_descriptions", "products"
   add_foreign_key "product_images", "products"
   add_foreign_key "product_reviews", "orders"
   add_foreign_key "product_reviews", "products"

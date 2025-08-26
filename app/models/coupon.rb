@@ -17,4 +17,13 @@ class Coupon < ApplicationRecord
 
   scope :active, -> { where(is_active: true) }
   scope :valid, -> { where('valid_from <= ? AND valid_until >= ?', Time.current, Time.current) }
+
+  # Ransack configuration for Active Admin
+  def self.ransackable_attributes(auth_object = nil)
+    %w[id code name description discount_type discount_value min_order_amount max_usage_per_user max_total_usage valid_from valid_until is_active created_at updated_at]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w[coupon_usages users orders]
+  end
 end 

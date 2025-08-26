@@ -194,7 +194,7 @@ ActiveAdmin.setup do |config|
   #
   # Set the default locale for Active Admin
   #
-  config.default_locale = :vi
+  # config.default_locale = :vi
 
   # == Setting a Favicon
   #

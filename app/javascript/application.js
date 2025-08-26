@@ -4,3 +4,7 @@ import "controllers"
 
 // Font Awesome for Arctic Admin
 import "@fortawesome/fontawesome-free/css/all.css"
+
+// CKEditor
+import "ckeditor"
+import "./ckeditor_init"

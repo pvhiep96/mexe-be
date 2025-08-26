@@ -1,10 +1,10 @@
-class ProductImage < ApplicationRecord
+class ProductDescription < ApplicationRecord
   belongs_to :product
-  has_one_attached :image
 
+  validates :title, presence: true
+  validates :content, presence: true
   validates :position, presence: true, numericality: { only_integer: true, greater_than: 0 }
   validates :is_active, inclusion: { in: [true, false] }
-  validates :image, presence: true
 
   scope :active, -> { where(is_active: true) }
   scope :ordered, -> { order(position: :asc) }
@@ -14,7 +14,7 @@ class ProductImage < ApplicationRecord
 
   # Ransack configuration for Active Admin
   def self.ransackable_attributes(auth_object = nil)
-    %w[id position is_active created_at updated_at]
+    %w[id title content position is_active created_at updated_at]
   end
 
   def self.ransackable_associations(auth_object = nil)
@@ -25,8 +25,8 @@ class ProductImage < ApplicationRecord
 
   def set_default_position
     if position.blank?
-      max_position = product.product_images.maximum(:position) || 0
+      max_position = product.product_descriptions.maximum(:position) || 0
       self.position = max_position + 1
     end
   end
-end 
+end
