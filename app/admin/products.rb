@@ -403,7 +403,7 @@ ActiveAdmin.register Product do
       li "Sản phẩm kích hoạt: #{Product.where(is_active: true).count}"
       li "Sản phẩm nổi bật: #{Product.where(is_featured: true).count}"
       li "Sản phẩm mới: #{Product.where(is_new: true).count}"
-      li "Sản phẩm có ảnh: #{Product.joins(:product_images).distinct.count}"
+      li "Sản phẩm có ảnh: #{Product.where('main_image IS NOT NULL OR images IS NOT NULL AND JSON_LENGTH(images) > 0').count}"
       li "Sản phẩm có mô tả: #{Product.joins(:product_descriptions).distinct.count}"
       li "Sản phẩm có thông số: #{Product.joins(:product_specifications).distinct.count}"
     end

@@ -13,7 +13,6 @@ RUN apt-get update -qq && \
     curl \
     libjemalloc2 \
     libvips \
-    imagemagick \
     && rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Set working directory
@@ -33,8 +32,8 @@ COPY . .
 
 # Add a script to be executed every time the container starts
 COPY entrypoint.sh /usr/bin/
-# RUN chmod +x /usr/bin/entrypoint.sh
-# ENTRYPOINT ["entrypoint.sh"]
+RUN chmod +x /usr/bin/entrypoint.sh
+ENTRYPOINT ["entrypoint.sh"]
 
 # Configure the main process to run when running the image
 EXPOSE 3000

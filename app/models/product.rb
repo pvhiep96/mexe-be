@@ -4,7 +4,7 @@ class Product < ApplicationRecord
   has_many :product_specifications, dependent: :destroy
   has_many :product_variants, dependent: :destroy
   has_many :product_descriptions, dependent: :destroy
-  has_many :product_images, dependent: :destroy
+
   has_many :order_items, dependent: :destroy
   has_many :wishlists, dependent: :destroy
   has_many :wished_by_users, through: :wishlists, source: :user

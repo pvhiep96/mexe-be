@@ -20,7 +20,7 @@ module Api
             id: item.id,
             product_id: item.product.id,
             product_name: item.product.name,
-            product_image: item.product.product_images.first&.image_url,
+            product_image: item.product.main_image,
             product_price: item.product.price,
             added_at: item.created_at
           }
