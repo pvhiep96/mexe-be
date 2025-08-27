@@ -194,7 +194,7 @@ ActiveAdmin.setup do |config|
   #
   # Set the default locale for Active Admin
   #
-  config.default_locale = :vi
+  # config.default_locale = :vi
 
   # == Setting a Favicon
   #
@@ -365,4 +365,5 @@ ActiveAdmin.setup do |config|
   # You can switch to using Webpacker here.
   #
   # config.use_webpacker = true
+
 end

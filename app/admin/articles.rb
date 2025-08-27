@@ -1,4 +1,6 @@
 ActiveAdmin.register Article do
+
+
   permit_params :title, :slug, :excerpt, :content, :featured_image, :author, :category, :tags, 
                 :status, :published_at, :view_count, :meta_title, :meta_description
 
@@ -7,6 +9,13 @@ ActiveAdmin.register Article do
   index do
     selectable_column
     id_column
+    column "Ảnh" do |article|
+      if article.featured_image.attached?
+        image_tag article.featured_image, style: "width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"
+      else
+        "Không có ảnh"
+      end
+    end
     column "Tiêu đề", :title
     column "Tác giả", :author
     column "Danh mục", :category
@@ -30,7 +39,17 @@ ActiveAdmin.register Article do
       f.input :slug, label: "Đường dẫn"
       f.input :excerpt, label: "Tóm tắt"
       f.input :content, as: :text, label: "Nội dung"
-      f.input :featured_image, label: "Hình ảnh nổi bật"
+      f.input :featured_image, label: "Hình ảnh nổi bật", as: :file,
+              hint: "Chọn ảnh nổi bật cho bài viết (JPG, PNG, GIF, tối đa 5MB)",
+              input_html: { accept: 'image/*' }
+      
+      if f.object.featured_image.attached?
+        div style: "margin: 15px 0; padding: 15px; background: #e8f4fd; border-radius: 8px; border: 1px solid #007cba;" do
+          h4 "Ảnh nổi bật hiện tại:", style: "margin: 0 0 10px 0; color: #007cba;"
+          image_tag f.object.featured_image, style: "max-width: 200px; max-height: 150px; object-fit: cover; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+        end
+      end
+      
       f.input :author, label: "Tác giả"
       f.input :category, label: "Danh mục"
       f.input :tags, label: "Thẻ"
@@ -49,7 +68,13 @@ ActiveAdmin.register Article do
       row "Đường dẫn", :slug
       row "Tóm tắt", :excerpt
       row "Nội dung", :content
-      row "Hình ảnh nổi bật", :featured_image
+      row "Hình ảnh nổi bật" do |article|
+        if article.featured_image.attached?
+          image_tag article.featured_image, style: "max-width: 300px; max-height: 200px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+        else
+          "Không có ảnh"
+        end
+      end
       row "Tác giả", :author
       row "Danh mục", :category
       row "Thẻ", :tags

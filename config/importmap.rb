@@ -8,3 +8,6 @@ pin_all_from "app/javascript/controllers", under: "controllers"
 
 # Font Awesome for Arctic Admin
 pin "@fortawesome/fontawesome-free", to: "https://ga.jspm.io/npm:@fortawesome/fontawesome-free@7.0.0/js/all.js"
+
+# CKEditor
+pin "ckeditor", to: "https://ga.jspm.io/npm:ckeditor@4.22.1/ckeditor.js"

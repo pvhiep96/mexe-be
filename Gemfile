@@ -35,6 +35,9 @@ gem "devise"
 gem "sassc-rails"
 gem "arctic_admin"
 
+# CKEditor for rich text editing
+gem "ckeditor"
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 
@@ -42,7 +45,9 @@ gem "tzinfo-data", platforms: %i[ windows jruby ]
 gem "bootsnap", require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-# gem "image_processing", "~> 1.2"
+gem "image_processing", "~> 1.2"
+gem "carrierwave", "~> 3.0"
+gem "mini_magick", "~> 4.12"
 gem 'active_model_serializers', '~> 0.10.14'# For JSON serialization
 
 
