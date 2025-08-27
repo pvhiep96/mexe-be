@@ -5,10 +5,9 @@ ActiveAdmin.register Product do
                 :price, :original_price, :discount_percent, :cost_price, 
                 :stock_quantity, :min_stock_alert, :is_active, :is_featured, :is_new, :is_hot, 
                 :is_preorder, :preorder_quantity, :preorder_end_date, :warranty_period, 
-                :view_count, :main_image,
+                :view_count, :main_image, { images: [] },
                 product_specifications_attributes: [:id, :spec_name, :spec_value, :unit, :position, :is_active, :_destroy],
-                product_descriptions_attributes: [:id, :title, :content, :position, :is_active, :_destroy],
-                product_images_attributes: [:id, :image, :position, :is_active, :_destroy]
+                product_descriptions_attributes: [:id, :title, :content, :position, :is_active, :_destroy]
 
   menu label: "Sản phẩm"
 
@@ -16,8 +15,8 @@ ActiveAdmin.register Product do
     selectable_column
     id_column
     column "Ảnh" do |product|
-      if product.persisted? && product.main_image && product.main_image.attached?
-        image_tag product.main_image, style: "width: 50px; height: 50px; object-fit: cover;"
+      if product.persisted? && product.main_image.present?
+        image_tag product.main_image.url(:thumb), style: "width: 50px; height: 50px; object-fit: cover;"
       else
         "Không có ảnh"
       end
@@ -48,14 +47,15 @@ ActiveAdmin.register Product do
   filter :created_at
 
   form html: { multipart: true } do |f|
-    f.inputs "Thông tin sản phẩm" do
+    # Main form inputs using same layout as show page
+    f.inputs do
       f.input :name, label: "Tên sản phẩm"
       f.input :slug, label: "Đường dẫn"
       f.input :sku, label: "Mã SKU"
       f.input :brand, label: "Thương hiệu"
       f.input :category, label: "Danh mục"
-      f.input :short_description, label: "Mô tả ngắn"
-      f.input :price, label: "Giá"
+      f.input :short_description, label: "Mô tả ngắn", input_html: { rows: 3 }
+      f.input :price, label: "Giá bán"
       f.input :original_price, label: "Giá gốc"
       f.input :discount_percent, label: "Phần trăm giảm giá"
       f.input :cost_price, label: "Giá vốn"
@@ -69,48 +69,162 @@ ActiveAdmin.register Product do
       f.input :is_preorder, label: "Đặt trước"
       f.input :preorder_quantity, label: "Số lượng đặt trước"
       f.input :preorder_end_date, label: "Ngày kết thúc đặt trước"
+      f.input :view_count, label: "Lượt xem"
     end
 
-    f.inputs "Quản lý ảnh sản phẩm" do
-      f.input :main_image, label: "Ảnh chính", as: :file, 
-              hint: "Chọn ảnh chính cho sản phẩm (JPG, PNG, GIF, tối đa 5MB)",
-              input_html: { accept: 'image/*' }
-      
-      if f.object.persisted? && f.object.main_image.attached?
-        div class: "current-main-image" do
-          h4 "Ảnh chính hiện tại:"
-          image_tag f.object.main_image, style: "width: 150px; height: 150px; object-fit: cover; margin: 10px;"
+    # Image management panel - same style as show page
+    panel "Thư viện ảnh" do
+      # Hướng dẫn sử dụng
+      div class: "image-upload-guide" do
+        h4 "📖 Hướng dẫn upload ảnh"
+        ul do
+          li "🖼️ **Ảnh chính**: Ảnh đại diện chính của sản phẩm, hiển thị trong danh sách và trang chi tiết"
+          li "📸 **Ảnh bổ sung**: Thêm nhiều góc nhìn khác nhau về sản phẩm"
+          li "📏 **Kích thước khuyến nghị**: Tối thiểu 600x600px, tỷ lệ vuông (1:1) cho đẹp nhất"
+          li "💾 **Định dạng hỗ trợ**: JPG, PNG, GIF. Dung lượng tối đa: 5MB/ảnh"
+          li "🔢 **Vị trí**: Số nhỏ hiển thị trước. Để trống = tự động sắp xếp"
+          li "✅ **Kích hoạt**: Chỉ ảnh được kích hoạt mới hiển thị trên website"
         end
       end
+
+      f.input :main_image, label: "Ảnh chính", as: :file, 
+              hint: "Chọn ảnh chính cho sản phẩm (JPG, PNG, GIF, tối đa 5MB)",
+              input_html: { accept: 'image/*', id: 'main_image_input' }
       
-      f.has_many :product_images, allow_destroy: true, new_record: "Thêm ảnh khác" do |img|
-        img.input :image, label: "Chọn ảnh", as: :file, 
-                  hint: "Chọn ảnh bổ sung (JPG, PNG, GIF, tối đa 5MB)",
-                  input_html: { accept: 'image/*' }
-        img.input :position, label: "Vị trí", 
-                  hint: "Số càng nhỏ càng hiển thị trước (để trống để tự động)"
-        img.input :is_active, label: "Kích hoạt"
-        
-        # Preview ảnh đã upload (chỉ hiển thị cho record đã lưu)
-        if img.object.persisted? && img.object.image.attached?
-          div class: "image-preview" do
-            h5 "Preview ảnh:"
-            image_tag img.object.image, style: "width: 120px; height: 120px; object-fit: cover; margin: 5px; border: 1px solid #ddd; border-radius: 4px;"
+      # Preview container for new main image
+      div id: "main_image_preview", class: "main-image-preview", style: "display: none; margin: 15px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6;" do
+        h4 "Preview ảnh chính mới:"
+        div id: "main_image_preview_container", class: "main-image-container"
+      end
+      
+      if f.object.persisted? && f.object.main_image.present?
+        div class: "main-image-show" do
+          h3 "Ảnh chính:"
+          div class: "main-image-container" do
+            image_tag f.object.main_image.url(:large), style: "width: 250px; height: 250px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);"
+          end
+          div class: "image-actions", style: "margin-top: 10px; text-align: center;" do
+            link_to "🗑️ Xóa ảnh chính", delete_main_image_admin_product_path(f.object), 
+                    method: :delete, 
+                    confirm: "Bạn có chắc chắn muốn xóa ảnh chính?",
+                    class: "btn btn-danger btn-sm"
           end
         end
       end
       
-      # Hiển thị tất cả ảnh bổ sung hiện tại
-      if f.object.persisted? && f.object.product_images.active.any?
-        div class: "current-additional-images" do
-          h4 "Ảnh bổ sung hiện tại:"
-          f.object.product_images.active.ordered.each do |product_image|
-            if product_image.persisted? && product_image.image.attached?
-              div class: "additional-image-item", style: "display: inline-block; margin: 10px; text-align: center; border: 1px solid #ddd; padding: 10px; border-radius: 5px;" do
-                image_tag product_image.image, style: "width: 100px; height: 100px; object-fit: cover;"
-                div class: "image-info" do
-                  p "Vị trí: #{product_image.position}"
-                  p "Trạng thái: #{product_image.is_active ? 'Kích hoạt' : 'Không kích hoạt'}"
+      # Multiple images upload
+      div class: "multiple-images-upload" do
+        h4 "📷 Upload nhiều ảnh bổ sung"
+        
+        f.input :images, label: false, as: :file,
+                hint: raw("
+                  <div class='upload-hint'>
+                    <strong>💡 Hướng dẫn:</strong><br>
+                    🔹 Giữ <kbd>Ctrl</kbd> (Windows) hoặc <kbd>Cmd</kbd> (Mac) để chọn nhiều ảnh<br>
+                    🔹 Hoặc kéo thả nhiều file vào khung upload<br>
+                    🔹 Định dạng: JPG, PNG, GIF | Kích thước: tối đa 5MB/ảnh<br>
+                    🔹 Khuyến nghị: 600x600px trở lên cho chất lượng tốt nhất
+                  </div>
+                "),
+                input_html: { 
+                  multiple: true, 
+                  accept: 'image/*',
+                  title: "Chọn nhiều ảnh để upload cùng lúc",
+                  id: 'multiple_images_input'
+                }
+        
+        # Preview container for multiple images
+        div id: "multiple_images_preview", class: "multiple-images-preview", style: "display: none; margin: 15px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6;" do
+          h4 "Preview ảnh bổ sung mới:"
+          div id: "multiple_images_preview_container", class: "gallery-grid", style: "gap: 10px;"
+        end
+        
+        # JavaScript để hiển thị preview ảnh
+        script do
+          raw("
+            document.addEventListener('DOMContentLoaded', function() {
+              
+              // Preview for main image
+              const mainImageInput = document.getElementById('main_image_input');
+              if (mainImageInput) {
+                mainImageInput.addEventListener('change', function(e) {
+                  const file = e.target.files[0];
+                  const preview = document.getElementById('main_image_preview');
+                  const container = document.getElementById('main_image_preview_container');
+                  
+                  if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                      container.innerHTML = '<img src=\"' + e.target.result + '\" style=\"width: 250px; height: 250px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);\" />';
+                      preview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                  } else {
+                    preview.style.display = 'none';
+                    container.innerHTML = '';
+                  }
+                });
+              }
+              
+              // Preview for multiple images
+              const multipleImagesInput = document.getElementById('multiple_images_input');
+              if (multipleImagesInput) {
+                multipleImagesInput.addEventListener('change', function(e) {
+                  const files = e.target.files;
+                  const preview = document.getElementById('multiple_images_preview');
+                  const container = document.getElementById('multiple_images_preview_container');
+                  
+                  if (files.length > 0) {
+                    let html = '';
+                    let loadedCount = 0;
+                    
+                    for (let i = 0; i < files.length; i++) {
+                      if (files[i].type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                          html += '<div class=\"gallery-item\" style=\"text-align: center; padding: 10px; background: white; border-radius: 6px; border: 1px solid #dee2e6;\">' +
+                                  '<img src=\"' + e.target.result + '\" style=\"width: 120px; height: 120px; object-fit: cover; border-radius: 4px;\" />' +
+                                  '<div style=\"margin-top: 5px; font-size: 12px; color: #666;\">Ảnh #' + (loadedCount + 1) + '</div>' +
+                                  '</div>';
+                          loadedCount++;
+                          
+                          if (loadedCount === files.length) {
+                            container.innerHTML = html;
+                            preview.style.display = 'block';
+                          }
+                        };
+                        reader.readAsDataURL(files[i]);
+                      }
+                    }
+                  } else {
+                    preview.style.display = 'none';
+                    container.innerHTML = '';
+                  }
+                });
+              }
+              
+            });
+          ")
+        end
+      end
+      
+      # Hiển thị ảnh bổ sung hiện tại - same style as show page
+      if f.object.persisted? && f.object.safe_images.any?
+        div class: "gallery-images-show" do
+          h3 "Ảnh bổ sung:"
+          div class: "gallery-grid" do
+            f.object.safe_images.each_with_index do |image, index|
+              if image.present?
+                div class: "gallery-item" do
+                  div class: "item-meta" do
+                    div class: "main-image-container" do
+                      image_tag image.url(:small), style: "width: 180px; height: 180px; object-fit: cover; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+                    end
+                    div class: "item-meta" do
+                      span "Vị trí: #{index + 1} | "
+                      span "Kích hoạt", class: "status_tag ok"
+                    end
+                  end
                 end
               end
             end
@@ -119,7 +233,8 @@ ActiveAdmin.register Product do
       end
     end
 
-    f.inputs "Quản lý mô tả chi tiết" do
+    # Description management panel - same style as show page
+    panel "Mô tả chi tiết" do
       f.has_many :product_descriptions, allow_destroy: true, new_record: "Thêm mô tả mới" do |desc|
         desc.input :title, label: "Tiêu đề", 
                    hint: "VD: Mô tả sản phẩm, Tính năng nổi bật, Hướng dẫn sử dụng"
@@ -132,7 +247,8 @@ ActiveAdmin.register Product do
       end
     end
 
-    f.inputs "Quản lý thông số kỹ thuật" do
+    # Specifications management panel - same style as show page
+    panel "Thông số kỹ thuật" do
       f.has_many :product_specifications, allow_destroy: true, new_record: "Thêm thông số mới" do |spec|
         spec.input :spec_name, label: "Tên thông số", 
                    hint: "VD: Trọng lượng, Kích thước, Chất liệu, Màu sắc, Trọng lượng tịnh"
@@ -153,8 +269,8 @@ ActiveAdmin.register Product do
     attributes_table do
       row :id
       row "Ảnh chính" do |product|
-        if product.persisted? && product.main_image && product.main_image.attached?
-          image_tag product.main_image, style: "width: 200px; height: 200px; object-fit: cover;"
+        if product.persisted? && product.main_image.present?
+          image_tag product.main_image.url(:medium), style: "width: 200px; height: 200px; object-fit: cover;"
         else
           "Không có ảnh"
         end
@@ -190,26 +306,30 @@ ActiveAdmin.register Product do
 
     if resource.has_images?
       panel "Thư viện ảnh" do
-        if resource.persisted? && resource.main_image.attached?
+        if resource.persisted? && resource.main_image.present?
           div class: "main-image-show" do
             h3 "Ảnh chính:"
             div class: "main-image-container" do
-              image_tag resource.main_image, style: "width: 250px; height: 250px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);"
+              image_tag resource.main_image.url(:large), style: "width: 250px; height: 250px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);"
             end
           end
         end
         
-        if resource.product_images.active.any?
+        if resource.safe_images.any?
           div class: "gallery-images-show" do
             h3 "Ảnh bổ sung:"
             div class: "gallery-grid" do
-              resource.product_images.active.ordered.each do |product_image|
-                if product_image.persisted? && product_image.image.attached?
+              resource.safe_images.each_with_index do |image, index|
+                if image.present?
                   div class: "gallery-item" do
-                    image_tag product_image.image, style: "width: 180px; height: 180px; object-fit: cover; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
                     div class: "item-meta" do
-                      span "Vị trí: #{product_image.position} | "
-                      span product_image.is_active ? "Kích hoạt" : "Không kích hoạt", class: "status_tag #{product_image.is_active ? 'ok' : 'error'}"
+                      div class: "main-image-container" do
+                        image_tag image.url(:small), style: "width: 180px; height: 180px; object-fit: cover; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+                      end
+                      div class: "item-meta" do
+                        span "Vị trí: #{index + 1} | "
+                        span "Kích hoạt", class: "status_tag ok"
+                      end
                     end
                   end
                 end
@@ -262,8 +382,9 @@ ActiveAdmin.register Product do
 
   # Member actions để xóa ảnh
   member_action :delete_main_image, method: :delete do
-    if resource.main_image.attached?
-      resource.main_image.purge
+    if resource.main_image.present?
+      resource.remove_main_image!
+      resource.save
       redirect_to resource_path, notice: "Đã xóa ảnh chính"
     else
       redirect_to resource_path, alert: "Không có ảnh chính để xóa"
@@ -291,10 +412,10 @@ ActiveAdmin.register Product do
   # Controller để xử lý upload ảnh và nested attributes
   controller do
     def create
-      @product = Product.new(permitted_params[:product])
-      
       # Debug logging
       Rails.logger.info "Creating product with params: #{permitted_params[:product].inspect}"
+      
+      @product = Product.new(permitted_params[:product])
       
       if @product.save
         redirect_to resource_path(@product), notice: "Đã tạo sản phẩm thành công"
@@ -310,7 +431,26 @@ ActiveAdmin.register Product do
       # Debug logging
       Rails.logger.info "Updating product with params: #{permitted_params[:product].inspect}"
       
-      if @product.update(permitted_params[:product])
+      # Handle images separately to preserve existing images
+      product_params = permitted_params[:product]
+      
+      # If new images are being uploaded, append to existing images instead of replacing
+      if product_params[:images].present? && product_params[:images].any?(&:present?)
+        new_images = product_params[:images].reject(&:blank?)
+        existing_images = @product.images || []
+        
+        # Combine existing and new images
+        combined_images = existing_images + new_images
+        product_params[:images] = combined_images
+        
+        Rails.logger.info "Combined images: existing=#{existing_images.count}, new=#{new_images.count}, total=#{combined_images.count}"
+      elsif product_params[:images].present? && product_params[:images].all?(&:blank?)
+        # If images field is present but all blank, remove it from params to preserve existing images
+        product_params.delete(:images)
+        Rails.logger.info "Removed blank images from params to preserve existing images"
+      end
+      
+      if @product.update(product_params)
         redirect_to resource_path(@product), notice: "Đã cập nhật sản phẩm thành công"
       else
         Rails.logger.error "Failed to update product: #{@product.errors.full_messages}"
@@ -321,134 +461,5 @@ ActiveAdmin.register Product do
 
 
 
-  # CSS styles cho preview ảnh
-  config do
-    stylesheet do
-      %Q{
-        <style>
-          .image-preview {
-            margin: 10px 0;
-            padding: 10px;
-            background: #f9f9f9;
-            border-radius: 5px;
-            border-left: 3px solid #007cba;
-          }
-          
-          .image-preview h5 {
-            margin: 0 0 10px 0;
-            color: #007cba;
-            font-size: 14px;
-          }
-          
-          .current-additional-images {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f5f5f5;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-          }
-          
-          .current-additional-images h4 {
-            margin: 0 0 15px 0;
-            color: #333;
-            border-bottom: 2px solid #007cba;
-            padding-bottom: 5px;
-          }
-          
-          .additional-image-item {
-            background: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
-          }
-          
-          .additional-image-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-          }
-          
-          .image-info p {
-            margin: 2px 0;
-            font-size: 12px;
-            color: #666;
-          }
-          
-          .current-main-image {
-            margin: 15px 0;
-            padding: 15px;
-            background: #e8f4fd;
-            border-radius: 8px;
-            border: 1px solid #007cba;
-          }
-          
-          .current-main-image h4 {
-            margin: 0 0 10px 0;
-            color: #007cba;
-          }
-          
-          .main-image-show {
-            margin: 20px 0;
-            padding: 20px;
-            background: #e8f4fd;
-            border-radius: 10px;
-            border: 2px solid #007cba;
-          }
-          
-          .main-image-show h3 {
-            margin: 0 0 15px 0;
-            color: #007cba;
-            font-size: 18px;
-            border-bottom: 2px solid #007cba;
-            padding-bottom: 8px;
-          }
-          
-          .main-image-container {
-            text-align: center;
-          }
-          
-          .gallery-images-show {
-            margin: 20px 0;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            border: 1px solid #dee2e6;
-          }
-          
-          .gallery-images-show h3 {
-            margin: 0 0 20px 0;
-            color: #495057;
-            font-size: 18px;
-            border-bottom: 2px solid #6c757d;
-            padding-bottom: 8px;
-          }
-          
-          .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-          }
-          
-          .gallery-item {
-            text-align: center;
-            padding: 15px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
-          }
-          
-          .gallery-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-          }
-          
-          .item-meta {
-            margin-top: 10px;
-            font-size: 12px;
-            color: #6c757d;
-          }
-        </style>
-      }
-    end
-  end
+
 end

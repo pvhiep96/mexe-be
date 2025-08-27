@@ -1,6 +1,6 @@
 class ProductsController < ApplicationController
   def index
-    @products = Product.where(is_active: true).includes(:brand, :category, :main_image)
+    @products = Product.where(is_active: true).includes(:brand, :category)
   end
 
   def show
@@ -8,7 +8,7 @@ class ProductsController < ApplicationController
     @related_products = Product.where(category: @product.category, is_active: true)
                               .where.not(id: @product.id)
                               .limit(4)
-                              .includes(:brand, :main_image)
+                              .includes(:brand)
   end
 
   def test

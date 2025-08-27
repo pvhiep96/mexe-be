@@ -11,11 +11,16 @@ class Product < ApplicationRecord
   has_many :product_reviews, dependent: :destroy
   has_many :variants, class_name: 'ProductVariant'
 
-  # Active Storage for main image
-  has_one_attached :main_image
+  # CarrierWave for main image
+  mount_uploader :main_image, ProductMainImageUploader
   
-  # Active Storage for multiple images (if needed)
-  has_many_attached :images
+  # CarrierWave for multiple images - serialize as JSON array
+  mount_uploaders :images, ProductImagesUploader
+  serialize :images, type: Array, coder: JSON
+  
+  # Remove Active Storage associations
+  # has_one_attached :main_image
+  # has_many_attached :images
 
   # Nested attributes
   accepts_nested_attributes_for :product_specifications, 
@@ -24,9 +29,10 @@ class Product < ApplicationRecord
   accepts_nested_attributes_for :product_descriptions, 
                                 allow_destroy: true, 
                                 reject_if: :all_blank
-  accepts_nested_attributes_for :product_images, 
-                                allow_destroy: true, 
-                                reject_if: :all_blank
+  # Remove product_images nested attributes since we're using direct images upload
+  # accepts_nested_attributes_for :product_images, 
+  #                               allow_destroy: true, 
+  #                               reject_if: :all_blank
 
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true
@@ -48,15 +54,29 @@ class Product < ApplicationRecord
 
   # Method để kiểm tra có ảnh không
   def has_images?
-    main_image.attached? || product_images.active.any?
+    main_image.present? || (images.present? && images.any?)
   end
 
   # Method để lấy tất cả ảnh
   def all_images
-    images = []
-    images << main_image if main_image.attached?
-    images += product_images.active.ordered.map(&:image)
-    images
+    all_imgs = []
+    all_imgs << main_image if main_image.present?
+    if images.present? && images.is_a?(Array)
+      all_imgs += images.compact
+    end
+    all_imgs
+  end
+
+  # Method để lấy số lượng ảnh bổ sung
+  def additional_images_count
+    images.present? && images.is_a?(Array) ? images.compact.count : 0
+  end
+
+  # Method để lấy images array safe
+  def safe_images
+    return [] unless images.present?
+    return [] unless images.is_a?(Array)
+    images.compact
   end
 
   # Method để lấy mô tả chính (đầu tiên theo position)
@@ -84,6 +104,6 @@ class Product < ApplicationRecord
   end
 
   def self.ransackable_associations(auth_object = nil)
-    %w[brand category product_specifications product_variants product_descriptions product_images order_items wishlists product_reviews]
+    %w[brand category product_specifications product_variants product_descriptions order_items wishlists product_reviews]
   end
 end

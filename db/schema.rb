@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_08_26_143310) do
+ActiveRecord::Schema[7.2].define(version: 2025_08_26_163812) do
   create_table "active_admin_comments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
@@ -234,18 +234,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_26_143310) do
     t.index ["product_id"], name: "index_product_descriptions_on_product_id"
   end
 
-  create_table "product_images", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.bigint "product_id", null: false
-    t.string "alt_text"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "position", null: false
-    t.boolean "is_active", default: true
-    t.index ["is_active"], name: "index_product_images_on_is_active"
-    t.index ["position"], name: "index_product_images_on_position"
-    t.index ["product_id"], name: "index_product_images_on_product_id"
-  end
-
   create_table "product_reviews", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "product_id", null: false
     t.bigint "user_id", null: false
@@ -314,6 +302,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_26_143310) do
     t.integer "view_count", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "main_image"
+    t.text "images"
     t.index ["brand_id"], name: "index_products_on_brand_id"
     t.index ["category_id"], name: "index_products_on_category_id"
     t.index ["sku"], name: "index_products_on_sku", unique: true
@@ -412,7 +402,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_26_143310) do
   add_foreign_key "order_items", "products"
   add_foreign_key "orders", "users"
   add_foreign_key "product_descriptions", "products"
-  add_foreign_key "product_images", "products"
   add_foreign_key "product_reviews", "orders"
   add_foreign_key "product_reviews", "products"
   add_foreign_key "product_reviews", "users"
