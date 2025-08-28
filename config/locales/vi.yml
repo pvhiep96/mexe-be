@@ -1,0 +1,235 @@
+vi:
+  # Common translations
+  common:
+    actions: "Hành động"
+    edit: "Chỉnh sửa"
+    delete: "Xóa"
+    view: "Xem"
+    new: "Tạo mới"
+    save: "Lưu"
+    cancel: "Hủy"
+    back: "Quay lại"
+    confirm: "Xác nhận"
+    yes: "Có"
+    no: "Không"
+    search: "Tìm kiếm"
+    filter: "Bộ lọc"
+    clear: "Xóa"
+    apply: "Áp dụng"
+    loading: "Đang tải..."
+    error: "Lỗi"
+    success: "Thành công"
+    warning: "Cảnh báo"
+    info: "Thông tin"
+    
+  # Date and time formats
+  date:
+    formats:
+      default: "%d/%m/%Y"
+      short: "%d/%m"
+      long: "%d/%m/%Y %H:%M"
+      month_day: "%d/%m"
+      year_month: "%m/%Y"
+    day_names: [Chủ nhật, Thứ hai, Thứ ba, Thứ tư, Thứ năm, Thứ sáu, Thứ bảy]
+    abbr_day_names: [CN, T2, T3, T4, T5, T6, T7]
+    month_names: [~, Tháng 1, Tháng 2, Tháng 3, Tháng 4, Tháng 5, Tháng 6, Tháng 7, Tháng 8, Tháng 9, Tháng 10, Tháng 11, Tháng 12]
+    abbr_month_names: [~, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12]
+    order:
+      - :day
+      - :month
+      - :year
+  
+  time:
+    formats:
+      default: "%H:%M %d/%m/%Y"
+      short: "%H:%M"
+      long: "%H:%M %d/%m/%Y"
+      time_only: "%H:%M"
+    am: "sáng"
+    pm: "chiều"
+  
+  # Number formats
+  number:
+    currency:
+      format:
+        unit: "₫"
+        precision: 0
+        separator: "."
+        delimiter: ","
+        format: "%u%n"
+  
+  # Pagination
+  pagination:
+    previous: "Trước"
+    next: "Tiếp"
+    first: "Đầu"
+    last: "Cuối"
+    per_page: "Mỗi trang"
+    showing: "Hiển thị"
+    of: "trong tổng số"
+    entries: "bản ghi"
+    no_entries: "Không có bản ghi nào"
+  
+  # Messages
+  messages:
+    created: "%{resource_name} đã được tạo thành công."
+    updated: "%{resource_name} đã được cập nhật thành công."
+    deleted: "%{resource_name} đã được xóa thành công."
+    destroy_confirmation: "Bạn có chắc chắn muốn xóa %{resource_name} này không?"
+    empty: "Không có %{resource_name} nào."
+    empty_list: "Danh sách trống"
+    not_found: "Không tìm thấy %{resource_name}"
+    access_denied: "Bạn không có quyền truy cập vào trang này"
+    invalid: "Dữ liệu không hợp lệ"
+    saved: "Đã lưu thành công"
+    save_failed: "Lưu thất bại"
+    
+  # Boolean values
+  boolean:
+    true: "Có"
+    false: "Không"
+    
+  # Status
+  status:
+    active: "Kích hoạt"
+    inactive: "Không kích hoạt"
+    enabled: "Bật"
+    disabled: "Tắt"
+    published: "Đã xuất bản"
+    draft: "Bản nháp"
+    pending: "Chờ xử lý"
+    processing: "Đang xử lý"
+    completed: "Hoàn thành"
+    cancelled: "Đã hủy"
+    
+  # Navigation
+  navigation:
+    home: "Trang chủ"
+    dashboard: "Bảng điều khiển"
+    products: "Sản phẩm"
+    categories: "Danh mục"
+    brands: "Thương hiệu"
+    orders: "Đơn hàng"
+    users: "Người dùng"
+    articles: "Bài viết"
+    settings: "Cài đặt"
+    profile: "Hồ sơ"
+    logout: "Đăng xuất"
+    login: "Đăng nhập"
+    register: "Đăng ký"
+    
+  # Forms
+  forms:
+    inputs: "Thông tin"
+    actions: "Hành động"
+    submit: "Gửi"
+    cancel: "Hủy"
+    back: "Quay lại"
+    required: "Bắt buộc"
+    optional: "Tùy chọn"
+    select_option: "Chọn tùy chọn"
+    select_all: "Chọn tất cả"
+    deselect_all: "Bỏ chọn tất cả"
+    
+  # Tables
+  tables:
+    selectable_column: "Chọn"
+    id_column: "ID"
+    actions: "Hành động"
+    no_data: "Không có dữ liệu"
+    loading: "Đang tải dữ liệu..."
+    empty: "Không có bản ghi nào"
+    
+  # Filters
+  filters:
+    title: "Bộ lọc"
+    clear: "Xóa bộ lọc"
+    apply: "Áp dụng"
+    search: "Tìm kiếm"
+    date_range: "Khoảng thời gian"
+    price_range: "Khoảng giá"
+    category: "Danh mục"
+    brand: "Thương hiệu"
+    status: "Trạng thái"
+    active: "Kích hoạt"
+    inactive: "Không kích hoạt"
+    
+  # Sidebar
+  sidebar:
+    filters: "Bộ lọc"
+    search: "Tìm kiếm"
+    actions: "Hành động"
+    details: "Chi tiết"
+    navigation: "Điều hướng"
+    settings: "Cài đặt"
+    
+  # Footer
+  footer:
+    copyright: "© 2024 Mexe. Tất cả quyền được bảo lưu."
+    powered_by: "Được phát triển bởi"
+    version: "Phiên bản"
+    
+  # Errors
+  errors:
+    not_found: "Không tìm thấy"
+    unauthorized: "Không có quyền truy cập"
+    forbidden: "Bị cấm"
+    internal_server_error: "Lỗi máy chủ nội bộ"
+    bad_request: "Yêu cầu không hợp lệ"
+    unprocessable_entity: "Không thể xử lý yêu cầu"
+    too_many_requests: "Quá nhiều yêu cầu"
+    service_unavailable: "Dịch vụ không khả dụng"
+    
+  # Success messages
+  success:
+    created: "Tạo thành công"
+    updated: "Cập nhật thành công"
+    deleted: "Xóa thành công"
+    saved: "Lưu thành công"
+    uploaded: "Tải lên thành công"
+    imported: "Nhập thành công"
+    exported: "Xuất thành công"
+    
+  # Error messages
+  error:
+    create_failed: "Tạo thất bại"
+    update_failed: "Cập nhật thất bại"
+    delete_failed: "Xóa thất bại"
+    save_failed: "Lưu thất bại"
+    upload_failed: "Tải lên thất bại"
+    import_failed: "Nhập thất bại"
+    export_failed: "Xuất thất bại"
+    validation_failed: "Xác thực thất bại"
+    network_error: "Lỗi mạng"
+    server_error: "Lỗi máy chủ"
+    
+  # Validation messages
+  errors:
+    messages:
+      accepted: "phải được chấp nhận"
+      blank: "không được để trống"
+      confirmation: "không khớp với xác nhận"
+      empty: "không được để trống"
+      equal_to: "phải bằng %{count}"
+      even: "phải là số chẵn"
+      exclusion: "bị loại trừ"
+      greater_than: "phải lớn hơn %{count}"
+      greater_than_or_equal_to: "phải lớn hơn hoặc bằng %{count}"
+      inclusion: "không được bao gồm trong danh sách"
+      invalid: "không hợp lệ"
+      less_than: "phải nhỏ hơn %{count}"
+      less_than_or_equal_to: "phải nhỏ hơn hoặc bằng %{count}"
+      model_invalid: "Xác thực thất bại: %{errors}"
+      not_a_number: "không phải là số"
+      not_an_integer: "phải là số nguyên"
+      odd: "phải là số lẻ"
+      other_than: "phải khác %{count}"
+      present: "phải có mặt"
+      required: "phải có mặt"
+      taken: "đã được sử dụng"
+      too_long: "quá dài (tối đa %{count} ký tự)"
+      too_short: "quá ngắn (tối thiểu %{count} ký tự)"
+      wrong_length: "có độ dài sai (phải có %{count} ký tự)"
+      not_a_date: "không phải là ngày hợp lệ"
+      not_a_time: "không phải là thời gian hợp lệ"
+      not_a_datetime: "không phải là ngày giờ hợp lệ"

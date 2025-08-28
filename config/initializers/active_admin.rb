@@ -189,6 +189,12 @@ ActiveAdmin.setup do |config|
   # available formats in your application.
   #
   config.localize_format = :long
+  
+  # == Internationalization
+  #
+  # Set the default locale for Active Admin
+  #
+  config.default_locale = :vi
 
   # == Setting a Favicon
   #

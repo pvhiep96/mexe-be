@@ -11,6 +11,35 @@ Rails.application.routes.draw do
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
 
+  # API Routes
+  namespace :api do
+    namespace :v1 do
+      post 'auth/login', to: 'auth#login'
+      post 'auth/register', to: 'auth#register'
+      post 'auth/logout', to: 'auth#logout'
+      post 'auth/change_password', to: 'auth#change_password'
+      get 'auth/profile', to: 'auth#profile'
+      put 'auth/update_profile', to: 'auth#update_profile'
+    end
+  end
+
   # Defines the root path route ("/")
   # root "posts#index"
+
+  mount Rswag::Ui::Engine => '/api-docs'
+  mount Rswag::Api::Engine => '/api-docs'
+
+  namespace :api do
+    namespace :v1 do
+      resources :products, only: [:index, :show]
+      resources :orders, only: [:index, :show, :create]
+      resources :categories, only: [:index, :show]
+      resources :stores, only: [:index]
+      resources :brands, only: [:index, :show]
+      get 'users/me', to: 'users#show'
+      get 'users/orders', to: 'users#orders'
+      get 'users/favorites', to: 'users#favorites'
+      get 'users/addresses', to: 'users#addresses'
+    end
+  end
 end
