@@ -3,13 +3,13 @@ module Api
     class AuthController < ApplicationController
       before_action :authenticate_user!, only: [:profile, :update_profile, :change_password]
       before_action :ensure_json_request
-      
+
       def login
         user = User.find_by(email: params[:email])
-        
+
         if user && user.authenticate(params[:password])
           token = JwtService.generate_user_token(user)
-          
+
           render json: {
             success: true,
             message: 'Đăng nhập thành công',
@@ -24,13 +24,13 @@ module Api
           }, status: :unauthorized
         end
       end
-      
+
       def register
         user = User.new(user_params)
-        
+
         if user.save
           token = JwtService.generate_user_token(user)
-          
+
           render json: {
             success: true,
             message: 'Đăng ký thành công',
@@ -45,14 +45,14 @@ module Api
           }, status: :unprocessable_entity
         end
       end
-      
+
       def profile
         render json: {
           success: true,
           user: UserSerializer.new(current_user).serializable_hash
         }, status: :ok
       end
-      
+
       def update_profile
         if current_user.update(profile_params)
           render json: {
@@ -68,7 +68,7 @@ module Api
           }, status: :unprocessable_entity
         end
       end
-      
+
       def change_password
         if current_user.authenticate(params[:current_password])
           if current_user.update(password: params[:new_password])
@@ -91,7 +91,7 @@ module Api
           }, status: :unauthorized
         end
       end
-      
+
       def logout
         # Since we're using JWT, logout is mainly handled on frontend
         # by removing the token from storage
@@ -100,13 +100,13 @@ module Api
           message: 'Đăng xuất thành công'
         }, status: :ok
       end
-      
+
       private
-      
+
       def user_params
         params.require(:user).permit(:email, :password, :full_name, :phone, :address)
       end
-      
+
       def profile_params
         params.require(:user).permit(:full_name, :phone, :date_of_birth, :address)
       end

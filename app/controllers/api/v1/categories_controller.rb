@@ -1,9 +1,11 @@
 class Api::V1::CategoriesController < ApplicationController
   skip_before_action :verify_authenticity_token
-  
+
   def index
-    categories = Category.active.root_categories.order(:sort_order, :name)
-    render json: CategorySerializer.new(categories).serializable_hash
+    categories = Category.all
+    # render json: CategorySerializer.new(categories).to_json
+    # render json: categories, each_serializer: CategorySerializer,
+    render json: categories.to_json
   end
 
   def show
@@ -16,7 +18,7 @@ class Api::V1::CategoriesController < ApplicationController
     root_categories = Category.active.root_categories
                              .includes(:subcategories)
                              .order(:sort_order, :name)
-    
+
     categories_data = root_categories.map do |category|
       {
         id: category.id,
