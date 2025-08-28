@@ -3,19 +3,21 @@ ActiveAdmin.register Order do
                 :payment_status, :delivery_type, :shipping_address, :billing_address, :notes, 
                 :tracking_number, :shipped_at, :delivered_at
 
+  menu label: "Đơn hàng"
+
   index do
     selectable_column
     id_column
-    column :order_number
-    column :user
-    column :total_amount do |order|
+    column "Mã đơn hàng", :order_number
+    column "Khách hàng", :user
+    column "Tổng tiền", :total_amount do |order|
       number_to_currency(order.total_amount, unit: "₫", precision: 0)
     end
-    column :status
-    column :payment_status
-    column :payment_method
-    column :delivery_type
-    column :created_at
+    column "Trạng thái", :status
+    column "Trạng thái thanh toán", :payment_status
+    column "Phương thức thanh toán", :payment_method
+    column "Loại giao hàng", :delivery_type
+    column "Ngày tạo", :created_at
     actions
   end
 
@@ -29,48 +31,48 @@ ActiveAdmin.register Order do
   filter :created_at
 
   form do |f|
-    f.inputs do
-      f.input :user
-      f.input :order_number
-      f.input :subtotal
-      f.input :total_amount
-      f.input :payment_method
-      f.input :status
-      f.input :payment_status
-      f.input :delivery_type
-      f.input :shipping_address
-      f.input :billing_address
-      f.input :notes
-      f.input :tracking_number
-      f.input :shipped_at
-      f.input :delivered_at
+    f.inputs "Thông tin đơn hàng" do
+      f.input :user, label: "Khách hàng"
+      f.input :order_number, label: "Mã đơn hàng"
+      f.input :subtotal, label: "Tổng tiền hàng"
+      f.input :total_amount, label: "Tổng tiền"
+      f.input :payment_method, label: "Phương thức thanh toán"
+      f.input :status, label: "Trạng thái"
+      f.input :payment_status, label: "Trạng thái thanh toán"
+      f.input :delivery_type, label: "Loại giao hàng"
+      f.input :shipping_address, label: "Địa chỉ giao hàng"
+      f.input :billing_address, label: "Địa chỉ thanh toán"
+      f.input :notes, label: "Ghi chú"
+      f.input :tracking_number, label: "Mã theo dõi"
+      f.input :shipped_at, label: "Ngày giao hàng"
+      f.input :delivered_at, label: "Ngày nhận hàng"
     end
     f.actions
   end
 
   show do
     attributes_table do
-      row :id
-      row :order_number
-      row :user
-      row :subtotal do |order|
+      row "ID", :id
+      row "Mã đơn hàng", :order_number
+      row "Khách hàng", :user
+      row "Tổng tiền hàng", :subtotal do |order|
         number_to_currency(order.subtotal, unit: "₫", precision: 0)
       end
-      row :total_amount do |order|
+      row "Tổng tiền", :total_amount do |order|
         number_to_currency(order.total_amount, unit: "₫", precision: 0)
       end
-      row :payment_method
-      row :status
-      row :payment_status
-      row :delivery_type
-      row :shipping_address
-      row :billing_address
-      row :notes
-      row :tracking_number
-      row :shipped_at
-      row :delivered_at
-      row :created_at
-      row :updated_at
+      row "Phương thức thanh toán", :payment_method
+      row "Trạng thái", :status
+      row "Trạng thái thanh toán", :payment_status
+      row "Loại giao hàng", :delivery_type
+      row "Địa chỉ giao hàng", :shipping_address
+      row "Địa chỉ thanh toán", :billing_address
+      row "Ghi chú", :notes
+      row "Mã theo dõi", :tracking_number
+      row "Ngày giao hàng", :shipped_at
+      row "Ngày nhận hàng", :delivered_at
+      row "Ngày tạo", :created_at
+      row "Ngày cập nhật", :updated_at
     end
   end
 end

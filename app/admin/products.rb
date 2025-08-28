@@ -5,21 +5,23 @@ ActiveAdmin.register Product do
                 :is_preorder, :preorder_quantity, :preorder_end_date, :warranty_period, 
                 :meta_title, :meta_description, :view_count
 
+  menu label: "Sản phẩm"
+
   index do
     selectable_column
     id_column
-    column :name
-    column :sku
-    column :brand
-    column :category
-    column :price do |product|
+    column "Tên sản phẩm", :name
+    column "Mã SKU", :sku
+    column "Thương hiệu", :brand
+    column "Danh mục", :category
+    column "Giá", :price do |product|
       number_to_currency(product.price, unit: "₫", precision: 0)
     end
-    column :stock_quantity
-    column :is_active
-    column :is_featured
-    column :is_new
-    column :created_at
+    column "Số lượng tồn kho", :stock_quantity
+    column "Kích hoạt", :is_active
+    column "Nổi bật", :is_featured
+    column "Mới", :is_new
+    column "Ngày tạo", :created_at
     actions
   end
 
@@ -34,32 +36,32 @@ ActiveAdmin.register Product do
   filter :created_at
 
   form do |f|
-    f.inputs do
-      f.input :name
-      f.input :slug
-      f.input :sku
-      f.input :brand
-      f.input :category
-      f.input :description
-      f.input :short_description
-      f.input :price
-      f.input :original_price
-      f.input :discount_percent
-      f.input :cost_price
-      f.input :weight
-      f.input :dimensions
-      f.input :stock_quantity
-      f.input :min_stock_alert
-      f.input :warranty_period
-      f.input :is_active
-      f.input :is_featured
-      f.input :is_new
-      f.input :is_hot
-      f.input :is_preorder
-      f.input :preorder_quantity
-      f.input :preorder_end_date
-      f.input :meta_title
-      f.input :meta_description
+    f.inputs "Thông tin sản phẩm" do
+      f.input :name, label: "Tên sản phẩm"
+      f.input :slug, label: "Đường dẫn"
+      f.input :sku, label: "Mã SKU"
+      f.input :brand, label: "Thương hiệu"
+      f.input :category, label: "Danh mục"
+      f.input :description, label: "Mô tả"
+      f.input :short_description, label: "Mô tả ngắn"
+      f.input :price, label: "Giá"
+      f.input :original_price, label: "Giá gốc"
+      f.input :discount_percent, label: "Phần trăm giảm giá"
+      f.input :cost_price, label: "Giá vốn"
+      f.input :weight, label: "Trọng lượng"
+      f.input :dimensions, label: "Kích thước"
+      f.input :stock_quantity, label: "Số lượng tồn kho"
+      f.input :min_stock_alert, label: "Cảnh báo tồn kho tối thiểu"
+      f.input :warranty_period, label: "Thời hạn bảo hành"
+      f.input :is_active, label: "Kích hoạt"
+      f.input :is_featured, label: "Nổi bật"
+      f.input :is_new, label: "Mới"
+      f.input :is_hot, label: "Hot"
+      f.input :is_preorder, label: "Đặt trước"
+      f.input :preorder_quantity, label: "Số lượng đặt trước"
+      f.input :preorder_end_date, label: "Ngày kết thúc đặt trước"
+      f.input :meta_title, label: "Tiêu đề SEO"
+      f.input :meta_description, label: "Mô tả SEO"
     end
     f.actions
   end

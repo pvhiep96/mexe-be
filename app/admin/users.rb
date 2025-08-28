@@ -1,15 +1,17 @@
 ActiveAdmin.register User do
   permit_params :email, :full_name, :phone, :date_of_birth, :gender, :is_active, :is_verified
 
+  menu label: "Người dùng"
+
   index do
     selectable_column
     id_column
-    column :email
-    column :full_name
-    column :phone
-    column :is_active
-    column :is_verified
-    column :created_at
+    column "Email", :email
+    column "Họ và tên", :full_name
+    column "Số điện thoại", :phone
+    column "Kích hoạt", :is_active
+    column "Đã xác thực", :is_verified
+    column "Ngày tạo", :created_at
     actions
   end
 
@@ -21,30 +23,30 @@ ActiveAdmin.register User do
   filter :created_at
 
   form do |f|
-    f.inputs do
-      f.input :email
-      f.input :full_name
-      f.input :phone
-      f.input :date_of_birth
-      f.input :gender
-      f.input :is_active
-      f.input :is_verified
+    f.inputs "Thông tin người dùng" do
+      f.input :email, label: "Email"
+      f.input :full_name, label: "Họ và tên"
+      f.input :phone, label: "Số điện thoại"
+      f.input :date_of_birth, label: "Ngày sinh"
+      f.input :gender, label: "Giới tính"
+      f.input :is_active, label: "Kích hoạt"
+      f.input :is_verified, label: "Đã xác thực"
     end
     f.actions
   end
 
   show do
     attributes_table do
-      row :id
-      row :email
-      row :full_name
-      row :phone
-      row :date_of_birth
-      row :gender
-      row :is_active
-      row :is_verified
-      row :created_at
-      row :updated_at
+      row "ID", :id
+      row "Email", :email
+      row "Họ và tên", :full_name
+      row "Số điện thoại", :phone
+      row "Ngày sinh", :date_of_birth
+      row "Giới tính", :gender
+      row "Kích hoạt", :is_active
+      row "Đã xác thực", :is_verified
+      row "Ngày tạo", :created_at
+      row "Ngày cập nhật", :updated_at
     end
   end
 end

@@ -1,0 +1,361 @@
+vi:
+  active_admin:
+    dashboard: "Bảng điều khiển"
+    dashboard_welcome:
+      welcome: "Chào mừng bạn đến với trang quản trị"
+      call_to_action: "Bắt đầu quản lý hệ thống của bạn"
+    
+    # Common actions
+    actions: "Hành động"
+    edit: "Chỉnh sửa"
+    delete: "Xóa"
+    view: "Xem"
+    new: "Tạo mới"
+    save: "Lưu"
+    cancel: "Hủy"
+    back: "Quay lại"
+    confirm: "Xác nhận"
+    
+    # Common fields
+    id: "ID"
+    name: "Tên"
+    email: "Email"
+    phone: "Số điện thoại"
+    description: "Mô tả"
+    created_at: "Ngày tạo"
+    updated_at: "Ngày cập nhật"
+    is_active: "Kích hoạt"
+    is_featured: "Nổi bật"
+    is_new: "Mới"
+    is_hot: "Hot"
+    is_preorder: "Đặt trước"
+    is_verified: "Đã xác thực"
+    
+    # Users
+    users:
+      one: "Người dùng"
+      other: "Người dùng"
+      full_name: "Họ và tên"
+      date_of_birth: "Ngày sinh"
+      gender: "Giới tính"
+      male: "Nam"
+      female: "Nữ"
+      other_gender: "Khác"
+    
+    # Products
+    products:
+      one: "Sản phẩm"
+      other: "Sản phẩm"
+      sku: "Mã SKU"
+      brand: "Thương hiệu"
+      category: "Danh mục"
+      price: "Giá"
+      original_price: "Giá gốc"
+      discount_percent: "Phần trăm giảm giá"
+      cost_price: "Giá vốn"
+      weight: "Trọng lượng"
+      dimensions: "Kích thước"
+      stock_quantity: "Số lượng tồn kho"
+      min_stock_alert: "Cảnh báo tồn kho tối thiểu"
+      warranty_period: "Thời hạn bảo hành"
+      meta_title: "Tiêu đề SEO"
+      meta_description: "Mô tả SEO"
+      view_count: "Lượt xem"
+      short_description: "Mô tả ngắn"
+      preorder_quantity: "Số lượng đặt trước"
+      preorder_end_date: "Ngày kết thúc đặt trước"
+    
+    # Categories
+    categories:
+      one: "Danh mục"
+      other: "Danh mục"
+      slug: "Đường dẫn"
+      parent: "Danh mục cha"
+      sort_order: "Thứ tự sắp xếp"
+    
+    # Brands
+    brands:
+      one: "Thương hiệu"
+      other: "Thương hiệu"
+      logo: "Logo"
+      founded_year: "Năm thành lập"
+      field: "Lĩnh vực"
+      story: "Câu chuyện"
+      website: "Website"
+    
+    # Orders
+    orders:
+      one: "Đơn hàng"
+      other: "Đơn hàng"
+      order_number: "Mã đơn hàng"
+      user: "Khách hàng"
+      subtotal: "Tổng tiền hàng"
+      total_amount: "Tổng tiền"
+      payment_method: "Phương thức thanh toán"
+      status: "Trạng thái"
+      payment_status: "Trạng thái thanh toán"
+      delivery_type: "Loại giao hàng"
+      shipping_address: "Địa chỉ giao hàng"
+      billing_address: "Địa chỉ thanh toán"
+      notes: "Ghi chú"
+      tracking_number: "Mã theo dõi"
+      shipped_at: "Ngày giao hàng"
+      delivered_at: "Ngày nhận hàng"
+    
+    # Articles
+    articles:
+      one: "Bài viết"
+      other: "Bài viết"
+      title: "Tiêu đề"
+      excerpt: "Tóm tắt"
+      content: "Nội dung"
+      featured_image: "Hình ảnh nổi bật"
+      author: "Tác giả"
+      category: "Danh mục"
+      tags: "Thẻ"
+      status: "Trạng thái"
+      published_at: "Ngày xuất bản"
+      view_count: "Lượt xem"
+    
+    # Status options
+    status:
+      pending: "Chờ xử lý"
+      processing: "Đang xử lý"
+      shipped: "Đã giao hàng"
+      delivered: "Đã nhận hàng"
+      cancelled: "Đã hủy"
+      draft: "Bản nháp"
+      published: "Đã xuất bản"
+      archived: "Đã lưu trữ"
+    
+    # Payment status
+    payment_status:
+      pending: "Chờ thanh toán"
+      paid: "Đã thanh toán"
+      failed: "Thanh toán thất bại"
+      refunded: "Đã hoàn tiền"
+    
+    # Payment methods
+    payment_method:
+      cod: "Thanh toán khi nhận hàng"
+      bank_transfer: "Chuyển khoản ngân hàng"
+      credit_card: "Thẻ tín dụng"
+      e_wallet: "Ví điện tử"
+    
+    # Delivery types
+    delivery_type:
+      standard: "Giao hàng tiêu chuẩn"
+      express: "Giao hàng nhanh"
+      pickup: "Nhận tại cửa hàng"
+    
+    # Filters
+    filters:
+      title: "Bộ lọc"
+      clear: "Xóa bộ lọc"
+      apply: "Áp dụng"
+    
+    # Pagination
+    pagination:
+      previous: "Trước"
+      next: "Tiếp"
+      first: "Đầu"
+      last: "Cuối"
+      per_page: "Mỗi trang"
+      showing: "Hiển thị"
+      of: "trong tổng số"
+      entries: "bản ghi"
+    
+    # Messages
+    messages:
+      created: "%{resource_name} đã được tạo thành công."
+      updated: "%{resource_name} đã được cập nhật thành công."
+      deleted: "%{resource_name} đã được xóa thành công."
+      destroy_confirmation: "Bạn có chắc chắn muốn xóa %{resource_name} này không?"
+      empty: "Không có %{resource_name} nào."
+      empty_list: "Danh sách trống"
+    
+    # Sidebar
+    sidebar:
+      filters: "Bộ lọc"
+      search: "Tìm kiếm"
+      actions: "Hành động"
+      details: "Chi tiết"
+    
+    # Form
+    form:
+      inputs: "Thông tin"
+      actions: "Hành động"
+      submit: "Gửi"
+      cancel: "Hủy"
+      back: "Quay lại"
+    
+    # Table
+    table:
+      selectable_column: "Chọn"
+      id_column: "ID"
+      actions: "Hành động"
+      no_data: "Không có dữ liệu"
+    
+    # Boolean values
+    boolean:
+      true: "Có"
+      false: "Không"
+    
+    # Date formats
+    date:
+      formats:
+        default: "%d/%m/%Y"
+        short: "%d/%m"
+        long: "%d/%m/%Y %H:%M"
+    
+    # Time formats
+    time:
+      formats:
+        default: "%H:%M %d/%m/%Y"
+        short: "%H:%M"
+        long: "%H:%M %d/%m/%Y"
+    
+    # Batch actions
+    batch_actions:
+      title: "Hành động hàng loạt"
+      select_all: "Chọn tất cả"
+      deselect_all: "Bỏ chọn tất cả"
+      apply: "Áp dụng"
+      cancel: "Hủy"
+      no_selection: "Không có mục nào được chọn"
+    
+    # Search
+    search:
+      title: "Tìm kiếm"
+      placeholder: "Nhập từ khóa tìm kiếm..."
+      submit: "Tìm kiếm"
+      clear: "Xóa"
+      no_results: "Không tìm thấy kết quả"
+    
+    # Export
+    export:
+      title: "Xuất dữ liệu"
+      csv: "Xuất CSV"
+      xml: "Xuất XML"
+      json: "Xuất JSON"
+      pdf: "Xuất PDF"
+      success: "Xuất dữ liệu thành công"
+      failed: "Xuất dữ liệu thất bại"
+    
+    # Import
+    import:
+      title: "Nhập dữ liệu"
+      csv: "Nhập CSV"
+      file: "Chọn file"
+      submit: "Nhập dữ liệu"
+      success: "Nhập dữ liệu thành công"
+      failed: "Nhập dữ liệu thất bại"
+      template: "Tải template"
+    
+    # Comments
+    comments:
+      title: "Bình luận"
+      add: "Thêm bình luận"
+      edit: "Chỉnh sửa bình luận"
+      delete: "Xóa bình luận"
+      no_comments: "Không có bình luận nào"
+      author: "Tác giả"
+      content: "Nội dung"
+      created_at: "Thời gian tạo"
+    
+    # Notifications
+    notifications:
+      title: "Thông báo"
+      mark_as_read: "Đánh dấu đã đọc"
+      mark_all_as_read: "Đánh dấu tất cả đã đọc"
+      no_notifications: "Không có thông báo nào"
+      unread: "Chưa đọc"
+      read: "Đã đọc"
+    
+    # Settings
+    settings:
+      title: "Cài đặt"
+      general: "Chung"
+      appearance: "Giao diện"
+      security: "Bảo mật"
+      notifications: "Thông báo"
+      save: "Lưu cài đặt"
+      saved: "Đã lưu cài đặt"
+      failed: "Lưu cài đặt thất bại"
+    
+    # Profile
+    profile:
+      title: "Hồ sơ"
+      personal_info: "Thông tin cá nhân"
+      change_password: "Đổi mật khẩu"
+      preferences: "Tùy chọn"
+      avatar: "Ảnh đại diện"
+      update: "Cập nhật hồ sơ"
+      updated: "Đã cập nhật hồ sơ"
+    
+    # Authentication
+    authentication:
+      login: "Đăng nhập"
+      logout: "Đăng xuất"
+      register: "Đăng ký"
+      forgot_password: "Quên mật khẩu"
+      reset_password: "Đặt lại mật khẩu"
+      change_password: "Đổi mật khẩu"
+      current_password: "Mật khẩu hiện tại"
+      new_password: "Mật khẩu mới"
+      confirm_password: "Xác nhận mật khẩu"
+      remember_me: "Ghi nhớ đăng nhập"
+      sign_in: "Đăng nhập"
+      sign_out: "Đăng xuất"
+      sign_up: "Đăng ký"
+      already_have_account: "Đã có tài khoản?"
+      dont_have_account: "Chưa có tài khoản?"
+      password_requirements: "Mật khẩu phải có ít nhất 6 ký tự"
+    
+    # Errors
+    errors:
+      title: "Lỗi"
+      not_found: "Không tìm thấy"
+      unauthorized: "Không có quyền truy cập"
+      forbidden: "Bị cấm"
+      internal_server_error: "Lỗi máy chủ nội bộ"
+      bad_request: "Yêu cầu không hợp lệ"
+      unprocessable_entity: "Không thể xử lý yêu cầu"
+      too_many_requests: "Quá nhiều yêu cầu"
+      service_unavailable: "Dịch vụ không khả dụng"
+      validation_failed: "Xác thực thất bại"
+      record_not_found: "Không tìm thấy bản ghi"
+      access_denied: "Truy cập bị từ chối"
+    
+    # Success
+    success:
+      created: "Tạo thành công"
+      updated: "Cập nhật thành công"
+      deleted: "Xóa thành công"
+      saved: "Lưu thành công"
+      uploaded: "Tải lên thành công"
+      imported: "Nhập thành công"
+      exported: "Xuất thành công"
+      password_changed: "Đổi mật khẩu thành công"
+      profile_updated: "Cập nhật hồ sơ thành công"
+    
+    # Warnings
+    warnings:
+      title: "Cảnh báo"
+      unsaved_changes: "Bạn có thay đổi chưa lưu. Bạn có chắc chắn muốn rời khỏi trang?"
+      delete_confirmation: "Bạn có chắc chắn muốn xóa mục này không? Hành động này không thể hoàn tác."
+      session_expired: "Phiên đăng nhập của bạn đã hết hạn. Vui lòng đăng nhập lại."
+      data_loss: "Dữ liệu chưa lưu sẽ bị mất. Bạn có chắc chắn muốn tiếp tục?"
+    
+    # Info
+    info:
+      title: "Thông tin"
+      loading: "Đang tải..."
+      processing: "Đang xử lý..."
+      no_data: "Không có dữ liệu"
+      no_results: "Không có kết quả"
+      empty_list: "Danh sách trống"
+      help: "Trợ giúp"
+      about: "Về chúng tôi"
+      contact: "Liên hệ"
+      support: "Hỗ trợ"

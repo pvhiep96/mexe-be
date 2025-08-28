@@ -238,6 +238,66 @@ paths:
                 "$ref": "#/components/schemas/User"
         '401':
           description: Unauthorized
+  /stores:
+    get:
+      summary: List all stores
+      operationId: listStores
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stores:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Store'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+  /brands:
+    get:
+      summary: List all brands
+      operationId: listbrands
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stores:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Brand'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+  /categories:
+    get:
+      summary: List all Cagegory
+      operationId: listcategory
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stores:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Category'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
 components:
   schemas:
     Product:
@@ -577,3 +637,41 @@ components:
           type: boolean
         is_active:
           type: boolean
+    Store:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the store.
+        name:
+          type: string
+          description: Name of the store.
+        address:
+          type: string
+          description: Full address of the store.
+        phone:
+          type: string
+          description: Contact phone number of the store.
+          nullable: true
+        email:
+          type: string
+          description: Contact email of the store.
+          nullable: true
+        city:
+          type: string
+          description: City where the store is located.
+        is_active:
+          type: boolean
+          description: Indicates if the store is active.
+        opening_hours:
+          type: object
+          description: JSON object containing the store's opening hours.
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the store was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the store was last updated.
