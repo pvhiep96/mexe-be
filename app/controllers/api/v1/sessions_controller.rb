@@ -1,6 +1,5 @@
 module Api
   module V1
-    module Users
       class SessionsController < Devise::SessionsController
         respond_to :json
 
@@ -14,6 +13,5 @@ module Api
           render json: { message: 'Logged out successfully' }, status: :ok
         end
       end
-    end
   end
 end
