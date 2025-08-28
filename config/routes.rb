@@ -26,9 +26,6 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
 
-  mount Rswag::Ui::Engine => '/api-docs'
-  mount Rswag::Api::Engine => '/api-docs'
-
   namespace :api do
     namespace :v1 do
       resources :products, only: [:index, :show]
@@ -41,5 +38,11 @@ Rails.application.routes.draw do
       get 'users/favorites', to: 'users#favorites'
       get 'users/addresses', to: 'users#addresses'
     end
+  end
+
+
+  unless Rails.env.production?
+    mount Rswag::Ui::Engine => '/api-docs'
+    mount Rswag::Api::Engine => '/api-docs'
   end
 end
