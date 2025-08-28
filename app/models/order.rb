@@ -3,7 +3,7 @@ class Order < ApplicationRecord
   has_many :order_items, dependent: :destroy
   has_many :products, through: :order_items
   has_many :product_reviews, dependent: :destroy
-  has_many :coupon_usages, dependent: :destroy
+  # has_many :coupon_usages, dependent: :destroy
 
   validates :order_number, presence: true, uniqueness: true
   # validates :subtotal, presence: true, numericality: { greater_than_or_equal_to: 0 }
