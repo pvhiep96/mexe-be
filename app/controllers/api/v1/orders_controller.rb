@@ -43,21 +43,23 @@ module Api
             product_sku: product.sku,
             quantity: item_params[:quantity],
             unit_price: product.price,
-            total_price: product.price * item_params[:quantity],
-            variant_info: item_params[:variant_id] ? ProductVariant.find(item_params[:variant_id]).as_json : nil
+            total_price: product.price * item_params[:quantity]
+            # variant_info: item_params[:variant_id] ? ProductVariant.where(product_id: product.id, variant_value: item_params[:variant_id]).as_json : nil
           )
         end
-
+        order.valid?
         if order.save
+          order.calculate_totals
+          order.save
           render json: OrderSerializer.new(order).to_json, status: :created
         else
-          Rails.logger.info("==============#{order.errors.to_json}")
+          Rails.logger.error("Order creation failed: #{order.errors.full_messages.join(', ')}")
           render json: { errors: order.errors.full_messages }, status: :unprocessable_entity
         end
       rescue ActiveRecord::RecordNotFound
         render json: { error: 'Product or variant not found' }, status: :unprocessable_entity
       rescue StandardError => e
-        Rails.logger.info("============== #{e.message}")
+        puts e.message;
         render json: { error: "Failed to create order: #{e.message}" }, status: :unprocessable_entity
       end
 

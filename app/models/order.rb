@@ -49,12 +49,13 @@ class Order < ApplicationRecord
   end
 
   def calculate_totals
-    self.subtotal = 0
+    self.subtotal = order_items.sum('quantity * unit_price')
     self.payment_method = :cod
     self.discount_amount ||= 0.0
     self.shipping_fee ||= 0.0
     self.tax_amount ||= 0.0
     self.total_amount = 0
-    # self.total_amount = subtotal - discount_amount + shipping_fee + tax_amount
+    self.total_amount = subtotal - discount_amount + shipping_fee + tax_amount
+    # save
   end
 end
