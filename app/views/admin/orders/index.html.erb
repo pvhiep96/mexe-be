@@ -1,0 +1,133 @@
+<% content_for(:title, "Quản lý đơn hàng") %>
+
+<div class="admin-orders-index">
+  <div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h1>Danh sách đơn hàng</h1>
+    <% if current_admin_user.client? %>
+      <span class="badge badge-info">Client: <%= current_admin_user.client_name %></span>
+    <% end %>
+  </div>
+
+  <div class="orders-table" style="background: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); overflow: hidden;">
+    <table style="width: 100%; border-collapse: collapse;">
+      <thead style="background: #f8f9fa;">
+        <tr>
+          <th style="padding: 15px; text-align: left; border-bottom: 2px solid #dee2e6;">Mã đơn hàng</th>
+          <th style="padding: 15px; text-align: left; border-bottom: 2px solid #dee2e6;">Khách hàng</th>
+          <th style="padding: 15px; text-align: left; border-bottom: 2px solid #dee2e6;">Sản phẩm</th>
+          <th style="padding: 15px; text-align: left; border-bottom: 2px solid #dee2e6;">Tổng tiền</th>
+          <th style="padding: 15px; text-align: left; border-bottom: 2px solid #dee2e6;">Trạng thái</th>
+          <th style="padding: 15px; text-align: left; border-bottom: 2px solid #dee2e6;">Xử lý vận chuyển</th>
+          <th style="padding: 15px; text-align: left; border-bottom: 2px solid #dee2e6;">Ngày đặt</th>
+          <th style="padding: 15px; text-align: left; border-bottom: 2px solid #dee2e6;">Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @orders.each do |order| %>
+          <tr style="border-bottom: 1px solid #f8f9fa;">
+            <td style="padding: 15px;">
+              <strong><%= order.order_number %></strong>
+            </td>
+            <td style="padding: 15px;">
+              <%= order.user ? order.user.email : order.guest_email %>
+              <% if order.guest_name.present? %>
+                <br><small><%= order.guest_name %></small>
+              <% end %>
+            </td>
+            <td style="padding: 15px;">
+              <% if current_admin_user.client? %>
+                <!-- Client chỉ thấy sản phẩm của họ -->
+                <% client_products = order.products.where(client_id: current_admin_user.id) %>
+                <% client_products.each do |product| %>
+                  <div style="margin-bottom: 5px;">
+                    <%= product.name %> 
+                    <small>(SL: <%= order.order_items.find_by(product: product)&.quantity %>)</small>
+                  </div>
+                <% end %>
+              <% else %>
+                <!-- Super admin thấy tất cả sản phẩm -->
+                <% order.products.limit(3).each do |product| %>
+                  <div style="margin-bottom: 5px;"><%= product.name %></div>
+                <% end %>
+                <% if order.products.count > 3 %>
+                  <small>+ <%= order.products.count - 3 %> sản phẩm khác</small>
+                <% end %>
+              <% end %>
+            </td>
+            <td style="padding: 15px;">
+              <strong><%= number_to_currency(order.total_amount, unit: "₫", precision: 0) %></strong>
+            </td>
+            <td style="padding: 15px;">
+              <span class="badge badge-<%= order.status == 'pending' ? 'warning' : order.status == 'delivered' ? 'success' : 'info' %>">
+                <%= order.status.humanize %>
+              </span>
+            </td>
+            <td style="padding: 15px;">
+              <span class="badge badge-<%= order.processing_not_processed? ? 'danger' : order.processing_processing_delivered? ? 'success' : 'warning' %>">
+                <%= order.processing_status_text %>
+              </span>
+              <% if order.tracking_number.present? %>
+                <br><small>Mã vận đơn: <%= order.tracking_number %></small>
+              <% end %>
+            </td>
+            <td style="padding: 15px;">
+              <%= order.created_at.strftime("%d/%m/%Y %H:%M") %>
+            </td>
+            <td style="padding: 15px;">
+              <%= link_to "Xem chi tiết", admin_order_path(order), class: "btn btn-sm btn-primary" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    
+    <% if @orders.empty? %>
+      <div style="padding: 40px; text-align: center; color: #666;">
+        <% if current_admin_user.client? %>
+          Không có đơn hàng nào chứa sản phẩm của bạn.
+        <% else %>
+          Không có đơn hàng nào.
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<style>
+  .badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  
+  .badge-success { background: #28a745; color: white; }
+  .badge-danger { background: #dc3545; color: white; }
+  .badge-warning { background: #ffc107; color: black; }
+  .badge-info { background: #17a2b8; color: white; }
+  .badge-primary { background: #007bff; color: white; }
+  
+  .btn {
+    display: inline-block;
+    padding: 6px 12px;
+    margin: 2px;
+    background: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    border: 1px solid #007bff;
+    font-size: 12px;
+  }
+  
+  .btn:hover {
+    background: #0056b3;
+    border-color: #0056b3;
+  }
+  
+  .btn-sm {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+</style>

@@ -5,12 +5,12 @@ module Api
       before_action :ensure_json_request
 
       def show
-        render json: UserSerializer.new(current_user)
+        render json: UserSerializer.new(current_user).serializable_hash[:data]
       end
 
       def orders
         orders = current_user.orders.includes(:order_items).order(created_at: :desc)
-        render json: orders.map { |order| OrderSerializer.new(order).serializable_hash }
+        render json: orders.map { |order| OrderSerializer.new(order).serializable_hash[:data] }
       end
 
       def favorites
@@ -29,7 +29,7 @@ module Api
 
       def addresses
         user_addresses = current_user.user_addresses.order(is_default: :desc, created_at: :desc)
-        render json: user_addresses.map { |address| UserAddressSerializer.new(address).serializable_hash }
+        render json: user_addresses.map { |address| UserAddressSerializer.new(address).serializable_hash[:data] }
       end
 
       private

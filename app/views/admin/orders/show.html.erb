@@ -1,0 +1,268 @@
+<% content_for(:title, "Chi tiết đơn hàng") %>
+
+<div class="admin-order-show">
+  <div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h1>Đơn hàng #<%= @order.order_number %></h1>
+    <div>
+      <%= link_to "← Quay lại danh sách", admin_orders_path, class: "btn btn-secondary" %>
+    </div>
+  </div>
+
+  <div class="order-details" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
+    
+    <!-- Order Information -->
+    <div class="section" style="margin-bottom: 30px;">
+      <h3>Thông tin đơn hàng</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+          <strong>Mã đơn hàng:</strong> <%= @order.order_number %><br>
+          <strong>Khách hàng:</strong> <%= @order.user ? @order.user.email : @order.guest_email %><br>
+          <% if @order.guest_name.present? %>
+            <strong>Tên:</strong> <%= @order.guest_name %><br>
+          <% end %>
+          <% if @order.guest_phone.present? %>
+            <strong>Điện thoại:</strong> <%= @order.guest_phone %><br>
+          <% end %>
+        </div>
+        <div>
+          <strong>Trạng thái:</strong> 
+          <span class="badge badge-<%= @order.status == 'pending' ? 'warning' : @order.status == 'delivered' ? 'success' : 'info' %>">
+            <%= @order.status.humanize %>
+          </span><br>
+          
+          <strong>Xử lý vận chuyển:</strong> 
+          <span class="badge badge-<%= @order.processing_not_processed? ? 'danger' : @order.processing_processing_delivered? ? 'success' : 'warning' %>">
+            <%= @order.processing_status_text %>
+          </span><br>
+          
+          <strong>Tổng tiền:</strong> <%= number_to_currency(@order.total_amount, unit: "₫", precision: 0) %><br>
+          <strong>Ngày đặt:</strong> <%= @order.created_at.strftime("%d/%m/%Y %H:%M") %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shipping Information -->
+    <% if @order.shipping_provider.present? || @order.tracking_number.present? %>
+      <div class="section" style="margin-bottom: 30px;">
+        <h3>Thông tin vận chuyển</h3>
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 4px;">
+          <% if @order.shipping_provider.present? %>
+            <strong>Đơn vị vận chuyển:</strong> <%= @order.shipping_provider_name %><br>
+          <% end %>
+          <% if @order.tracking_number.present? %>
+            <strong>Mã vận đơn:</strong> <%= @order.tracking_number %><br>
+          <% end %>
+          <% if @order.full_tracking_url.present? %>
+            <strong>Link theo dõi:</strong> 
+            <a href="<%= @order.full_tracking_url %>" target="_blank" style="color: #007bff;">
+              <%= @order.full_tracking_url %>
+            </a><br>
+          <% end %>
+          <% if @order.shipped_at.present? %>
+            <strong>Thời gian giao vận chuyển:</strong> <%= @order.shipped_at.strftime("%d/%m/%Y %H:%M") %><br>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Update Shipping Form -->
+    <% if @can_update_shipping %>
+      <div class="section" style="margin-bottom: 30px;">
+        <h3>Cập nhật thông tin vận chuyển</h3>
+        <%= form_with model: @order, url: update_shipping_admin_order_path(@order), method: :patch, local: true do |form| %>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
+            <div>
+              <%= form.label :shipping_provider, "Đơn vị vận chuyển", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+              <%= form.select :shipping_provider, 
+                              options_for_select(Order::SHIPPING_PROVIDERS, @order.shipping_provider),
+                              { prompt: 'Chọn đơn vị vận chuyển' },
+                              { style: "width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" } %>
+            </div>
+            <div>
+              <%= form.label :tracking_number, "Mã vận đơn", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+              <%= form.text_field :tracking_number, 
+                                  placeholder: "Nhập mã vận đơn",
+                                  style: "width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" %>
+            </div>
+          </div>
+          
+          <div style="margin-bottom: 15px;">
+            <%= form.label :tracking_url, "Link theo dõi (tùy chọn)", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+            <%= form.url_field :tracking_url, 
+                               placeholder: "https://...",
+                               style: "width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" %>
+            <small style="color: #666;">Nếu để trống, hệ thống sẽ tự động tạo link theo dõi dựa trên đơn vị vận chuyển</small>
+          </div>
+
+          <div style="margin-bottom: 15px;">
+            <%= form.label :notes, "Ghi chú", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+            <%= form.text_area :notes, 
+                               rows: 3,
+                               placeholder: "Ghi chú về việc giao hàng...",
+                               style: "width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" %>
+          </div>
+
+          <%= form.submit "Cập nhật thông tin vận chuyển", 
+                          class: "btn btn-primary",
+                          style: "background: #28a745; border-color: #28a745;" %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <!-- Products -->
+    <div class="section" style="margin-bottom: 30px;">
+      <h3>Sản phẩm trong đơn hàng</h3>
+      <div style="background: white; border-radius: 4px; overflow: hidden; border: 1px solid #ddd;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead style="background: #f8f9fa;">
+            <tr>
+              <th style="padding: 12px; text-align: left; border-bottom: 1px solid #ddd;">Sản phẩm</th>
+              <th style="padding: 12px; text-align: left; border-bottom: 1px solid #ddd;">SKU</th>
+              <th style="padding: 12px; text-align: center; border-bottom: 1px solid #ddd;">Số lượng</th>
+              <th style="padding: 12px; text-align: right; border-bottom: 1px solid #ddd;">Đơn giá</th>
+              <th style="padding: 12px; text-align: right; border-bottom: 1px solid #ddd;">Thành tiền</th>
+              <% if current_admin_user.super_admin? %>
+                <th style="padding: 12px; text-align: left; border-bottom: 1px solid #ddd;">Client</th>
+              <% end %>
+            </tr>
+          </thead>
+          <tbody>
+            <% @order.order_items.includes(:product).each do |item| %>
+              <% if current_admin_user.super_admin? || item.product.client_id == current_admin_user.id %>
+                <tr>
+                  <td style="padding: 12px; border-bottom: 1px solid #f8f9fa;">
+                    <strong><%= item.product.name %></strong><br>
+                    <small><%= item.product.brand&.name %></small>
+                  </td>
+                  <td style="padding: 12px; border-bottom: 1px solid #f8f9fa;"><%= item.product.sku %></td>
+                  <td style="padding: 12px; border-bottom: 1px solid #f8f9fa; text-align: center;"><%= item.quantity %></td>
+                  <td style="padding: 12px; border-bottom: 1px solid #f8f9fa; text-align: right;">
+                    <%= number_to_currency(item.unit_price, unit: "₫", precision: 0) %>
+                  </td>
+                  <td style="padding: 12px; border-bottom: 1px solid #f8f9fa; text-align: right;">
+                    <strong><%= number_to_currency(item.quantity * item.unit_price, unit: "₫", precision: 0) %></strong>
+                  </td>
+                  <% if current_admin_user.super_admin? %>
+                    <td style="padding: 12px; border-bottom: 1px solid #f8f9fa;">
+                      <%= item.product.client&.display_name || 'Không có' %>
+                    </td>
+                  <% end %>
+                </tr>
+              <% end %>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Shipping Information -->
+    <div class="section">
+      <h3>Thông tin giao hàng</h3>
+      <div style="background: #f8f9fa; padding: 15px; border-radius: 4px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <div>
+            <% if @order.shipping_name.present? %>
+              <strong>Người nhận:</strong> <%= @order.shipping_name %><br>
+            <% elsif @order.guest_name.present? %>
+              <strong>Người nhận:</strong> <%= @order.guest_name %><br>
+            <% elsif @order.user.present? %>
+              <strong>Người nhận:</strong> <%= @order.user.full_name || @order.user.email %><br>
+            <% end %>
+            
+            <% if @order.shipping_phone.present? %>
+              <strong>Số điện thoại:</strong> <%= @order.shipping_phone %><br>
+            <% elsif @order.guest_phone.present? %>
+              <strong>Số điện thoại:</strong> <%= @order.guest_phone %><br>
+            <% elsif @order.user&.phone.present? %>
+              <strong>Số điện thoại:</strong> <%= @order.user.phone %><br>
+            <% end %>
+            
+            <% if @order.delivery_type == 'store_pickup' %>
+              <strong>Hình thức:</strong> Nhận tại cửa hàng<br>
+              <% if @order.store_location.present? %>
+                <strong>Cửa hàng:</strong> <%= @order.store_location %><br>
+              <% end %>
+            <% else %>
+              <strong>Hình thức:</strong> Giao hàng tận nơi<br>
+            <% end %>
+          </div>
+          
+          <div>
+            <% if @order.delivery_type == 'home' && (@order.delivery_address.present? || @order.shipping_city.present?) %>
+              <strong>Địa chỉ giao hàng:</strong><br>
+              <div style="margin-left: 10px; margin-top: 5px;">
+                <% if @order.delivery_address.present? %>
+                  <%= @order.delivery_address %><br>
+                <% end %>
+                
+                <% address_parts = [] %>
+                <% address_parts << @order.shipping_ward if @order.shipping_ward.present? %>
+                <% address_parts << @order.shipping_district if @order.shipping_district.present? %>
+                <% address_parts << @order.shipping_city if @order.shipping_city.present? %>
+                
+                <% if address_parts.any? %>
+                  <%= address_parts.join(', ') %><br>
+                <% end %>
+                
+                <% if @order.shipping_postal_code.present? %>
+                  <strong>Mã bưu điện:</strong> <%= @order.shipping_postal_code %><br>
+                <% end %>
+              </div>
+            <% end %>
+            
+            <% if @order.notes.present? %>
+              <strong>Ghi chú:</strong><br>
+              <div style="margin-left: 10px; margin-top: 5px; font-style: italic;">
+                <%= simple_format(@order.notes) %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  
+  .badge-success { background: #28a745; color: white; }
+  .badge-danger { background: #dc3545; color: white; }
+  .badge-warning { background: #ffc107; color: black; }
+  .badge-info { background: #17a2b8; color: white; }
+  .badge-primary { background: #007bff; color: white; }
+  
+  .btn {
+    display: inline-block;
+    padding: 8px 16px;
+    margin: 2px;
+    background: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    border: 1px solid #007bff;
+    cursor: pointer;
+  }
+  
+  .btn:hover {
+    background: #0056b3;
+    border-color: #0056b3;
+  }
+  
+  .btn-primary {
+    background: #007bff;
+    border-color: #007bff;
+  }
+  
+  .btn-secondary {
+    background: #6c757d;
+    border-color: #6c757d;
+  }
+</style>

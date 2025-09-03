@@ -1,0 +1,786 @@
+<%= form_with(model: [:admin, page.resource], local: true, multipart: true) do |form| %>
+  <%= render "admin/application/form_errors", resource: page.resource %>
+  
+  <!-- Standard Product Fields -->
+  <div class="field-unit">
+    <%= form.label :name %>
+    <%= form.text_field :name, class: "text-field" %>
+  </div>
+  
+  <div class="field-unit">
+    <%= form.label :slug %>
+    <%= form.text_field :slug, class: "text-field" %>
+  </div>
+  
+  <div class="field-unit">
+    <%= form.label :sku %>
+    <%= form.text_field :sku, class: "text-field" %>
+  </div>
+  
+  <div class="field-unit">
+    <%= form.label :brand_id %>
+    <%= form.collection_select :brand_id, Brand.all, :id, :name, { prompt: "Select a brand" }, class: "select" %>
+  </div>
+  
+  <div class="field-unit">
+    <%= form.label :category_id %>
+    <%= form.collection_select :category_id, Category.all, :id, :name, { prompt: "Select a category" }, class: "select" %>
+  </div>
+  
+  <div class="field-unit">
+    <%= form.label :description %>
+    <%= form.text_area :description, rows: 5, class: "text-field" %>
+  </div>
+  
+  <div class="field-unit">
+    <%= form.label :short_description %>
+    <%= form.text_area :short_description, rows: 3, class: "text-field" %>
+  </div>
+  
+  <div class="field-unit">
+    <%= form.label :price %>
+    <%= form.number_field :price, step: 0.01, class: "text-field" %>
+  </div>
+  
+  <div class="field-unit">
+    <%= form.label :original_price %>
+    <%= form.number_field :original_price, step: 0.01, class: "text-field" %>
+  </div>
+  
+  <div class="field-unit">
+    <%= form.label :stock_quantity %>
+    <%= form.number_field :stock_quantity, class: "text-field" %>
+  </div>
+  
+  <div class="field-unit">
+    <%= form.label :warranty_period %>
+    <%= form.text_field :warranty_period, class: "text-field" %>
+  </div>
+  
+  <div class="field-unit">
+    <%= form.check_box :is_active %>
+    <%= form.label :is_active, "Active" %>
+  </div>
+  
+  <div class="field-unit">
+    <%= form.check_box :is_featured %>
+    <%= form.label :is_featured, "Featured" %>
+  </div>
+  
+  <div class="field-unit">
+    <%= form.check_box :is_new %>
+    <%= form.label :is_new, "New" %>
+  </div>
+
+  <!-- Product Images Section -->
+  <div class="field-unit">
+    <div class="field-unit__label">
+      <label>Product Images</label>
+    </div>
+    <div class="field-unit__field">
+      <!-- Bulk Image Upload -->
+      <div class="bulk-upload-section" style="margin-bottom: 20px; padding: 15px; border: 2px dashed #007bff; border-radius: 8px; background: #f8f9fa;">
+        <label for="bulk-image-upload" style="display: block; margin-bottom: 10px; font-weight: bold;">📸 Upload Multiple Images</label>
+        <p style="margin: 0 0 10px; color: #666; font-size: 14px;">
+          Choose multiple images or drag and drop them here. Supported formats: JPG, PNG, WebP (max 5MB each)
+        </p>
+        <input type="file" id="bulk-image-upload" multiple accept="image/jpeg,image/jpg,image/png,image/webp" style="margin-bottom: 10px;">
+        <div id="bulk-preview-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 15px;"></div>
+        <button type="button" id="add-bulk-images" class="btn btn-primary" style="margin-top: 10px; display: none;">Add Selected Images</button>
+      </div>
+      
+      <div id="product-images-container">
+        <%= form.fields_for :product_images do |image_form| %>
+          <div class="nested-field-wrapper product-image-fields" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0;">
+            <!-- Current Image Preview -->
+            <% if image_form.object.image? %>
+              <div class="current-image-preview" style="margin-bottom: 15px;">
+                <label>Current Image:</label>
+                <div style="position: relative; display: inline-block;">
+                  <img src="<%= image_form.object.image.url %>" alt="<%= image_form.object.alt_text %>" style="max-width: 200px; max-height: 150px; border: 1px solid #ddd; border-radius: 4px;">
+                  <button type="button" class="delete-current-image btn btn-danger btn-xs" style="position: absolute; top: -5px; right: -5px; width: 20px; height: 20px; border-radius: 50%; padding: 0; font-size: 12px;">×</button>
+                </div>
+              </div>
+            <% end %>
+            
+            <div class="field-unit">
+              <label>Image</label>
+              <%= image_form.file_field :image, accept: "image/jpeg,image/jpg,image/png,image/webp", class: "text-field image-upload", data: { preview_target: "image_preview_#{image_form.object.object_id}" } %>
+            </div>
+            
+            <!-- New Image Preview -->
+            <div class="field-unit">
+              <div id="image_preview_<%= image_form.object.object_id %>" class="image-preview" style="margin-top: 10px; display: none;">
+                <label>Preview:</label><br>
+                <img class="preview-image" style="max-width: 200px; max-height: 150px; border: 1px solid #ddd; border-radius: 4px;">
+                <button type="button" class="remove-preview btn btn-secondary btn-xs" style="margin-left: 10px;">Remove</button>
+              </div>
+            </div>
+            
+            <div class="field-unit">
+              <label>Alt Text</label>
+              <%= image_form.text_field :alt_text, class: "text-field" %>
+            </div>
+            <div class="field-unit">
+              <label>Sort Order</label>
+              <%= image_form.number_field :sort_order, value: image_form.object.sort_order || 0, class: "text-field" %>
+            </div>
+            <div class="field-unit">
+              <%= image_form.check_box :is_primary %>
+              <%= image_form.label :is_primary, "Primary Image" %>
+            </div>
+            <div class="field-unit">
+              <%= image_form.hidden_field :_destroy %>
+              <button type="button" class="remove-nested-field btn btn-danger btn-sm">Remove Image</button>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      
+      <button type="button" id="add-product-image" class="btn btn-secondary">Add Image</button>
+    </div>
+  </div>
+
+  <!-- Product Descriptions Section -->
+  <div class="field-unit">
+    <div class="field-unit__label">
+      <label>Product Descriptions</label>
+    </div>
+    <div class="field-unit__field">
+      <div id="product-descriptions-container">
+        <%= form.fields_for :product_descriptions do |desc_form| %>
+          <div class="nested-field-wrapper product-description-fields" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0;">
+            <div class="field-unit">
+              <label>Title</label>
+              <%= desc_form.text_field :title, class: "text-field" %>
+            </div>
+            <div class="field-unit">
+              <label>Content</label>
+              <%= desc_form.text_area :content, 
+                  class: "ckeditor text-field", 
+                  id: "product_descriptions_content_#{desc_form.object.object_id}",
+                  rows: 10 %>
+            </div>
+            <div class="field-unit">
+              <label>Sort Order</label>
+              <%= desc_form.number_field :sort_order, value: desc_form.object.sort_order || 0, class: "text-field" %>
+            </div>
+            <div class="field-unit">
+              <%= desc_form.hidden_field :_destroy %>
+              <button type="button" class="remove-nested-field btn btn-danger btn-sm">Remove Description</button>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      
+      <button type="button" id="add-product-description" class="btn btn-secondary">Add Description</button>
+    </div>
+  </div>
+
+  <!-- Product Specifications Section -->
+  <div class="field-unit">
+    <div class="field-unit__label">
+      <label>Product Specifications</label>
+    </div>
+    <div class="field-unit__field">
+      <div id="product-specifications-container">
+        <%= form.fields_for :product_specifications do |spec_form| %>
+          <div class="nested-field-wrapper product-specification-fields" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0;">
+            <div class="field-unit">
+              <label>Name</label>
+              <%= spec_form.text_field :spec_name, class: "text-field" %>
+            </div>
+            <div class="field-unit">
+              <label>Value</label>
+              <%= spec_form.text_field :spec_value, class: "text-field" %>
+            </div>
+            <div class="field-unit">
+              <label>Unit</label>
+              <%= spec_form.text_field :unit, class: "text-field" %>
+            </div>
+            <div class="field-unit">
+              <label>Sort Order</label>
+              <%= spec_form.number_field :sort_order, value: spec_form.object.sort_order || 0, class: "text-field" %>
+            </div>
+            <div class="field-unit">
+              <%= spec_form.hidden_field :_destroy %>
+              <button type="button" class="remove-nested-field btn btn-danger btn-sm">Remove Specification</button>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      
+      <button type="button" id="add-product-specification" class="btn btn-secondary">Add Specification</button>
+    </div>
+  </div>
+
+  <!-- Product Videos Section -->
+  <div class="field-unit">
+    <div class="field-unit__label">
+      <label>Product Videos</label>
+    </div>
+    <div class="field-unit__field">
+      <div style="margin-bottom: 15px; padding: 10px; background: #e7f3ff; border-radius: 4px; font-size: 14px;">
+        📹 <strong>Hỗ trợ:</strong> YouTube và Vimeo URLs. Ví dụ: https://www.youtube.com/watch?v=ABC123 hoặc https://youtu.be/ABC123
+      </div>
+      
+      <div id="product-videos-container">
+        <%= form.fields_for :product_videos do |video_form| %>
+          <div class="nested-field-wrapper product-video-fields" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0;">
+            <div class="field-unit">
+              <label>Video URL</label>
+              <%= video_form.url_field :url, class: "text-field", placeholder: "https://www.youtube.com/watch?v=..." %>
+            </div>
+            <div class="field-unit">
+              <label>Title</label>
+              <%= video_form.text_field :title, class: "text-field", placeholder: "Video title" %>
+            </div>
+            <div class="field-unit">
+              <label>Description</label>
+              <%= video_form.text_area :description, rows: 3, class: "text-field", placeholder: "Video description (optional)" %>
+            </div>
+            <div class="field-unit">
+              <label>Sort Order</label>
+              <%= video_form.number_field :sort_order, value: video_form.object.sort_order || 0, class: "text-field" %>
+            </div>
+            <div class="field-unit">
+              <%= video_form.check_box :is_active, checked: video_form.object.is_active != false %>
+              <%= video_form.label :is_active, "Active" %>
+            </div>
+            <div class="field-unit">
+              <%= video_form.hidden_field :_destroy %>
+              <button type="button" class="remove-nested-field btn btn-danger btn-sm">Remove Video</button>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      
+      <button type="button" id="add-product-video" class="btn btn-secondary">Add Video</button>
+    </div>
+  </div>
+
+  <!-- Templates for new nested fields -->
+  <script type="text/template" id="product-image-template">
+    <div class="nested-field-wrapper product-image-fields" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0;">
+      <div class="field-unit">
+        <label>Image</label>
+        <input type="file" name="product[product_images_attributes][NEW_RECORD][image]" accept="image/jpeg,image/jpg,image/png,image/webp" class="text-field image-upload" data-preview-target="image_preview_NEW_RECORD">
+      </div>
+      
+      <!-- New Image Preview -->
+      <div class="field-unit">
+        <div id="image_preview_NEW_RECORD" class="image-preview" style="margin-top: 10px; display: none;">
+          <label>Preview:</label><br>
+          <img class="preview-image" style="max-width: 200px; max-height: 150px; border: 1px solid #ddd; border-radius: 4px;">
+          <button type="button" class="remove-preview btn btn-secondary btn-xs" style="margin-left: 10px;">Remove</button>
+        </div>
+      </div>
+      
+      <div class="field-unit">
+        <label>Alt Text</label>
+        <input type="text" name="product[product_images_attributes][NEW_RECORD][alt_text]" class="text-field">
+      </div>
+      <div class="field-unit">
+        <label>Sort Order</label>
+        <input type="number" name="product[product_images_attributes][NEW_RECORD][sort_order]" value="0" class="text-field">
+      </div>
+      <div class="field-unit">
+        <input type="checkbox" name="product[product_images_attributes][NEW_RECORD][is_primary]" value="1">
+        <label>Primary Image</label>
+      </div>
+      <div class="field-unit">
+        <button type="button" class="remove-nested-field btn btn-danger btn-sm">Remove Image</button>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/template" id="product-description-template">
+    <div class="nested-field-wrapper product-description-fields" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0;">
+      <div class="field-unit">
+        <label>Title</label>
+        <input type="text" name="product[product_descriptions_attributes][NEW_RECORD][title]" class="text-field">
+      </div>
+      <div class="field-unit">
+        <label>Content</label>
+        <textarea name="product[product_descriptions_attributes][NEW_RECORD][content]" 
+                  class="ckeditor text-field" 
+                  id="product_descriptions_content_NEW_RECORD"
+                  rows="10"></textarea>
+      </div>
+      <div class="field-unit">
+        <label>Sort Order</label>
+        <input type="number" name="product[product_descriptions_attributes][NEW_RECORD][sort_order]" value="0" class="text-field">
+      </div>
+      <div class="field-unit">
+        <button type="button" class="remove-nested-field btn btn-danger btn-sm">Remove Description</button>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/template" id="product-specification-template">
+    <div class="nested-field-wrapper product-specification-fields" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0;">
+      <div class="field-unit">
+        <label>Name</label>
+        <input type="text" name="product[product_specifications_attributes][NEW_RECORD][spec_name]" class="text-field">
+      </div>
+      <div class="field-unit">
+        <label>Value</label>
+        <input type="text" name="product[product_specifications_attributes][NEW_RECORD][spec_value]" class="text-field">
+      </div>
+      <div class="field-unit">
+        <label>Unit</label>
+        <input type="text" name="product[product_specifications_attributes][NEW_RECORD][unit]" class="text-field">
+      </div>
+      <div class="field-unit">
+        <label>Sort Order</label>
+        <input type="number" name="product[product_specifications_attributes][NEW_RECORD][position]" value="0" class="text-field">
+      </div>
+      <div class="field-unit">
+        <button type="button" class="remove-nested-field btn btn-danger btn-sm">Remove Specification</button>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/template" id="product-video-template">
+    <div class="nested-field-wrapper product-video-fields" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0;">
+      <div class="field-unit">
+        <label>Video URL</label>
+        <input type="url" name="product[product_videos_attributes][NEW_RECORD][url]" class="text-field" placeholder="https://www.youtube.com/watch?v=...">
+      </div>
+      <div class="field-unit">
+        <label>Title</label>
+        <input type="text" name="product[product_videos_attributes][NEW_RECORD][title]" class="text-field" placeholder="Video title">
+      </div>
+      <div class="field-unit">
+        <label>Description</label>
+        <textarea name="product[product_videos_attributes][NEW_RECORD][description]" rows="3" class="text-field" placeholder="Video description (optional)"></textarea>
+      </div>
+      <div class="field-unit">
+        <label>Sort Order</label>
+        <input type="number" name="product[product_videos_attributes][NEW_RECORD][sort_order]" value="0" class="text-field">
+      </div>
+      <div class="field-unit">
+        <input type="checkbox" name="product[product_videos_attributes][NEW_RECORD][is_active]" value="1" checked>
+        <label>Active</label>
+      </div>
+      <div class="field-unit">
+        <button type="button" class="remove-nested-field btn btn-danger btn-sm">Remove Video</button>
+      </div>
+    </div>
+  </script>
+
+  <div class="form-actions">
+    <%= form.submit %>
+    <%= link_to "Cancel", [:admin, page.resource.class], class: "btn btn-secondary" %>
+  </div>
+<% end %>
+
+<script type="text/javascript">
+  function initializeCKEditorForProduct() {
+    if (typeof CKEDITOR === 'undefined') {
+      setTimeout(initializeCKEditorForProduct, 1000);
+      return;
+    }
+    
+    if (!CKEDITOR.env) {
+      setTimeout(initializeCKEditorForProduct, 500);
+      return;
+    }
+    
+    var textareas = document.querySelectorAll('textarea.ckeditor');
+    
+    if (textareas.length === 0) {
+      setTimeout(initializeCKEditorForProduct, 500);
+      return;
+    }
+    
+    textareas.forEach(function(textarea, index) {
+      if (CKEDITOR.instances[textarea.id]) {
+        return;
+      }
+      
+      if (textarea.offsetParent === null) {
+        return;
+      }
+      
+      try {
+        CKEDITOR.replace(textarea.id, {
+          height: 400,
+          width: '100%',
+          language: 'vi',
+          toolbar: [
+            { name: 'document', items: [ 'Source', '-', 'Preview', '-', 'Templates' ] },
+            { name: 'clipboard', items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
+            { name: 'editing', items: [ 'Find', 'Replace', '-', 'SelectAll' ] },
+            '/',
+            { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat' ] },
+            { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },
+            { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
+            '/',
+            { name: 'insert', items: [ 'Image', 'Table', 'HorizontalRule', 'SpecialChar' ] },
+            { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },
+            { name: 'colors', items: [ 'TextColor', 'BGColor' ] },
+            { name: 'tools', items: [ 'Maximize', 'ShowBlocks' ] }
+          ],
+          removeDialogTabs: 'image:advanced;link:advanced'
+        });
+      } catch (error) {
+        // Silent error handling
+      }
+    });
+  }
+  
+  function reinitializeCKEditor() {
+    setTimeout(initializeCKEditorForProduct, 100);
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(initializeCKEditorForProduct, 1000);
+    });
+  } else {
+    setTimeout(initializeCKEditorForProduct, 1000);
+  }
+  
+  window.addEventListener('load', function() {
+    setTimeout(initializeCKEditorForProduct, 1500);
+  });
+  
+  document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+      setTimeout(initializeCKEditorForProduct, 500);
+    }
+  });
+  
+  setTimeout(function() {
+    initializeCKEditorForProduct();
+  }, 3000);
+  
+  // Image Upload and Preview Functionality
+  function initializeImagePreview() {
+    // Handle file input changes for image preview
+    document.addEventListener('change', function(e) {
+      if (e.target.classList.contains('image-upload')) {
+        handleImagePreview(e.target);
+      }
+      
+      if (e.target.id === 'bulk-image-upload') {
+        handleBulkImagePreview(e.target);
+      }
+    });
+    
+    // Handle remove preview buttons
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('remove-preview')) {
+        removeImagePreview(e.target);
+      }
+      
+      if (e.target.classList.contains('delete-current-image')) {
+        deleteCurrentImage(e.target);
+      }
+      
+      if (e.target.classList.contains('remove-bulk-preview')) {
+        removeBulkPreview(e.target);
+      }
+      
+      if (e.target.id === 'add-bulk-images') {
+        addBulkImagesToForm();
+      }
+    });
+  }
+  
+  function handleImagePreview(fileInput) {
+    const file = fileInput.files[0];
+    const previewTarget = fileInput.getAttribute('data-preview-target');
+    const previewContainer = document.getElementById(previewTarget);
+    
+    if (!file || !previewContainer) return;
+    
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      alert('Chỉ chấp nhận các định dạng: JPG, PNG, WebP');
+      fileInput.value = '';
+      return;
+    }
+    
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert('Kích thước file không được vượt quá 5MB');
+      fileInput.value = '';
+      return;
+    }
+    
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const previewImage = previewContainer.querySelector('.preview-image');
+      previewImage.src = e.target.result;
+      previewContainer.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+  
+  function removeImagePreview(button) {
+    const previewContainer = button.closest('.image-preview');
+    const fieldWrapper = button.closest('.nested-field-wrapper');
+    const fileInput = fieldWrapper.querySelector('.image-upload');
+    
+    previewContainer.style.display = 'none';
+    fileInput.value = '';
+  }
+  
+  function deleteCurrentImage(button) {
+    if (confirm('Bạn có chắc chắn muốn xóa ảnh hiện tại?')) {
+      const currentImagePreview = button.closest('.current-image-preview');
+      const fieldWrapper = button.closest('.nested-field-wrapper');
+      const destroyInput = fieldWrapper.querySelector('input[name*="[_destroy]"]');
+      
+      currentImagePreview.style.display = 'none';
+      if (destroyInput) {
+        destroyInput.value = '1';
+      }
+    }
+  }
+  
+  // Bulk image upload functions
+  let bulkFiles = [];
+  
+  function handleBulkImagePreview(fileInput) {
+    const files = Array.from(fileInput.files);
+    const previewContainer = document.getElementById('bulk-preview-container');
+    const addButton = document.getElementById('add-bulk-images');
+    
+    // Clear previous previews
+    previewContainer.innerHTML = '';
+    bulkFiles = [];
+    
+    files.forEach((file, index) => {
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+      if (!validTypes.includes(file.type)) {
+        alert(`File "${file.name}" không đúng định dạng. Chỉ chấp nhận: JPG, PNG, WebP`);
+        return;
+      }
+      
+      // Validate file size (max 5MB)
+      const maxSize = 5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        alert(`File "${file.name}" vượt quá 5MB`);
+        return;
+      }
+      
+      bulkFiles.push(file);
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const previewDiv = document.createElement('div');
+        previewDiv.className = 'bulk-preview-item';
+        previewDiv.style.cssText = 'position: relative; border: 1px solid #ddd; border-radius: 4px; overflow: hidden;';
+        previewDiv.dataset.fileIndex = index;
+        
+        previewDiv.innerHTML = `
+          <img src="${e.target.result}" style="width: 100%; height: 120px; object-fit: cover;">
+          <div style="padding: 5px; font-size: 11px; background: #f8f9fa;">
+            <div style="font-weight: bold; margin-bottom: 2px;">${file.name}</div>
+            <div>${(file.size / 1024).toFixed(1)} KB</div>
+          </div>
+          <button type="button" class="remove-bulk-preview" data-file-index="${index}" 
+                  style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; 
+                         border-radius: 50%; background: #dc3545; color: white; border: none; 
+                         cursor: pointer; font-size: 12px; display: flex; align-items: center; 
+                         justify-content: center;">×</button>
+        `;
+        
+        previewContainer.appendChild(previewDiv);
+      };
+      reader.readAsDataURL(file);
+    });
+    
+    if (bulkFiles.length > 0) {
+      addButton.style.display = 'block';
+      addButton.textContent = `Add ${bulkFiles.length} Image(s)`;
+    } else {
+      addButton.style.display = 'none';
+    }
+  }
+  
+  function removeBulkPreview(button) {
+    const fileIndex = parseInt(button.dataset.fileIndex);
+    const previewItem = button.closest('.bulk-preview-item');
+    const addButton = document.getElementById('add-bulk-images');
+    
+    // Remove from bulkFiles array
+    bulkFiles = bulkFiles.filter((_, index) => index !== fileIndex);
+    
+    // Remove preview element
+    previewItem.remove();
+    
+    // Update add button
+    if (bulkFiles.length > 0) {
+      addButton.textContent = `Add ${bulkFiles.length} Image(s)`;
+    } else {
+      addButton.style.display = 'none';
+    }
+    
+    // Update file indices for remaining previews
+    const remainingPreviews = document.querySelectorAll('.bulk-preview-item');
+    remainingPreviews.forEach((preview, newIndex) => {
+      preview.dataset.fileIndex = newIndex;
+      const removeBtn = preview.querySelector('.remove-bulk-preview');
+      removeBtn.dataset.fileIndex = newIndex;
+    });
+  }
+  
+  function addBulkImagesToForm() {
+    const container = document.getElementById('product-images-container');
+    const template = document.getElementById('product-image-template');
+    
+    if (!container || !template || bulkFiles.length === 0) return;
+    
+    bulkFiles.forEach((file, index) => {
+      const newIndex = Date.now() + index;
+      let newField = template.innerHTML.replace(/NEW_RECORD/g, newIndex);
+      
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = newField;
+      wrapper.className = 'nested-field-wrapper';
+      
+      container.appendChild(wrapper);
+      
+      // Set the file to the file input
+      const fileInput = wrapper.querySelector('.image-upload');
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(file);
+      fileInput.files = dataTransfer.files;
+      
+      // Trigger preview for this field
+      handleImagePreview(fileInput);
+      
+      // Initialize event listeners for new field
+      fileInput.addEventListener('change', function(e) {
+        handleImagePreview(e.target);
+      });
+      
+      const removePreviewBtn = wrapper.querySelector('.remove-preview');
+      if (removePreviewBtn) {
+        removePreviewBtn.addEventListener('click', function(e) {
+          removeImagePreview(e.target);
+        });
+      }
+    });
+    
+    // Clear bulk upload
+    document.getElementById('bulk-image-upload').value = '';
+    document.getElementById('bulk-preview-container').innerHTML = '';
+    document.getElementById('add-bulk-images').style.display = 'none';
+    bulkFiles = [];
+  }
+  
+  // Initialize image preview functionality
+  initializeImagePreview();
+</script>
+
+<style>
+  .btn-xs {
+    padding: 2px 6px;
+    font-size: 11px;
+    line-height: 1.2;
+    border-radius: 3px;
+  }
+  
+  .image-upload {
+    border: 2px dashed #ddd;
+    padding: 10px;
+    border-radius: 4px;
+    transition: border-color 0.3s;
+  }
+  
+  .image-upload:hover {
+    border-color: #007bff;
+  }
+  
+  .image-preview {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #e9ecef;
+  }
+  
+  .current-image-preview {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #e9ecef;
+  }
+  
+  .delete-current-image {
+    background: #dc3545;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .delete-current-image:hover {
+    background: #c82333;
+  }
+  
+  .preview-image {
+    display: block;
+    margin: 5px 0;
+  }
+  
+  .bulk-upload-section {
+    transition: all 0.3s ease;
+  }
+  
+  .bulk-upload-section:hover {
+    border-color: #0056b3 !important;
+    background: #e7f3ff !important;
+  }
+  
+  .bulk-preview-item {
+    transition: transform 0.2s ease;
+  }
+  
+  .bulk-preview-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  
+  .remove-bulk-preview:hover {
+    background: #c82333 !important;
+    transform: scale(1.1);
+  }
+  
+  #bulk-image-upload {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  #bulk-image-upload:hover {
+    border-color: #007bff;
+  }
+  
+  #add-bulk-images {
+    background: #28a745;
+    border-color: #28a745;
+    color: white;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  #add-bulk-images:hover {
+    background: #218838;
+    border-color: #218838;
+    transform: translateY(-1px);
+  }
+</style>

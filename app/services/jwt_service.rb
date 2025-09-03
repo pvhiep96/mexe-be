@@ -13,8 +13,14 @@ class JwtService
   end
 
   def self.decode(token)
-    JWT.decode(token, SECRET_KEY, true, { algorithm: ALGORITHM })
-  rescue JWT::ExpiredSignature, JWT::DecodeError
+    decoded = JWT.decode(token, SECRET_KEY, true, { algorithm: ALGORITHM })
+    Rails.logger.debug "JWT Decode successful: #{decoded}"
+    decoded
+  rescue JWT::ExpiredSignature => e
+    Rails.logger.error "JWT Expired: #{e.message}"
+    nil
+  rescue JWT::DecodeError => e
+    Rails.logger.error "JWT Decode Error: #{e.message}"
     nil
   end
 

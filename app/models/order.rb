@@ -20,14 +20,14 @@ class Order < ApplicationRecord
     delivered: 'delivered',
     cancelled: 'cancelled',
     refunded: 'refunded'
-  }
+  }, _suffix: true
 
   enum payment_status: {
-    payment_pending: 'pending',
+    pending: 'pending',
     paid: 'paid',
     failed: 'failed',
-    payment_refunded: 'refunded'
-  }
+    refunded: 'refunded'
+  }, _prefix: :payment
 
   enum payment_method: {
     cod: 'cod',
@@ -40,12 +40,67 @@ class Order < ApplicationRecord
     store_pickup: 'store'
   }
 
+  enum status_processed: {
+    not_processed: 0,
+    shipped_to_carrier: 1,
+    processing_delivered: 2
+  }, _prefix: :processing
+
+  SHIPPING_PROVIDERS = [
+    ['Giao Hàng Nhanh', 'ghn'],
+    ['Giao Hàng Tiết Kiệm', 'ghtk'], 
+    ['Viettel Post', 'viettel_post'],
+    ['Tự nhập thủ công', 'manual']
+  ].freeze
+
   def self.ransackable_attributes(auth_object = nil)
-    %w[id order_number subtotal total_amount status payment_status payment_method delivery_type created_at updated_at]
+    %w[id order_number subtotal total_amount status payment_status payment_method delivery_type status_processed shipping_provider tracking_number shipping_name shipping_phone shipping_city shipping_district shipping_ward shipping_postal_code delivery_address guest_name guest_email guest_phone created_at updated_at]
   end
 
   def self.ransackable_associations(auth_object = nil)
     %w[user order_items products product_reviews coupon_usages]
+  end
+
+  # Get all clients related to this order
+  def related_clients
+    products.joins(:client).select('admin_users.*').distinct
+  end
+
+  # Check if order contains products from specific client
+  def contains_products_from_client?(client)
+    products.where(client_id: client.id).exists?
+  end
+
+  # Helper methods for status_processed with new enum names
+  def processing_status_text
+    case status_processed
+    when 'not_processed' then 'Chưa xử lý'
+    when 'shipped_to_carrier' then 'Đã giao đơn vị vận chuyển'
+    when 'processing_delivered' then 'Đã giao hàng'
+    end
+  end
+
+  # Get shipping provider display name
+  def shipping_provider_name
+    provider_hash = SHIPPING_PROVIDERS.find { |name, value| value == shipping_provider }
+    provider_hash ? provider_hash[0] : shipping_provider&.humanize
+  end
+
+  # Generate tracking URL based on provider
+  def full_tracking_url
+    return tracking_url if tracking_url.present?
+    return nil unless tracking_number.present?
+
+    case shipping_provider
+    when 'ghn'
+      "https://5sao.ghn.dev/?order_code=#{tracking_number}"
+    when 'ghtk'
+      "https://khachhang.giaohangtietkiem.vn/khach-hang/tra-cuu-don-hang?bill_code=#{tracking_number}"
+    when 'viettel_post'
+      "https://viettelpost.vn/tra-cuu-hanh-trinh-don-hang?ma-don-hang=#{tracking_number}"
+    else
+      nil
+    end
   end
 
   def calculate_totals

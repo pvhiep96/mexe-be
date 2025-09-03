@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1">
+  <title>
+    <%= content_for(:title) %>
+    <%= Rails.application.class.name.split("::").first.titleize %> Admin
+  </title>
+
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+  <%= stylesheet_link_tag "administrate/application" %>
+  <script src="//cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+  <%= javascript_importmap_tags %>
+  <%= javascript_include_tag "administrate/application" %>
+  <%= javascript_include_tag "admin/nested_forms" %>
+  
+  <style>
+    .admin-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+    
+    .admin-sidebar {
+      width: 250px;
+      background: #343a40;
+      color: white;
+      padding: 0;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    
+    .admin-content {
+      flex: 1;
+      margin-left: 250px;
+      padding: 20px;
+      background: #f8f9fa;
+      min-height: 100vh;
+    }
+    
+    .sidebar-header {
+      padding: 20px;
+      background: #212529;
+      border-bottom: 1px solid #495057;
+    }
+    
+    .sidebar-header h3 {
+      margin: 0;
+      color: white;
+      font-size: 18px;
+    }
+    
+    .sidebar-nav {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+    
+    .sidebar-nav li {
+      border-bottom: 1px solid #495057;
+    }
+    
+    .sidebar-nav a {
+      display: block;
+      padding: 15px 20px;
+      color: #adb5bd;
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+    
+    .sidebar-nav a:hover,
+    .sidebar-nav a.active {
+      background: #495057;
+      color: white;
+    }
+    
+    .sidebar-nav .nav-icon {
+      width: 20px;
+      display: inline-block;
+      margin-right: 10px;
+    }
+    
+    .content-header {
+      background: white;
+      padding: 20px;
+      margin: -20px -20px 20px -20px;
+      border-bottom: 1px solid #dee2e6;
+    }
+    
+    .content-header h1 {
+      margin: 0;
+      color: #495057;
+    }
+    
+    .main-content {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    
+    @media (max-width: 768px) {
+      .admin-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s;
+      }
+      
+      .admin-content {
+        margin-left: 0;
+      }
+      
+      .sidebar-toggle {
+        display: block !important;
+      }
+      
+      .admin-sidebar.open {
+        transform: translateX(0);
+      }
+    }
+    
+    .sidebar-toggle {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+      background: #343a40;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <nav class="admin-sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h3>Admin Panel</h3>
+      </div>
+      
+      <ul class="sidebar-nav">
+        <li>
+          <%= link_to admin_root_path, class: "#{current_page?(admin_root_path) ? 'active' : ''}" do %>
+            <span class="nav-icon">📊</span>
+            Dashboard
+          <% end %>
+        </li>
+        
+        <li>
+          <%= link_to admin_products_path, class: "#{current_page?(admin_products_path) || request.path.start_with?('/admin/products') ? 'active' : ''}" do %>
+            <span class="nav-icon">📦</span>
+            Products
+          <% end %>
+        </li>
+        
+        <li>
+          <%= link_to admin_brands_path, class: "#{current_page?(admin_brands_path) || request.path.start_with?('/admin/brands') ? 'active' : ''}" do %>
+            <span class="nav-icon">🏷️</span>
+            Brands
+          <% end %>
+        </li>
+        
+        <li>
+          <%= link_to admin_categories_path, class: "#{current_page?(admin_categories_path) || request.path.start_with?('/admin/categories') ? 'active' : ''}" do %>
+            <span class="nav-icon">📂</span>
+            Categories
+          <% end %>
+        </li>
+        
+        <li>
+          <a href="#">
+            <span class="nav-icon">👥</span>
+            Users
+          </a>
+        </li>
+        
+        <li>
+          <a href="#">
+            <span class="nav-icon">📈</span>
+            Orders
+          </a>
+        </li>
+        
+        <li>
+          <a href="#">
+            <span class="nav-icon">⚙️</span>
+            Settings
+          </a>
+        </li>
+        
+        <li style="border-top: 1px solid #495057; margin-top: 20px;">
+          <a href="/" target="_blank">
+            <span class="nav-icon">🌐</span>
+            View Site
+          </a>
+        </li>
+      </ul>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="admin-content">
+      <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+      
+      <%= content_for(:layout) %>
+    </main>
+  </div>
+
+  <script type="text/javascript">
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+    }
+    
+    // Wait for both CKEDITOR and DOM to be ready
+    var initializeCKEditorWhenReady = function() {
+      if (typeof CKEDITOR !== 'undefined' && document.readyState === 'complete') {
+        console.log('CKEDITOR is ready, initializing...');
+        setTimeout(function() {
+          var textareas = document.querySelectorAll('textarea.ckeditor');
+          console.log('Found textareas:', textareas.length);
+          textareas.forEach(function(textarea) {
+            if (!CKEDITOR.instances[textarea.id]) {
+              console.log('Initializing CKEditor for:', textarea.id);
+              CKEDITOR.replace(textarea.id, {
+                height: 400,
+                language: 'vi',
+                toolbar: [
+                  { name: 'document', items: [ 'Source', '-', 'NewPage', 'Preview', '-', 'Templates' ] },
+                  { name: 'clipboard', items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
+                  { name: 'editing', items: [ 'Find', 'Replace', '-', 'SelectAll' ] },
+                  '/',
+                  { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat' ] },
+                  { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },
+                  { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
+                  '/',
+                  { name: 'insert', items: [ 'Image', 'Table', 'HorizontalRule', 'SpecialChar' ] },
+                  { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },
+                  { name: 'colors', items: [ 'TextColor', 'BGColor' ] },
+                  { name: 'tools', items: [ 'Maximize' ] }
+                ],
+                filebrowserBrowseUrl: '/ckeditor/attachment_files',
+                filebrowserImageBrowseUrl: '/ckeditor/pictures',
+                filebrowserImageUploadUrl: '/ckeditor/pictures',
+                filebrowserUploadUrl: '/ckeditor/attachment_files'
+              });
+            }
+          });
+        }, 100);
+      } else {
+        setTimeout(initializeCKEditorWhenReady, 100);
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeCKEditorWhenReady();
+    });
+  </script>
+</body>
+</html>

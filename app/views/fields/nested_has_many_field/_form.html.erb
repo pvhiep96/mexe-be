@@ -1,0 +1,110 @@
+<div class="nested-has-many-field" data-field-name="<%= field.nested_attributes_name %>">
+  <div class="nested-items">
+    <% field.nested_attributes_with_new.each_with_index do |item, index| %>
+      <div class="nested-item" data-index="<%= index %>">
+        <div class="nested-item-header">
+          <h4>Image <%= index + 1 %></h4>
+          <% if item[:id].present? %>
+            <button type="button" class="btn btn-sm btn-danger remove-item" data-index="<%= index %>">
+              Remove
+            </button>
+          <% end %>
+        </div>
+        
+        <% field.nested_edit_attributes.each do |attr| %>
+          <div class="form-group">
+            <label><%= attr.to_s.humanize %></label>
+            <% if attr == :image %>
+              <%= file_field_tag "#{field.nested_attributes_name}[#{index}][#{attr}]", 
+                  class: "form-control", 
+                  accept: "image/*" %>
+              <% if item[:id].present? && item[attr].present? %>
+                <div class="current-image">
+                  <small>Current image:</small>
+                  <%= image_tag item[attr].url, style: "max-width: 100px; max-height: 100px;" %>
+                </div>
+              <% end %>
+            <% elsif attr == :is_primary %>
+              <%= check_box_tag "#{field.nested_attributes_name}[#{index}][#{attr}]", 
+                  "1", 
+                  item[attr], 
+                  class: "form-check-input" %>
+            <% else %>
+              <%= text_field_tag "#{field.nested_attributes_name}[#{index}][#{attr}]", 
+                  item[attr], 
+                  class: "form-control" %>
+            <% end %>
+          </div>
+        <% end %>
+        
+        <% if item[:id].present? %>
+          <%= hidden_field_tag "#{field.nested_attributes_name}[#{index}][id]", item[:id] %>
+        <% end %>
+        <%= hidden_field_tag "#{field.nested_attributes_name}[#{index}][_destroy]", "0" %>
+      </div>
+    <% end %>
+  </div>
+  
+  <button type="button" class="btn btn-secondary add-item">Add Another Image</button>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const container = document.querySelector('[data-field-name="<%= field.nested_attributes_name %>"]');
+  if (!container) return;
+  
+  // Add new item
+  container.querySelector('.add-item').addEventListener('click', function() {
+    const itemsContainer = container.querySelector('.nested-items');
+    const newIndex = itemsContainer.children.length;
+    const newItem = itemsContainer.children[0].cloneNode(true);
+    
+    // Update index
+    newItem.dataset.index = newIndex;
+    newItem.querySelector('h4').textContent = `Image ${newIndex + 1}`;
+    
+    // Clear values
+    newItem.querySelectorAll('input, textarea, select').forEach(input => {
+      if (input.type === 'file') {
+        input.value = '';
+      } else if (input.type === 'checkbox') {
+        input.checked = false;
+      } else {
+        input.value = '';
+      }
+    });
+    
+    // Update names
+    newItem.querySelectorAll('input, textarea, select').forEach(input => {
+      if (input.name) {
+        input.name = input.name.replace(/\[\d+\]/, `[${newIndex}]`);
+      }
+    });
+    
+    // Remove remove button and current image
+    const removeBtn = newItem.querySelector('.remove-item');
+    if (removeBtn) removeBtn.remove();
+    const currentImage = newItem.querySelector('.current-image');
+    if (currentImage) currentImage.remove();
+    
+    // Clear ID
+    const idField = newItem.querySelector('input[name*="[id]"]');
+    if (idField) idField.value = '';
+    
+    itemsContainer.appendChild(newItem);
+  });
+  
+  // Remove item
+  container.addEventListener('click', function(e) {
+    if (e.target.classList.contains('remove-item')) {
+      const index = e.target.dataset.index;
+      const item = container.querySelector(`[data-index="${index}"]`);
+      const destroyField = item.querySelector('input[name*="[_destroy]"]');
+      if (destroyField) {
+        destroyField.value = "1";
+        item.style.display = 'none';
+      }
+    }
+  });
+});
+</script>

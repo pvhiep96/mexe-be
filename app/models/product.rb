@@ -1,16 +1,27 @@
 class Product < ApplicationRecord
   belongs_to :brand, optional: true
   belongs_to :category, optional: true
+  belongs_to :client, class_name: 'AdminUser', optional: true
   has_many :product_images, dependent: :destroy
+  has_many :product_descriptions, dependent: :destroy  
   has_many :product_specifications, dependent: :destroy
+  has_many :product_videos, dependent: :destroy
   has_many :product_variants, dependent: :destroy
   has_many :order_items, dependent: :destroy
   has_many :wishlists, dependent: :destroy
   has_many :wished_by_users, through: :wishlists, source: :user
   has_many :product_reviews, dependent: :destroy
   has_many :images, class_name: 'ProductImage'
+  has_many :descriptions, class_name: 'ProductDescription'
+  has_many :videos, class_name: 'ProductVideo'
   has_many :variants, class_name: 'ProductVariant'
   has_many :specifications, class_name: 'ProductSpecification'
+
+  # Nested attributes for admin interface
+  accepts_nested_attributes_for :product_images, allow_destroy: true, reject_if: :all_blank
+  accepts_nested_attributes_for :product_descriptions, allow_destroy: true, reject_if: proc { |attr| attr['title'].blank? && attr['content'].blank? }
+  accepts_nested_attributes_for :product_specifications, allow_destroy: true, reject_if: proc { |attr| attr['spec_name'].blank? && attr['spec_value'].blank? }
+  accepts_nested_attributes_for :product_videos, allow_destroy: true, reject_if: proc { |attr| attr['url'].blank? && attr['title'].blank? }
 
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true
@@ -30,6 +41,16 @@ class Product < ApplicationRecord
   end
 
   def self.ransackable_associations(auth_object = nil)
-    %w[brand category product_images product_specifications product_variants order_items wishlists product_reviews]
+    %w[brand category product_images product_specifications product_videos product_variants order_items wishlists product_reviews]
+  end
+
+  # Get primary image or first image
+  def primary_image
+    product_images.primary.first || product_images.first
+  end
+
+  # Get primary image URL
+  def primary_image_url
+    primary_image&.image_url
   end
 end

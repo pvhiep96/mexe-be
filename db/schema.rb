@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_08_14_000001) do
+ActiveRecord::Schema[7.2].define(version: 2025_08_31_020915) do
   create_table "active_admin_comments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
@@ -61,8 +61,13 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_14_000001) do
     t.datetime "remember_created_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "role", default: 0, null: false
+    t.string "client_name"
+    t.string "client_phone"
+    t.text "client_address"
     t.index ["email"], name: "index_admin_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
+    t.index ["role"], name: "index_admin_users_on_role"
   end
 
   create_table "article_images", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -108,6 +113,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_14_000001) do
     t.integer "sort_order", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "logo_url"
     t.index ["slug"], name: "index_brands_on_slug", unique: true
   end
 
@@ -123,6 +129,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_14_000001) do
     t.text "meta_description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "image_url"
     t.index ["parent_id"], name: "index_categories_on_parent_id"
     t.index ["slug"], name: "index_categories_on_slug", unique: true
   end
@@ -208,18 +215,40 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_14_000001) do
     t.decimal "coupon_discount", precision: 10, scale: 2, default: "0.0"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "status_processed", default: 0, null: false
+    t.string "shipping_provider"
+    t.string "tracking_number"
+    t.string "tracking_url"
+    t.datetime "shipped_at"
+    t.datetime "delivered_at"
+    t.string "shipping_name"
+    t.string "shipping_phone"
+    t.string "shipping_city"
+    t.string "shipping_district"
+    t.string "shipping_ward"
+    t.string "shipping_postal_code"
     t.index ["order_number"], name: "index_orders_on_order_number", unique: true
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
+  create_table "product_descriptions", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "product_id", null: false
+    t.string "title"
+    t.text "content"
+    t.integer "sort_order", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_product_descriptions_on_product_id"
+  end
+
   create_table "product_images", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "product_id", null: false
-    t.string "image_url", null: false
     t.string "alt_text"
     t.integer "sort_order", default: 0
     t.boolean "is_primary", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "image"
     t.index ["product_id"], name: "index_product_images_on_product_id"
   end
 
@@ -244,6 +273,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_14_000001) do
     t.string "spec_name", null: false
     t.text "spec_value", null: false
     t.integer "sort_order", default: 0
+    t.string "unit"
+    t.string "active", default: "1"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["product_id"], name: "index_product_specifications_on_product_id"
@@ -259,6 +290,19 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_14_000001) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["product_id"], name: "index_product_variants_on_product_id"
+  end
+
+  create_table "product_videos", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "product_id", null: false
+    t.string "url", null: false
+    t.string "title"
+    t.text "description"
+    t.integer "sort_order", default: 0
+    t.boolean "is_active", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id", "sort_order"], name: "index_product_videos_on_product_id_and_sort_order"
+    t.index ["product_id"], name: "index_product_videos_on_product_id"
   end
 
   create_table "products", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -290,8 +334,10 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_14_000001) do
     t.integer "view_count", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "client_id"
     t.index ["brand_id"], name: "index_products_on_brand_id"
     t.index ["category_id"], name: "index_products_on_category_id"
+    t.index ["client_id"], name: "index_products_on_client_id"
     t.index ["sku"], name: "index_products_on_sku", unique: true
     t.index ["slug"], name: "index_products_on_slug", unique: true
   end
@@ -387,12 +433,15 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_14_000001) do
   add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "products"
   add_foreign_key "orders", "users"
+  add_foreign_key "product_descriptions", "products"
   add_foreign_key "product_images", "products"
   add_foreign_key "product_reviews", "orders"
   add_foreign_key "product_reviews", "products"
   add_foreign_key "product_reviews", "users"
   add_foreign_key "product_specifications", "products"
   add_foreign_key "product_variants", "products"
+  add_foreign_key "product_videos", "products"
+  add_foreign_key "products", "admin_users", column: "client_id"
   add_foreign_key "products", "brands"
   add_foreign_key "products", "categories"
   add_foreign_key "user_addresses", "users"

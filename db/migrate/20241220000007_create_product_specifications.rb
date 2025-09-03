@@ -5,8 +5,10 @@ class CreateProductSpecifications < ActiveRecord::Migration[7.2]
       t.string :spec_name, null: false
       t.text :spec_value, null: false
       t.integer :sort_order, default: 0
+      t.string :unit
+      t.string :active, default: true
 
       t.timestamps
     end
   end
-end 
+end

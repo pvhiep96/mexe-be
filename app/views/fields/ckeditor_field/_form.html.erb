@@ -1,0 +1,27 @@
+<div class="field-unit__label">
+  <%= f.label field.attribute, field.attribute.to_s.humanize %>
+</div>
+<div class="field-unit__field">
+  <%= f.text_area field.attribute, 
+      class: "ckeditor",
+      id: "#{field.attribute}_#{f.object.object_id}",
+      data: {
+        ckeditor: {
+          height: 400,
+          language: 'vi',
+          toolbar: 'Full'
+        }
+      } %>
+</div>
+
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof CKEDITOR !== 'undefined') {
+      CKEDITOR.replace('<%= "#{field.attribute}_#{f.object.object_id}" %>', {
+        height: 400,
+        language: 'vi',
+        toolbar: 'Full'
+      });
+    }
+  });
+</script>

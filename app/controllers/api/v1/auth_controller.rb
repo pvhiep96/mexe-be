@@ -1,19 +1,24 @@
 module Api
   module V1
     class AuthController < ApplicationController
-      before_action :authenticate_user!, only: [:profile, :update_profile, :change_password]
+      before_action :authenticate_user!, only: [:update_profile, :change_password]
       before_action :ensure_json_request
+      # skip_before_action :authenticate_user_from_token, only: [:login, :register, :profile]
 
       def login
         user = User.find_by(email: params[:email])
 
         if user && user.authenticate(params[:password])
           token = JwtService.generate_user_token(user)
+          
+          user_data = UserSerializer.new(user).serializable_hash
+          # Extract actual user data from serializer
+          actual_user_data = user_data.is_a?(Hash) && user_data[:data] ? user_data[:data] : user_data
 
           render json: {
             success: true,
             message: 'Đăng nhập thành công',
-            user: UserSerializer.new(user).serializable_hash,
+            user: actual_user_data,
             token: token
           }, status: :ok
         else
@@ -30,11 +35,14 @@ module Api
 
         if user.save
           token = JwtService.generate_user_token(user)
+          
+          user_data = UserSerializer.new(user).serializable_hash
+          actual_user_data = user_data.is_a?(Hash) && user_data[:data] ? user_data[:data] : user_data
 
           render json: {
             success: true,
             message: 'Đăng ký thành công',
-            user: UserSerializer.new(user).serializable_hash,
+            user: actual_user_data,
             token: token
           }, status: :created
         else
@@ -47,18 +55,57 @@ module Api
       end
 
       def profile
-        render json: {
-          success: true,
-          user: UserSerializer.new(current_user).serializable_hash
-        }, status: :ok
+        # Manually verify token for profile endpoint
+        token = extract_token_from_header
+        
+        unless token
+          render json: {
+            success: false,
+            message: 'Token không được cung cấp',
+            errors: ['Token không được cung cấp']
+          }, status: :unauthorized
+          return
+        end
+
+        begin
+          user_id = JwtService.extract_user_id(token)
+          user = User.find_by(id: user_id)
+          
+          unless user
+            render json: {
+              success: false,
+              message: 'Người dùng không tồn tại',
+              errors: ['Người dùng không tồn tại']
+            }, status: :unauthorized
+            return
+          end
+
+          user_data = UserSerializer.new(user).serializable_hash
+          actual_user_data = user_data.is_a?(Hash) && user_data[:data] ? user_data[:data] : user_data
+          
+          render json: {
+            success: true,
+            user: actual_user_data
+          }, status: :ok
+        rescue => e
+          Rails.logger.error "Profile verification error: #{e.message}"
+          render json: {
+            success: false,
+            message: 'Token không hợp lệ',
+            errors: ['Token không hợp lệ']
+          }, status: :unauthorized
+        end
       end
 
       def update_profile
         if current_user.update(profile_params)
+          user_data = UserSerializer.new(current_user).serializable_hash
+          actual_user_data = user_data.is_a?(Hash) && user_data[:data] ? user_data[:data] : user_data
+          
           render json: {
             success: true,
             message: 'Cập nhật thông tin thành công',
-            user: UserSerializer.new(current_user).serializable_hash
+            user: actual_user_data
           }, status: :ok
         else
           render json: {

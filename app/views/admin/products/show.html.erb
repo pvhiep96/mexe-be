@@ -1,0 +1,263 @@
+<% content_for(:title, "Product Details") %>
+
+<div class="admin-product-show">
+  <div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h1><%= page.resource.name %></h1>
+    <div>
+      <%= link_to "Edit", edit_admin_product_path(page.resource), class: "btn btn-primary" %>
+      <%= link_to "← Back to Products", admin_products_path, class: "btn btn-secondary" %>
+    </div>
+  </div>
+
+  <div class="product-details" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+    
+    <!-- Basic Information -->
+    <div class="section" style="margin-bottom: 30px;">
+      <h3>Basic Information</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+          <strong>Name:</strong> <%= page.resource.name %><br>
+          <strong>SKU:</strong> <%= page.resource.sku %><br>
+          <strong>Slug:</strong> <%= page.resource.slug %><br>
+          <strong>Brand:</strong> <%= page.resource.brand&.name || 'N/A' %><br>
+          <strong>Category:</strong> <%= page.resource.category&.name || 'N/A' %>
+        </div>
+        <div>
+          <strong>Price:</strong> <%= number_to_currency(page.resource.price, unit: "₫", precision: 0) if page.resource.price %><br>
+          <strong>Original Price:</strong> <%= number_to_currency(page.resource.original_price, unit: "₫", precision: 0) if page.resource.original_price %><br>
+          <strong>Stock:</strong> <%= page.resource.stock_quantity || 0 %><br>
+          <strong>Warranty:</strong> <%= page.resource.warranty_period || 'N/A' %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="section" style="margin-bottom: 30px;">
+      <h3>Status</h3>
+      <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+        <span class="badge <%= page.resource.is_active? ? 'badge-success' : 'badge-danger' %>">
+          <%= page.resource.is_active? ? 'Active' : 'Inactive' %>
+        </span>
+        <% if page.resource.is_featured? %>
+          <span class="badge badge-primary">Featured</span>
+        <% end %>
+        <% if page.resource.is_new? %>
+          <span class="badge badge-info">New</span>
+        <% end %>
+        <% if page.resource.is_hot? %>
+          <span class="badge badge-warning">Hot</span>
+        <% end %>
+        <% if page.resource.is_preorder? %>
+          <span class="badge badge-secondary">Pre-order</span>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <% if page.resource.description.present? %>
+      <div class="section" style="margin-bottom: 30px;">
+        <h3>Description</h3>
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 4px;">
+          <%= simple_format(page.resource.description) %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Short Description -->
+    <% if page.resource.short_description.present? %>
+      <div class="section" style="margin-bottom: 30px;">
+        <h3>Short Description</h3>
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 4px;">
+          <%= simple_format(page.resource.short_description) %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Product Images -->
+    <% if page.resource.product_images.any? %>
+      <div class="section" style="margin-bottom: 30px;">
+        <h3>Product Images (<%= page.resource.product_images.count %>)</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+          <% page.resource.product_images.each do |image| %>
+            <div style="border: 1px solid #ddd; border-radius: 4px; overflow: hidden;">
+              <% if image.image? %>
+                <img src="<%= image.image.url rescue '#' %>" alt="<%= image.alt_text %>" style="width: 100%; height: 150px; object-fit: cover;">
+              <% else %>
+                <div style="width: 100%; height: 150px; background: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                  No Image
+                </div>
+              <% end %>
+              <div style="padding: 10px; font-size: 12px;">
+                <div><strong>Alt Text:</strong> <%= image.alt_text || 'N/A' %></div>
+                <div><strong>Order:</strong> <%= image.sort_order || 0 %></div>
+                <% if image.is_primary? %>
+                  <div style="color: #28a745;"><strong>Primary Image</strong></div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Product Descriptions -->
+    <% if page.resource.product_descriptions.any? %>
+      <div class="section" style="margin-bottom: 30px;">
+        <h3>Product Descriptions (<%= page.resource.product_descriptions.count %>)</h3>
+        <% page.resource.product_descriptions.order(:sort_order).each_with_index do |desc, index| %>
+          <div style="border: 1px solid #ddd; border-radius: 4px; padding: 15px; margin-bottom: 15px;">
+            <h4><%= desc.title %></h4>
+            <div style="margin: 10px 0; color: #666; font-size: 12px;">
+              Sort Order: <%= desc.sort_order || 0 %>
+            </div>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 4px;">
+              <%= raw(desc.content) if desc.content.present? %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <!-- Product Specifications -->
+    <% if page.resource.product_specifications.any? %>
+      <div class="section" style="margin-bottom: 30px;">
+        <h3>Product Specifications (<%= page.resource.product_specifications.count %>)</h3>
+        <div style="background: white; border-radius: 4px; overflow: hidden; border: 1px solid #ddd;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead style="background: #f8f9fa;">
+              <tr>
+                <th style="padding: 12px; text-align: left; border-bottom: 1px solid #ddd;">Name</th>
+                <th style="padding: 12px; text-align: left; border-bottom: 1px solid #ddd;">Value</th>
+                <th style="padding: 12px; text-align: left; border-bottom: 1px solid #ddd;">Unit</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% page.resource.product_specifications.order(:sort_order).each do |spec| %>
+                <tr>
+                  <td style="padding: 12px; border-bottom: 1px solid #f8f9fa;"><strong><%= spec.spec_name %></strong></td>
+                  <td style="padding: 12px; border-bottom: 1px solid #f8f9fa;"><%= spec.spec_value %></td>
+                  <td style="padding: 12px; border-bottom: 1px solid #f8f9fa;"><%= spec.unit || '-' %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Product Videos -->
+    <% if page.resource.product_videos.any? %>
+      <div class="section" style="margin-bottom: 30px;">
+        <h3>Product Videos (<%= page.resource.product_videos.count %>)</h3>
+        <% page.resource.product_videos.ordered.each_with_index do |video, index| %>
+          <div style="border: 1px solid #ddd; border-radius: 4px; padding: 15px; margin-bottom: 15px;">
+            <div style="display: grid; grid-template-columns: 200px 1fr; gap: 15px;">
+              <!-- Video Thumbnail/Embed -->
+              <div>
+                <% if video.youtube? && video.thumbnail_url %>
+                  <div style="position: relative;">
+                    <img src="<%= video.thumbnail_url %>" alt="<%= video.title %>" style="width: 100%; height: 112px; object-fit: cover; border-radius: 4px;">
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.7); color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                      ▶
+                    </div>
+                  </div>
+                <% else %>
+                  <div style="width: 100%; height: 112px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #666;">
+                    📹 Video
+                  </div>
+                <% end %>
+              </div>
+              
+              <!-- Video Info -->
+              <div>
+                <h4 style="margin: 0 0 8px 0;"><%= video.title %></h4>
+                <div style="color: #666; font-size: 14px; margin-bottom: 8px;">
+                  <strong>URL:</strong> 
+                  <a href="<%= video.url %>" target="_blank" style="color: #007bff;"><%= video.url %></a>
+                </div>
+                <% if video.description.present? %>
+                  <div style="color: #333; font-size: 14px; margin-bottom: 8px;">
+                    <%= simple_format(video.description) %>
+                  </div>
+                <% end %>
+                <div style="font-size: 12px; color: #666;">
+                  <span><strong>Sort Order:</strong> <%= video.sort_order || 0 %></span>
+                  <span style="margin-left: 15px;">
+                    <span class="badge <%= video.is_active? ? 'badge-success' : 'badge-danger' %>">
+                      <%= video.is_active? ? 'Active' : 'Inactive' %>
+                    </span>
+                  </span>
+                  <span style="margin-left: 15px; color: #999;">
+                    <% if video.youtube? %>
+                      📺 YouTube
+                    <% elsif video.vimeo? %>
+                      🎥 Vimeo  
+                    <% else %>
+                      🌐 Video
+                    <% end %>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <!-- Metadata -->
+    <div class="section" style="margin-bottom: 30px;">
+      <h3>Metadata</h3>
+      <div>
+        <strong>Created:</strong> <%= page.resource.created_at.strftime("%Y-%m-%d %H:%M") %><br>
+        <strong>Updated:</strong> <%= page.resource.updated_at.strftime("%Y-%m-%d %H:%M") %><br>
+        <strong>View Count:</strong> <%= page.resource.view_count || 0 %><br>
+        <strong>Meta Title:</strong> <%= page.resource.meta_title || 'N/A' %><br>
+        <strong>Meta Description:</strong> <%= page.resource.meta_description || 'N/A' %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  
+  .badge-success { background: #28a745; color: white; }
+  .badge-danger { background: #dc3545; color: white; }
+  .badge-primary { background: #007bff; color: white; }
+  .badge-info { background: #17a2b8; color: white; }
+  .badge-warning { background: #ffc107; color: black; }
+  .badge-secondary { background: #6c757d; color: white; }
+  
+  .btn {
+    display: inline-block;
+    padding: 8px 16px;
+    margin: 2px;
+    background: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    border: 1px solid #007bff;
+  }
+  
+  .btn:hover {
+    background: #0056b3;
+    border-color: #0056b3;
+  }
+  
+  .btn-primary {
+    background: #007bff;
+    border-color: #007bff;
+  }
+  
+  .btn-secondary {
+    background: #6c757d;
+    border-color: #6c757d;
+  }
+</style>

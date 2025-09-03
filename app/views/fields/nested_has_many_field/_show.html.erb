@@ -1,0 +1,26 @@
+<% if field.data.any? %>
+  <div class="nested-has-many-field">
+    <% field.data.each do |item| %>
+      <div class="nested-item">
+        <% field.nested_show_attributes.each do |attr| %>
+          <div class="nested-attribute">
+            <strong><%= attr.to_s.humanize %>:</strong>
+            <% if attr == :image && item.send(attr).present? %>
+              <div class="image-preview">
+                <%= image_tag item.send(attr).url, style: "max-width: 200px; max-height: 200px;" %>
+                <br>
+                <small><%= item.send(attr).url %></small>
+              </div>
+            <% elsif attr == :is_primary %>
+              <%= item.send(attr) ? "Yes" : "No" %>
+            <% else %>
+              <%= item.send(attr) %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <span class="text-muted">No images uploaded</span>
+<% end %>

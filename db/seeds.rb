@@ -12,42 +12,54 @@ puts "Seeding database..."
 
 # Create settings
 puts "Creating settings..."
-Setting.create!([
+[
   { setting_key: 'site_name', setting_value: 'Mexe - Phụ Kiện Ô Tô & Workspace', setting_type: 'string', description: 'Tên website' },
   { setting_key: 'site_description', setting_value: 'Chuyên cung cấp phụ kiện ô tô chất lượng cao và workspace hiệu quả', setting_type: 'string', description: 'Mô tả website' },
   { setting_key: 'contact_email', setting_value: 'info@mexe.com', setting_type: 'string', description: 'Email liên hệ' },
   { setting_key: 'contact_phone', setting_value: '1900-1234', setting_type: 'string', description: 'Số điện thoại liên hệ' },
   { setting_key: 'free_shipping_threshold', setting_value: '500000', setting_type: 'number', description: 'Ngưỡng miễn phí vận chuyển (VNĐ)' },
   { setting_key: 'default_shipping_fee', setting_value: '30000', setting_type: 'number', description: 'Phí vận chuyển mặc định (VNĐ)' }
-])
+].each do |setting|
+  Setting.find_or_create_by(setting_key: setting[:setting_key]) do |s|
+    s.assign_attributes(setting)
+  end
+end
 
 # Create categories
 puts "Creating categories..."
-categories = Category.create!([
-  { name: 'Phụ Kiện Ô Tô', slug: 'phu-kien-o-to', description: 'Các phụ kiện cần thiết cho ô tô', sort_order: 1 },
-  { name: 'Camera Hành Trình', slug: 'camera-hanh-trinh', description: 'Camera ghi hình hành trình', parent_id: 1, sort_order: 1 },
-  { name: 'Thảm Sàn', slug: 'tham-san', description: 'Thảm sàn ô tô', parent_id: 1, sort_order: 2 },
-  { name: 'Nội Thất', slug: 'noi-that', description: 'Phụ kiện nội thất ô tô', parent_id: 1, sort_order: 3 },
-  { name: 'Workspace', slug: 'workspace', description: 'Thiết bị workspace', sort_order: 2 },
-  { name: 'Bàn Phím', slug: 'ban-phim', description: 'Bàn phím cơ và gaming', parent_id: 5, sort_order: 1 },
-  { name: 'Chuột', slug: 'chuot', description: 'Chuột gaming và công thái học', parent_id: 5, sort_order: 2 },
-  { name: 'Ghế Công Thái Học', slug: 'ghe-cong-thai-hoc', description: 'Ghế ngồi công thái học', parent_id: 5, sort_order: 3 }
-])
+# Create parent categories first
+auto_category = Category.create(name: 'Phụ Kiện Ô Tô', slug: 'phu-kien-o-to', description: 'Các phụ kiện cần thiết cho ô tô')
+
+puts "Auto category ID: #{auto_category.id}" if auto_category.persisted?
+
+# Create subcategories  
+if auto_category.persisted?
+  Category.create([
+    { name: 'Camera Hành Trình', slug: 'camera-hanh-trinh', description: 'Camera ghi hình hành trình', parent_id: auto_category.id },
+    { name: 'Thảm Sàn', slug: 'tham-san', description: 'Thảm sàn ô tô', parent_id: auto_category.id },
+    { name: 'Nội Thất', slug: 'noi-that', description: 'Phụ kiện nội thất ô tô', parent_id: auto_category.id },
+    { name: 'Đèn LED', slug: 'den-led', description: 'Đèn LED trang trí và chiếu sáng', parent_id: auto_category.id },
+    { name: 'Bảo Vệ', slug: 'bao-ve', description: 'Phụ kiện bảo vệ xe', parent_id: auto_category.id },
+    { name: 'Âm Thanh', slug: 'am-thanh', description: 'Hệ thống âm thanh xe hơi', parent_id: auto_category.id }
+  ])
+end
 
 # Create brands
 puts "Creating brands..."
-brands = Brand.create!([
+brands = Brand.create([
   { name: 'Honda Genuine Parts', slug: 'honda-genuine-parts', description: 'Phụ kiện chính hãng Honda', founded_year: 1948, field: 'Automotive Parts', story: 'Honda Genuine Parts cung cấp phụ kiện chính hãng chất lượng cao', sort_order: 1 },
   { name: 'Toyota Genuine Parts', slug: 'toyota-genuine-parts', description: 'Phụ kiện chính hãng Toyota', founded_year: 1937, field: 'Automotive Parts', story: 'Toyota Genuine Parts đảm bảo chất lượng và độ bền', sort_order: 2 },
   { name: 'Hyundai Mobis', slug: 'hyundai-mobis', description: 'Phụ kiện Hyundai Mobis', founded_year: 1977, field: 'Automotive Parts', story: 'Hyundai Mobis với công nghệ tiên tiến', sort_order: 3 },
   { name: 'AUTOLIGHT', slug: 'autolight', description: 'Thiết bị chiếu sáng ô tô', founded_year: 2009, field: 'Automotive Lighting', story: 'Chuyên về thiết bị chiếu sáng xe ô tô', sort_order: 4 },
-  { name: 'Hexcal', slug: 'hexcal', description: 'Thiết bị workspace', founded_year: 2020, field: 'Workspace Equipment', story: 'Thiết bị workspace hiện đại', sort_order: 5 },
-  { name: 'Nuphy', slug: 'nuphy', description: 'Bàn phím cơ cao cấp', founded_year: 2019, field: 'Mechanical Keyboards', story: 'Bàn phím cơ chất lượng cao', sort_order: 6 }
+  { name: 'BlackVue', slug: 'blackvue', description: 'Camera hành trình cao cấp', founded_year: 2007, field: 'Dash Cameras', story: 'Thương hiệu camera hành trình hàng đầu thế giới', sort_order: 5 },
+  { name: 'WeatherTech', slug: 'weathertech', description: 'Phụ kiện bảo vệ xe', founded_year: 1989, field: 'Automotive Protection', story: 'Chuyên về phụ kiện bảo vệ xe chất lượng cao', sort_order: 6 },
+  { name: 'Pioneer', slug: 'pioneer', description: 'Hệ thống âm thanh xe hơi', founded_year: 1938, field: 'Car Audio', story: 'Thương hiệu âm thanh xe hơi hàng đầu', sort_order: 7 },
+  { name: '3M', slug: '3m', description: 'Phụ kiện bảo vệ và làm sạch', founded_year: 1902, field: 'Automotive Care', story: 'Công nghệ bảo vệ và chăm sóc xe tiên tiến', sort_order: 8 }
 ])
 
 # Create products
 puts "Creating products..."
-products = Product.create!([
+products = Product.create([
   {
     name: 'Camera Hành Trình 4K AUTOLIGHT AL-2024',
     slug: 'camera-hanh-trinh-4k-autolight-al-2024',
@@ -62,6 +74,21 @@ products = Product.create!([
     stock_quantity: 50,
     is_featured: true,
     is_new: true,
+    warranty_period: 24
+  },
+  {
+    name: 'Camera Hành Trình BlackVue DR750X-2CH',
+    slug: 'camera-hanh-trinh-blackvue-dr750x-2ch',
+    sku: 'CAM-BV-750X',
+    description: 'Camera hành trình 2 kênh Full HD với GPS và WiFi',
+    short_description: 'Camera hành trình 2 kênh cao cấp BlackVue',
+    brand_id: 5,
+    category_id: 2,
+    price: 4500000,
+    original_price: 5000000,
+    discount_percent: 10,
+    stock_quantity: 30,
+    is_featured: true,
     warranty_period: 24
   },
   {
@@ -80,88 +107,518 @@ products = Product.create!([
     warranty_period: 12
   },
   {
-    name: 'Bàn Phím Cơ Nuphy Air75',
-    slug: 'ban-phim-co-nuphy-air75',
-    sku: 'KB-NU-75',
-    description: 'Bàn phím cơ không dây 75% với switch Gateron',
-    short_description: 'Bàn phím cơ không dây cao cấp',
+    name: 'Thảm Sàn WeatherTech Custom Fit',
+    slug: 'tham-san-weathertech-custom-fit',
+    sku: 'THAM-WT-001',
+    description: 'Thảm sàn cao cấp WeatherTech với thiết kế tùy chỉnh',
+    short_description: 'Thảm sàn cao cấp WeatherTech',
     brand_id: 6,
-    category_id: 6,
-    price: 3200000,
-    original_price: 3500000,
-    discount_percent: 8.57,
-    stock_quantity: 25,
-    is_featured: true,
-    is_preorder: true,
-    preorder_quantity: 10,
-    preorder_end_date: Date.current + 30.days,
+    category_id: 3,
+    price: 1200000,
+    original_price: 1400000,
+    discount_percent: 14.29,
+    stock_quantity: 75,
+    is_hot: true,
+    warranty_period: 24
+  },
+  {
+    name: 'Đèn LED Trang Trí Nội Thất Xe',
+    slug: 'den-led-trang-tri-noi-that-xe',
+    sku: 'DEN-LED-001',
+    description: 'Đèn LED trang trí nội thất xe với 16 màu sắc',
+    short_description: 'Đèn LED trang trí nội thất đa màu',
+    brand_id: 4,
+    category_id: 4,
+    price: 350000,
+    original_price: 400000,
+    discount_percent: 12.5,
+    stock_quantity: 200,
+    is_new: true,
     warranty_period: 12
   },
   {
-    name: 'Ghế Công Thái Học Hexcal Studio',
-    slug: 'ghe-cong-thai-hoc-hexcal-studio',
-    sku: 'GHE-HX-001',
-    description: 'Ghế công thái học cao cấp với nhiều tùy chỉnh',
-    short_description: 'Ghế công thái học chất lượng cao',
-    brand_id: 5,
-    category_id: 8,
-    price: 8500000,
-    original_price: 9500000,
-    discount_percent: 10.53,
-    stock_quantity: 15,
+    name: 'Bộ Đèn LED Gầm Xe AUTOLIGHT',
+    slug: 'bo-den-led-gam-xe-autolight',
+    sku: 'DEN-GAM-001',
+    description: 'Bộ đèn LED gầm xe với điều khiển từ xa',
+    short_description: 'Đèn LED gầm xe điều khiển từ xa',
+    brand_id: 4,
+    category_id: 4,
+    price: 800000,
+    original_price: 900000,
+    discount_percent: 11.11,
+    stock_quantity: 80,
+    is_featured: true,
+    warranty_period: 12
+  },
+  {
+    name: 'Bộ Bảo Vệ Gương Chiếu Hậu 3M',
+    slug: 'bo-bao-ve-guong-chieu-hau-3m',
+    sku: 'BAOVE-3M-001',
+    description: 'Bộ bảo vệ gương chiếu hậu chống va đập 3M',
+    short_description: 'Bảo vệ gương chiếu hậu chống va đập',
+    brand_id: 8,
+    category_id: 5,
+    price: 250000,
+    original_price: 300000,
+    discount_percent: 16.67,
+    stock_quantity: 150,
     is_new: true,
-    warranty_period: 36
+    warranty_period: 12
+  },
+  {
+    name: 'Bộ Bảo Vệ Cửa Xe WeatherTech',
+    slug: 'bo-bao-ve-cua-xe-weathertech',
+    sku: 'BAOVE-WT-002',
+    description: 'Bộ bảo vệ cửa xe chống va đập và trầy xước',
+    short_description: 'Bảo vệ cửa xe chống va đập',
+    brand_id: 6,
+    category_id: 5,
+    price: 450000,
+    original_price: 500000,
+    discount_percent: 10,
+    stock_quantity: 100,
+    is_hot: true,
+    warranty_period: 24
+  },
+  {
+    name: 'Loa Xe Hơi Pioneer TS-A1670F',
+    slug: 'loa-xe-hoi-pioneer-ts-a1670f',
+    sku: 'LOA-PIO-001',
+    description: 'Loa xe hơi 6.5 inch với âm thanh mạnh mẽ',
+    short_description: 'Loa xe hơi Pioneer chất lượng cao',
+    brand_id: 7,
+    category_id: 6,
+    price: 1200000,
+    original_price: 1400000,
+    discount_percent: 14.29,
+    stock_quantity: 60,
+    is_featured: true,
+    warranty_period: 12
+  },
+  {
+    name: 'Amply Xe Hơi Pioneer GM-D8604',
+    slug: 'amply-xe-hoi-pioneer-gm-d8604',
+    sku: 'AMP-PIO-001',
+    description: 'Amply xe hơi 4 kênh công suất cao',
+    short_description: 'Amply xe hơi 4 kênh Pioneer',
+    brand_id: 7,
+    category_id: 6,
+    price: 2800000,
+    original_price: 3200000,
+    discount_percent: 12.5,
+    stock_quantity: 40,
+    is_new: true,
+    warranty_period: 24
   }
 ])
 
 # Create product specifications
 puts "Creating product specifications..."
-ProductSpecification.create!([
+ProductSpecification.create([
+  # Camera AUTOLIGHT AL-2024
   { product_id: 1, spec_name: 'Độ phân giải', spec_value: '4K (3840x2160)', sort_order: 1 },
   { product_id: 1, spec_name: 'Góc nhìn', spec_value: '170°', sort_order: 2 },
   { product_id: 1, spec_name: 'Bộ nhớ', spec_value: '128GB', sort_order: 3 },
   { product_id: 1, spec_name: 'Pin', spec_value: 'Li-ion 1000mAh', sort_order: 4 },
-  { product_id: 2, spec_name: 'Chất liệu', spec_value: 'Cao su + Nylon', sort_order: 1 },
-  { product_id: 2, spec_name: 'Kích thước', spec_value: 'Phù hợp Honda Civic', sort_order: 2 },
-  { product_id: 2, spec_name: 'Màu sắc', spec_value: 'Đen', sort_order: 3 },
-  { product_id: 3, spec_name: 'Layout', spec_value: '75%', sort_order: 1 },
-  { product_id: 3, spec_name: 'Switch', spec_value: 'Gateron Red', sort_order: 2 },
-  { product_id: 3, spec_name: 'Kết nối', spec_value: 'Bluetooth 5.0 + USB-C', sort_order: 3 },
-  { product_id: 3, spec_name: 'Pin', spec_value: '4000mAh', sort_order: 4 },
-  { product_id: 4, spec_name: 'Tải trọng', spec_value: '150kg', sort_order: 1 },
-  { product_id: 4, spec_name: 'Chất liệu', spec_value: 'Mesh + Nhôm', sort_order: 2 },
-  { product_id: 4, spec_name: 'Điều chỉnh', spec_value: 'Cao, nghiêng, tựa lưng', sort_order: 3 }
+  
+  # Camera BlackVue DR750X-2CH
+  { product_id: 2, spec_name: 'Độ phân giải', spec_value: 'Full HD (1920x1080)', sort_order: 1 },
+  { product_id: 2, spec_name: 'Số kênh', spec_value: '2 kênh (Trước + Sau)', sort_order: 2 },
+  { product_id: 2, spec_name: 'GPS', spec_value: 'Có', sort_order: 3 },
+  { product_id: 2, spec_name: 'WiFi', spec_value: '2.4GHz', sort_order: 4 },
+  
+  # Thảm sàn Honda Civic
+  { product_id: 3, spec_name: 'Chất liệu', spec_value: 'Cao su + Nylon', sort_order: 1 },
+  { product_id: 3, spec_name: 'Kích thước', spec_value: 'Phù hợp Honda Civic', sort_order: 2 },
+  { product_id: 3, spec_name: 'Màu sắc', spec_value: 'Đen', sort_order: 3 },
+  
+  # Thảm sàn WeatherTech
+  { product_id: 4, spec_name: 'Chất liệu', spec_value: 'Cao su tự nhiên', sort_order: 1 },
+  { product_id: 4, spec_name: 'Thiết kế', spec_value: 'Custom Fit', sort_order: 2 },
+  { product_id: 4, spec_name: 'Chống trượt', spec_value: 'Có', sort_order: 3 },
+  
+  # Đèn LED nội thất
+  { product_id: 5, spec_name: 'Số màu', spec_value: '16 màu sắc', sort_order: 1 },
+  { product_id: 5, spec_name: 'Điều khiển', spec_value: 'Remote + App', sort_order: 2 },
+  { product_id: 5, spec_name: 'Công suất', spec_value: '12V', sort_order: 3 },
+  
+  # Đèn LED gầm xe
+  { product_id: 6, spec_name: 'Công suất', spec_value: '12V', sort_order: 1 },
+  { product_id: 6, spec_name: 'Điều khiển', spec_value: 'Remote từ xa', sort_order: 2 },
+  { product_id: 6, spec_name: 'Độ sáng', spec_value: '6000K', sort_order: 3 },
+  
+  # Bảo vệ gương 3M
+  { product_id: 7, spec_name: 'Chất liệu', spec_value: 'Polyurethane 3M', sort_order: 1 },
+  { product_id: 7, spec_name: 'Độ dày', spec_value: '2mm', sort_order: 2 },
+  { product_id: 7, spec_name: 'Màu sắc', spec_value: 'Trong suốt', sort_order: 3 },
+  
+  # Bảo vệ cửa WeatherTech
+  { product_id: 8, spec_name: 'Chất liệu', spec_value: 'Polyurethane cao cấp', sort_order: 1 },
+  { product_id: 8, spec_name: 'Độ dày', spec_value: '3mm', sort_order: 2 },
+  { product_id: 8, spec_name: 'Màu sắc', spec_value: 'Đen', sort_order: 3 },
+  
+  # Loa Pioneer
+  { product_id: 9, spec_name: 'Kích thước', spec_value: '6.5 inch', sort_order: 1 },
+  { product_id: 9, spec_name: 'Công suất', spec_value: '50W RMS', sort_order: 2 },
+  { product_id: 9, spec_name: 'Tần số', spec_value: '35Hz - 22kHz', sort_order: 3 },
+  
+  # Amply Pioneer
+  { product_id: 10, spec_name: 'Số kênh', spec_value: '4 kênh', sort_order: 1 },
+  { product_id: 10, spec_name: 'Công suất', spec_value: '100W x 4 @ 4Ω', sort_order: 2 },
+  { product_id: 10, spec_name: 'Điện áp', spec_value: '12V', sort_order: 3 }
 ])
 
-# Create product images
+# Create product images (Note: Using sample URLs, in production these would be actual uploaded files)
 puts "Creating product images..."
-ProductImage.create!([
-  { product_id: 1, image_url: '/images/products/camera-hanh-trinh-1.jpg', alt_text: 'Camera hành trình 4K AUTOLIGHT', is_primary: true, sort_order: 1 },
-  { product_id: 1, image_url: '/images/products/camera-hanh-trinh-2.jpg', alt_text: 'Camera hành trình góc nhìn rộng', sort_order: 2 },
-  { product_id: 2, image_url: '/images/products/tham-san-honda-1.jpg', alt_text: 'Thảm sàn Honda Civic', is_primary: true, sort_order: 1 },
-  { product_id: 2, image_url: '/images/products/tham-san-honda-2.jpg', alt_text: 'Thảm sàn chất liệu cao cấp', sort_order: 2 },
-  { product_id: 3, image_url: '/images/products/ban-phim-nuphy-1.jpg', alt_text: 'Bàn phím cơ Nuphy Air75', is_primary: true, sort_order: 1 },
-  { product_id: 3, image_url: '/images/products/ban-phim-nuphy-2.jpg', alt_text: 'Bàn phím không dây', sort_order: 2 },
-  { product_id: 4, image_url: '/images/products/ghe-hexcal-1.jpg', alt_text: 'Ghế công thái học Hexcal', is_primary: true, sort_order: 1 },
-  { product_id: 4, image_url: '/images/products/ghe-hexcal-2.jpg', alt_text: 'Ghế điều chỉnh nhiều tư thế', sort_order: 2 }
+puts "Note: ProductImages will be created without actual files - you can upload real images through the admin interface"
+# For now, we'll skip creating ProductImages in seeds since CarrierWave requires actual files
+# You can upload images through the admin interface after running seeds
+
+# Create product descriptions
+puts "Creating product descriptions..."
+ProductDescription.create([
+  # Camera AUTOLIGHT AL-2024 descriptions
+  {
+    product_id: 1,
+    title: 'Đặc điểm nổi bật',
+    content: '<p><strong>Camera Hành Trình 4K AUTOLIGHT AL-2024</strong> là sản phẩm camera hành trình cao cấp với công nghệ ghi hình 4K Ultra HD, mang đến chất lượng hình ảnh cực kỳ sắc nét cả ngày và đêm.</p>
+
+<ul>
+<li>🎥 <strong>Chất lượng 4K Ultra HD:</strong> Ghi hình với độ phân giải 3840x2160, đảm bảo mọi chi tiết đều được ghi lại rõ ràng</li>
+<li>📱 <strong>Góc nhìn siêu rộng 170°:</strong> Bao quát toàn bộ tầm nhìn phía trước, không bỏ sót bất kỳ chi tiết nào</li>
+<li>🌙 <strong>Chế độ ghi đêm WDR:</strong> Công nghệ cảm biến ánh sáng tiên tiến, cho hình ảnh rõ nét ngay cả trong điều kiện ánh sáng yếu</li>
+<li>💾 <strong>Lưu trữ 128GB:</strong> Bộ nhớ trong lớn, lưu trữ hàng giờ video chất lượng cao</li>
+</ul>',
+    sort_order: 1
+  },
+  {
+    product_id: 1,
+    title: 'Tính năng thông minh',
+    content: '<p>Camera được trang bị nhiều tính năng thông minh giúp tăng cường an toàn và tiện ích:</p>
+
+<ul>
+<li>🚗 <strong>G-Sensor thông minh:</strong> Tự động khóa file khi phát hiện va chạm hoặc phanh gấp</li>
+<li>🔄 <strong>Ghi đè tự động:</strong> Tự động ghi đè video cũ khi bộ nhớ đầy, đảm bảo luôn ghi được video mới</li>
+<li>🔋 <strong>Pin dự phòng Li-ion 1000mAh:</strong> Tiếp tục ghi hình ngay cả khi tắt máy</li>
+<li>📺 <strong>LCD 3 inch:</strong> Màn hình lớn, xem lại video trực tiếp trên camera</li>
+</ul>',
+    sort_order: 2
+  },
+  
+  # Camera BlackVue DR750X-2CH descriptions
+  {
+    product_id: 2,
+    title: 'Camera hành trình 2 kênh cao cấp',
+    content: '<p><strong>BlackVue DR750X-2CH</strong> là camera hành trình 2 kênh cao cấp với công nghệ WiFi và GPS tích hợp, mang đến giải pháp giám sát toàn diện cho xe của bạn.</p>
+
+<ul>
+<li>📹 <strong>2 kênh ghi hình:</strong> Ghi hình đồng thời phía trước và sau xe</li>
+<li>📡 <strong>GPS tích hợp:</strong> Ghi lại vị trí, tốc độ và tuyến đường</li>
+<li>📶 <strong>WiFi 2.4GHz:</strong> Kết nối nhanh chóng với smartphone</li>
+<li>💾 <strong>Bộ nhớ microSD:</strong> Hỗ trợ thẻ nhớ lên đến 256GB</li>
+</ul>',
+    sort_order: 1
+  },
+  
+  # Thảm sàn Honda Civic descriptions
+  {
+    product_id: 3,
+    title: 'Thiết kế hoàn hảo cho Honda Civic',
+    content: '<p><strong>Thảm Sàn Ô Tô Cao Cấp Honda Civic</strong> được thiết kế riêng biệt cho từng dòng xe Honda Civic, đảm bảo sự vừa vặn hoàn hảo và bảo vệ tối ưu cho sàn xe.</p>
+
+<h4>Đặc điểm vượt trội:</h4>
+<ul>
+<li>✅ <strong>Vừa vặn 100%:</strong> Được gia công chính xác theo khuôn sàn xe Honda Civic</li>
+<li>💧 <strong>Chống thấm nước:</strong> Bảo vệ sàn xe khỏi nước, bùn đất và các chất lỏng khác</li>
+<li>🧽 <strong>Dễ vệ sinh:</strong> Chỉ cần nước và xà phòng để vệ sinh sạch sẽ</li>
+<li>👟 <strong>Chống trượt:</strong> Bề mặt có rãnh chống trượt, đảm bảo an toàn khi lái xe</li>
+</ul>',
+    sort_order: 1
+  },
+  {
+    product_id: 3,
+    title: 'Chất liệu cao cấp',
+    content: '<p>Sản phẩm được làm từ chất liệu cao su tự nhiên kết hợp sợi Nylon có độ bền cao:</p>
+
+<ul>
+<li>🏭 <strong>Cao su tự nhiên:</strong> An toàn với sức khỏe, không mùi, không độc hại</li>
+<li>🧵 <strong>Sợi Nylon gia cường:</strong> Tăng độ bền, chống xé rách và biến dạng</li>
+<li>🎨 <strong>Màu đen sang trọng:</strong> Phù hợp với mọi nội thất xe, tăng tính thẩm mỹ</li>
+<li>⚡ <strong>Độ bền cao:</strong> Sử dụng được trong nhiều năm mà không bị hỏng</li>
+</ul>',
+    sort_order: 2
+  },
+
+  # Thảm sàn WeatherTech descriptions
+  {
+    product_id: 4,
+    title: 'Thảm sàn cao cấp WeatherTech',
+    content: '<p><strong>Thảm Sàn WeatherTech Custom Fit</strong> được thiết kế đặc biệt với công nghệ DigitalFit™, tạo ra sự vừa vặn hoàn hảo cho từng dòng xe cụ thể.</p>
+
+<ul>
+<li>🎯 <strong>DigitalFit™ Technology:</strong> Thiết kế chính xác theo từng dòng xe</li>
+<li>💧 <strong>Chống thấm nước hoàn hảo:</strong> Bảo vệ sàn xe khỏi mọi loại chất lỏng</li>
+<li>🧽 <strong>Dễ vệ sinh:</strong> Chỉ cần nước để làm sạch</li>
+<li>👟 <strong>Chống trượt tối ưu:</strong> Bề mặt có rãnh chống trượt hiệu quả</li>
+</ul>',
+    sort_order: 1
+  },
+
+  # Đèn LED nội thất descriptions
+  {
+    product_id: 5,
+    title: 'Đèn LED trang trí nội thất đa màu',
+    content: '<p><strong>Đèn LED Trang Trí Nội Thất Xe</strong> với 16 màu sắc rực rỡ, tạo không gian nội thất xe sang trọng và hiện đại.</p>
+
+<ul>
+<li>🎨 <strong>16 màu sắc:</strong> Tùy chỉnh theo sở thích cá nhân</li>
+<li>📱 <strong>Điều khiển từ xa:</strong> Remote và ứng dụng smartphone</li>
+<li>⚡ <strong>Tiết kiệm năng lượng:</strong> Công suất thấp, tuổi thọ cao</li>
+<li>🔧 <strong>Dễ lắp đặt:</strong> Thiết kế plug-and-play</li>
+</ul>',
+    sort_order: 1
+  },
+
+  # Đèn LED gầm xe descriptions
+  {
+    product_id: 6,
+    title: 'Đèn LED gầm xe điều khiển từ xa',
+    content: '<p><strong>Bộ Đèn LED Gầm Xe AUTOLIGHT</strong> với ánh sáng mạnh mẽ và điều khiển từ xa, tạo hiệu ứng ánh sáng ấn tượng cho xe của bạn.</p>
+
+<ul>
+<li>💡 <strong>Ánh sáng mạnh mẽ:</strong> Độ sáng 6000K, tạo hiệu ứng đẹp mắt</li>
+<li>📱 <strong>Điều khiển từ xa:</strong> Remote điều khiển tiện lợi</li>
+<li>🔧 <strong>Dễ lắp đặt:</strong> Thiết kế đơn giản, phù hợp mọi loại xe</li>
+<li>⚡ <strong>Tiết kiệm năng lượng:</strong> Công suất thấp, không ảnh hưởng ắc quy</li>
+</ul>',
+    sort_order: 1
+  },
+
+  # Bảo vệ gương 3M descriptions
+  {
+    product_id: 7,
+    title: 'Bảo vệ gương chiếu hậu chống va đập',
+    content: '<p><strong>Bộ Bảo Vệ Gương Chiếu Hậu 3M</strong> với chất liệu Polyurethane cao cấp, bảo vệ gương xe khỏi va đập và trầy xước.</p>
+
+<ul>
+<li>🛡️ <strong>Chống va đập:</strong> Bảo vệ gương khỏi tác động mạnh</li>
+<li>🔍 <strong>Trong suốt:</strong> Không ảnh hưởng tầm nhìn</li>
+<li>🧽 <strong>Dễ vệ sinh:</strong> Bề mặt mịn, dễ lau chùi</li>
+<li>⚡ <strong>Độ bền cao:</strong> Không bị biến dạng theo thời gian</li>
+</ul>',
+    sort_order: 1
+  },
+
+  # Bảo vệ cửa WeatherTech descriptions
+  {
+    product_id: 8,
+    title: 'Bảo vệ cửa xe chống va đập',
+    content: '<p><strong>Bộ Bảo Vệ Cửa Xe WeatherTech</strong> với chất liệu Polyurethane cao cấp, bảo vệ cửa xe khỏi va đập và trầy xước.</p>
+
+<ul>
+<li>🛡️ <strong>Chống va đập:</strong> Bảo vệ cửa xe hiệu quả</li>
+<li>🔧 <strong>Dễ lắp đặt:</strong> Thiết kế đơn giản, phù hợp mọi loại xe</li>
+<li>🧽 <strong>Dễ vệ sinh:</strong> Bề mặt mịn, dễ lau chùi</li>
+<li>⚡ <strong>Độ bền cao:</strong> Không bị biến dạng theo thời gian</li>
+</ul>',
+    sort_order: 1
+  },
+
+  # Loa Pioneer descriptions
+  {
+    product_id: 9,
+    title: 'Loa xe hơi Pioneer chất lượng cao',
+    content: '<p><strong>Loa Xe Hơi Pioneer TS-A1670F</strong> với công suất 50W RMS, mang đến âm thanh mạnh mẽ và chất lượng cao cho xe của bạn.</p>
+
+<ul>
+<li>🔊 <strong>Công suất cao:</strong> 50W RMS, âm thanh mạnh mẽ</li>
+<li>📏 <strong>Kích thước 6.5 inch:</strong> Phù hợp hầu hết các loại xe</li>
+<li>🎵 <strong>Âm thanh chất lượng:</strong> Tần số 35Hz - 22kHz</li>
+<li>🔧 <strong>Dễ lắp đặt:</strong> Thiết kế tương thích với nhiều loại xe</li>
+</ul>',
+    sort_order: 1
+  },
+
+  # Amply Pioneer descriptions
+  {
+    product_id: 10,
+    title: 'Amply xe hơi 4 kênh công suất cao',
+    content: '<p><strong>Amply Xe Hơi Pioneer GM-D8604</strong> với 4 kênh và công suất 100W x 4, mang đến âm thanh mạnh mẽ và chất lượng cao.</p>
+
+<ul>
+<li>🔊 <strong>4 kênh:</strong> Hỗ trợ hệ thống âm thanh đa kênh</li>
+<li>⚡ <strong>Công suất cao:</strong> 100W x 4 @ 4Ω</li>
+<li>🔧 <strong>Dễ lắp đặt:</strong> Thiết kế compact, phù hợp mọi loại xe</li>
+<li>🎵 <strong>Âm thanh chất lượng:</strong> Tín hiệu âm thanh sạch, không nhiễu</li>
+</ul>',
+    sort_order: 1
+  }
+])
+
+# Create product videos
+puts "Creating product videos..."
+ProductVideo.create([
+  # Camera AUTOLIGHT videos
+  {
+    product_id: 1,
+    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    title: 'Đánh giá chi tiết Camera Hành Trình 4K AUTOLIGHT',
+    description: 'Video review chi tiết về chất lượng hình ảnh, tính năng và cách sử dụng camera hành trình 4K AUTOLIGHT AL-2024.',
+    sort_order: 1,
+    is_active: true
+  },
+  {
+    product_id: 1,  
+    url: 'https://www.youtube.com/watch?v=oHg5SJYRHA0',
+    title: 'Hướng dẫn cài đặt Camera Hành Trình',
+    description: 'Video hướng dẫn cách cài đặt và sử dụng camera hành trình một cách đơn giản và hiệu quả.',
+    sort_order: 2,
+    is_active: true
+  },
+  
+  # Camera BlackVue videos
+  {
+    product_id: 2,
+    url: 'https://www.youtube.com/watch?v=jNQXAC9IVRw',
+    title: 'BlackVue DR750X-2CH - Camera 2 kênh cao cấp',
+    description: 'Đánh giá chi tiết về camera hành trình 2 kênh BlackVue với GPS và WiFi tích hợp.',
+    sort_order: 1,
+    is_active: true
+  },
+  
+  # Thảm sàn Honda Civic videos
+  {
+    product_id: 3,
+    url: 'https://www.youtube.com/watch?v=YQHsXMglC9A',
+    title: 'Cách lắp đặt thảm sàn Honda Civic',
+    description: 'Hướng dẫn chi tiết cách lắp đặt thảm sàn cho Honda Civic, đảm bảo vừa vặn và an toàn.',
+    sort_order: 1,
+    is_active: true
+  },
+
+  # Thảm sàn WeatherTech videos
+  {
+    product_id: 4,
+    url: 'https://www.youtube.com/watch?v=fJ9rUzIMcZQ',
+    title: 'WeatherTech Custom Fit - Thảm sàn cao cấp',
+    description: 'Review chi tiết về thảm sàn WeatherTech với công nghệ DigitalFit™.',
+    sort_order: 1,
+    is_active: true
+  },
+
+  # Đèn LED nội thất videos
+  {
+    product_id: 5,
+    url: 'https://www.youtube.com/watch?v=3AtDnEC4zak',
+    title: 'Đèn LED trang trí nội thất xe - Hướng dẫn lắp đặt',
+    description: 'Hướng dẫn cách lắp đặt và sử dụng đèn LED trang trí nội thất xe.',
+    sort_order: 1,
+    is_active: true
+  },
+
+  # Đèn LED gầm xe videos
+  {
+    product_id: 6,
+    url: 'https://www.youtube.com/watch?v=QH2-TGUlwu4',
+    title: 'Đèn LED gầm xe AUTOLIGHT - Hiệu ứng ánh sáng',
+    description: 'Demo hiệu ứng ánh sáng và cách lắp đặt đèn LED gầm xe.',
+    sort_order: 1,
+    is_active: true
+  },
+
+  # Bảo vệ gương 3M videos
+  {
+    product_id: 7,
+    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    title: 'Bảo vệ gương chiếu hậu 3M - Cách lắp đặt',
+    description: 'Hướng dẫn cách lắp đặt bộ bảo vệ gương chiếu hậu 3M.',
+    sort_order: 1,
+    is_active: true
+  },
+
+  # Bảo vệ cửa WeatherTech videos
+  {
+    product_id: 8,
+    url: 'https://www.youtube.com/watch?v=oHg5SJYRHA0',
+    title: 'Bảo vệ cửa xe WeatherTech - Review chi tiết',
+    description: 'Review chi tiết về bộ bảo vệ cửa xe WeatherTech.',
+    sort_order: 1,
+    is_active: true
+  },
+
+  # Loa Pioneer videos
+  {
+    product_id: 9,
+    url: 'https://www.youtube.com/watch?v=jNQXAC9IVRw',
+    title: 'Loa xe hơi Pioneer TS-A1670F - Test âm thanh',
+    description: 'Test âm thanh và đánh giá chất lượng loa xe hơi Pioneer.',
+    sort_order: 1,
+    is_active: true
+  },
+
+  # Amply Pioneer videos
+  {
+    product_id: 10,
+    url: 'https://www.youtube.com/watch?v=YQHsXMglC9A',
+    title: 'Amply xe hơi Pioneer GM-D8604 - Hướng dẫn lắp đặt',
+    description: 'Hướng dẫn cách lắp đặt và cài đặt amply xe hơi Pioneer.',
+    sort_order: 1,
+    is_active: true
+  }
 ])
 
 # Create product variants
 puts "Creating product variants..."
-ProductVariant.create!([
+ProductVariant.create([
+  # Camera AUTOLIGHT variants
   { product_id: 1, variant_name: 'Màu sắc', variant_value: 'Đen', price_adjustment: 0, stock_quantity: 30 },
   { product_id: 1, variant_name: 'Màu sắc', variant_value: 'Trắng', price_adjustment: 100000, stock_quantity: 20 },
-  { product_id: 2, variant_name: 'Kích thước', variant_value: 'Sedan', price_adjustment: 0, stock_quantity: 60 },
-  { product_id: 2, variant_name: 'Kích thước', variant_value: 'Hatchback', price_adjustment: 50000, stock_quantity: 40 },
-  { product_id: 3, variant_name: 'Switch', variant_value: 'Gateron Red', price_adjustment: 0, stock_quantity: 15 },
-  { product_id: 3, variant_name: 'Switch', variant_value: 'Gateron Brown', price_adjustment: 200000, stock_quantity: 10 },
-  { product_id: 4, variant_name: 'Màu sắc', variant_value: 'Đen', price_adjustment: 0, stock_quantity: 10 },
-  { product_id: 4, variant_name: 'Màu sắc', variant_value: 'Xám', price_adjustment: 300000, stock_quantity: 5 }
+  
+  # Camera BlackVue variants
+  { product_id: 2, variant_name: 'Bộ nhớ', variant_value: '64GB', price_adjustment: 0, stock_quantity: 15 },
+  { product_id: 2, variant_name: 'Bộ nhớ', variant_value: '128GB', price_adjustment: 200000, stock_quantity: 10 },
+  { product_id: 2, variant_name: 'Bộ nhớ', variant_value: '256GB', price_adjustment: 400000, stock_quantity: 5 },
+  
+  # Thảm sàn Honda Civic variants
+  { product_id: 3, variant_name: 'Kích thước', variant_value: 'Sedan', price_adjustment: 0, stock_quantity: 60 },
+  { product_id: 3, variant_name: 'Kích thước', variant_value: 'Hatchback', price_adjustment: 50000, stock_quantity: 40 },
+  
+  # Thảm sàn WeatherTech variants
+  { product_id: 4, variant_name: 'Dòng xe', variant_value: 'Honda Civic', price_adjustment: 0, stock_quantity: 40 },
+  { product_id: 4, variant_name: 'Dòng xe', variant_value: 'Toyota Camry', price_adjustment: 0, stock_quantity: 35 },
+  
+  # Đèn LED nội thất variants
+  { product_id: 5, variant_name: 'Số đèn', variant_value: '4 đèn', price_adjustment: 0, stock_quantity: 100 },
+  { product_id: 5, variant_name: 'Số đèn', variant_value: '6 đèn', price_adjustment: 50000, stock_quantity: 80 },
+  { product_id: 5, variant_name: 'Số đèn', variant_value: '8 đèn', price_adjustment: 100000, stock_quantity: 60 },
+  
+  # Đèn LED gầm xe variants
+  { product_id: 6, variant_name: 'Màu sắc', variant_value: 'Trắng', price_adjustment: 0, stock_quantity: 40 },
+  { product_id: 6, variant_name: 'Màu sắc', variant_value: 'Xanh dương', price_adjustment: 50000, stock_quantity: 30 },
+  { product_id: 6, variant_name: 'Màu sắc', variant_value: 'Đỏ', price_adjustment: 50000, stock_quantity: 30 },
+  
+  # Bảo vệ gương 3M variants
+  { product_id: 7, variant_name: 'Kích thước', variant_value: 'Nhỏ', price_adjustment: 0, stock_quantity: 80 },
+  { product_id: 7, variant_name: 'Kích thước', variant_value: 'Trung bình', price_adjustment: 30000, stock_quantity: 50 },
+  { product_id: 7, variant_name: 'Kích thước', variant_value: 'Lớn', price_adjustment: 50000, stock_quantity: 30 },
+  
+  # Bảo vệ cửa WeatherTech variants
+  { product_id: 8, variant_name: 'Số cửa', variant_value: '2 cửa', price_adjustment: 0, stock_quantity: 60 },
+  { product_id: 8, variant_name: 'Số cửa', variant_value: '4 cửa', price_adjustment: 100000, stock_quantity: 40 },
+  
+  # Loa Pioneer variants
+  { product_id: 9, variant_name: 'Công suất', variant_value: '50W RMS', price_adjustment: 0, stock_quantity: 40 },
+  { product_id: 9, variant_name: 'Công suất', variant_value: '100W RMS', price_adjustment: 200000, stock_quantity: 20 },
+  
+  # Amply Pioneer variants
+  { product_id: 10, variant_name: 'Công suất', variant_value: '100W x 4', price_adjustment: 0, stock_quantity: 25 },
+  { product_id: 10, variant_name: 'Công suất', variant_value: '150W x 4', price_adjustment: 500000, stock_quantity: 15 }
 ])
 
 # Create shipping zones
 puts "Creating shipping zones..."
-ShippingZone.create!([
+ShippingZone.create([
   { name: 'Hà Nội', cities: ['Hà Nội'], shipping_fee: 20000, free_shipping_threshold: 500000, estimated_days: '1-2 ngày' },
   { name: 'TP. Hồ Chí Minh', cities: ['TP. Hồ Chí Minh'], shipping_fee: 20000, free_shipping_threshold: 500000, estimated_days: '1-2 ngày' },
   { name: 'Đà Nẵng', cities: ['Đà Nẵng'], shipping_fee: 30000, free_shipping_threshold: 800000, estimated_days: '2-3 ngày' },
@@ -170,7 +627,7 @@ ShippingZone.create!([
 
 # Create stores
 puts "Creating stores..."
-Store.create!([
+Store.create([
   {
     name: 'Mexe Store Hà Nội',
     address: '123 Nguyễn Huệ, Hoàn Kiếm, Hà Nội',
@@ -199,7 +656,7 @@ Store.create!([
 
 # Create coupons
 puts "Creating coupons..."
-Coupon.create!([
+Coupon.create([
   {
     code: 'WELCOME10',
     name: 'Giảm giá chào mừng 10%',
@@ -229,7 +686,7 @@ Coupon.create!([
 
 # Create articles
 puts "Creating articles..."
-articles = Article.create!([
+articles = Article.create([
   {
     title: 'Top 10 phụ kiện ô tô cần thiết cho xe mới',
     slug: 'top-10-phu-kien-o-to-can-thiet',
@@ -250,7 +707,7 @@ articles = Article.create!([
     content: 'Camera hành trình là một trong những phụ kiện quan trọng nhất cho xe ô tô hiện nay...',
     featured_image: '/images/articles/camera-hanh-trinh.jpg',
     author: 'Mexe Team',
-    category: 'Công Nghệ',
+    category: 'Phụ Kiện Ô Tô',
     tags: ['camera', 'hành trình', '4K', 'an toàn'],
     status: 'published',
     published_at: Time.current - 3.days,
@@ -268,18 +725,48 @@ articles = Article.create!([
     status: 'published',
     published_at: Time.current - 1.day,
     view_count: 567
+  },
+  {
+    title: 'Đèn LED trang trí xe - Xu hướng mới 2024',
+    slug: 'den-led-trang-tri-xe-xu-huong-moi-2024',
+    excerpt: 'Khám phá xu hướng sử dụng đèn LED trang trí xe hơi để tạo phong cách cá nhân và nâng cao tính thẩm mỹ.',
+    content: 'Đèn LED trang trí xe hơi đang trở thành xu hướng mới trong giới chơi xe...',
+    featured_image: '/images/articles/den-led-trang-tri.jpg',
+    author: 'Mexe Team',
+    category: 'Phụ Kiện Ô Tô',
+    tags: ['đèn LED', 'trang trí', 'thẩm mỹ', 'xu hướng'],
+    status: 'published',
+    published_at: Time.current - 2.days,
+    view_count: 720
+  },
+  {
+    title: 'Hệ thống âm thanh xe hơi - Hướng dẫn nâng cấp',
+    slug: 'he-thong-am-thanh-xe-hoi-huong-dan-nang-cap',
+    excerpt: 'Hướng dẫn chi tiết cách nâng cấp hệ thống âm thanh xe hơi để có trải nghiệm âm nhạc tuyệt vời.',
+    content: 'Hệ thống âm thanh xe hơi chất lượng cao không chỉ mang đến trải nghiệm âm nhạc tuyệt vời...',
+    featured_image: '/images/articles/am-thanh-xe-hoi.jpg',
+    author: 'Mexe Team',
+    category: 'Phụ Kiện Ô Tô',
+    tags: ['âm thanh', 'loa', 'amply', 'nâng cấp'],
+    status: 'published',
+    published_at: Time.current - 4.days,
+    view_count: 650
   }
 ])
 
 # Create article images
 puts "Creating article images..."
-ArticleImage.create!([
+ArticleImage.create([
   { article_id: 1, image_url: '/images/articles/top-10-phu-kien-1.jpg', alt_text: 'Camera hành trình', caption: 'Camera hành trình bảo vệ quyền lợi', sort_order: 1 },
   { article_id: 1, image_url: '/images/articles/top-10-phu-kien-2.jpg', alt_text: 'Thảm sàn ô tô', caption: 'Thảm sàn bảo vệ sàn xe', sort_order: 2 },
   { article_id: 2, image_url: '/images/articles/camera-hanh-trinh-1.jpg', alt_text: 'Camera 4K', caption: 'Chất lượng hình ảnh 4K', sort_order: 1 },
   { article_id: 2, image_url: '/images/articles/camera-hanh-trinh-2.jpg', alt_text: 'Góc nhìn rộng', caption: 'Góc nhìn 170°', sort_order: 2 },
   { article_id: 3, image_url: '/images/articles/tham-san-1.jpg', alt_text: 'Thảm cao su', caption: 'Thảm cao su chống trượt', sort_order: 1 },
-  { article_id: 3, image_url: '/images/articles/tham-san-2.jpg', alt_text: 'Thảm nylon', caption: 'Thảm nylon dễ vệ sinh', sort_order: 2 }
+  { article_id: 3, image_url: '/images/articles/tham-san-2.jpg', alt_text: 'Thảm nylon', caption: 'Thảm nylon dễ vệ sinh', sort_order: 2 },
+  { article_id: 4, image_url: '/images/articles/den-led-1.jpg', alt_text: 'Đèn LED nội thất', caption: 'Đèn LED trang trí nội thất xe', sort_order: 1 },
+  { article_id: 4, image_url: '/images/articles/den-led-2.jpg', alt_text: 'Đèn LED gầm xe', caption: 'Đèn LED gầm xe ấn tượng', sort_order: 2 },
+  { article_id: 5, image_url: '/images/articles/am-thanh-1.jpg', alt_text: 'Loa xe hơi', caption: 'Loa xe hơi chất lượng cao', sort_order: 1 },
+  { article_id: 5, image_url: '/images/articles/am-thanh-2.jpg', alt_text: 'Amply xe hơi', caption: 'Amply xe hơi công suất cao', sort_order: 2 }
 ])
 
 puts "Database seeding completed successfully!"
@@ -289,6 +776,8 @@ puts "- #{Category.count} categories"
 puts "- #{Brand.count} brands"
 puts "- #{Product.count} products"
 puts "- #{ProductSpecification.count} product specifications"
+puts "- #{ProductDescription.count} product descriptions"
+puts "- #{ProductVideo.count} product videos"
 puts "- #{ProductImage.count} product images"
 puts "- #{ProductVariant.count} product variants"
 puts "- #{ShippingZone.count} shipping zones"
@@ -297,7 +786,41 @@ puts "- #{Coupon.count} coupons"
 puts "- #{Article.count} articles"
 puts "- #{ArticleImage.count} article images"
 
-# Create admin user
-puts "Creating admin user..."
-AdminUser.create!(email: 'admin@mexe.com', password: 'password123', password_confirmation: 'password123') unless AdminUser.exists?(email: 'admin@mexe.com')
-puts "Admin user created: admin@mexe.com / password123"
+# Create admin users
+puts "Creating admin users..."
+
+# Super Admin
+super_admin = AdminUser.find_or_create_by(email: 'admin@mexe.com') do |admin|
+  admin.password = 'password123'
+  admin.password_confirmation = 'password123'
+  admin.role = :super_admin
+end
+
+# Client users
+client1 = AdminUser.find_or_create_by(email: 'client1@mexe.com') do |admin|
+  admin.password = 'password123'
+  admin.password_confirmation = 'password123'
+  admin.role = :client
+  admin.client_name = 'AUTOLIGHT Vietnam'
+  admin.client_phone = '0901234567'
+  admin.client_address = '123 Nguyễn Văn Cừ, Q.1, TP.HCM'
+end
+
+client2 = AdminUser.find_or_create_by(email: 'client2@mexe.com') do |admin|
+  admin.password = 'password123'
+  admin.password_confirmation = 'password123'
+  admin.role = :client
+  admin.client_name = 'Honda Parts Dealer'
+  admin.client_phone = '0907654321'
+  admin.client_address = '456 Lê Văn Việt, Q.9, TP.HCM'
+end
+
+# Assign products to clients
+puts "Assigning products to clients..."
+Product.where(brand_id: [4, 6]).update_all(client_id: client1.id) # AUTOLIGHT và đèn LED products
+Product.where(brand_id: [1, 6]).limit(3).update_all(client_id: client2.id) # Honda và WeatherTech products
+
+puts "Admin users created:"
+puts "- Super Admin: admin@mexe.com / password123"
+puts "- Client 1: client1@mexe.com / password123 (#{client1.client_name})"
+puts "- Client 2: client2@mexe.com / password123 (#{client2.client_name})"

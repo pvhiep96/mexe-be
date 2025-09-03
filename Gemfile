@@ -29,11 +29,16 @@ gem "bcrypt", "~> 3.1.7"
 # JWT for authentication
 gem "jwt"
 
-# ActiveAdmin for admin interface
-gem "activeadmin"
+# Pagination
+gem "kaminari"
+
+# Administrate for admin interface
+gem "administrate"
 gem "devise"
-gem "sassc-rails"
-gem "arctic_admin"
+
+# Image upload and processing
+gem "carrierwave"
+gem "mini_magick"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]

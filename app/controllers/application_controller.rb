@@ -2,21 +2,23 @@ class ApplicationController < ActionController::Base
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
   
-  # Skip CSRF protection for API endpoints
+  # CSRF protection - use exception for web, null_session for API
+  protect_from_forgery with: :exception, unless: -> { request.format.json? }
   protect_from_forgery with: :null_session, if: -> { request.format.json? }
   skip_before_action :verify_authenticity_token, if: -> { request.format.json? }
-  
-  # JWT Authentication for API endpoints
-  before_action :authenticate_user_from_token, if: -> { request.format.json? }
   
   private
   
   def authenticate_user_from_token
     token = extract_token_from_header
+    Rails.logger.debug "Auth Header Token: #{token ? 'Present' : 'Missing'}"
     return unless token
     
     user_id = JwtService.extract_user_id(token)
+    Rails.logger.debug "User ID from token: #{user_id}"
+    
     @current_user = User.find_by(id: user_id) if user_id
+    Rails.logger.debug "Current user found: #{@current_user ? @current_user.email : 'None'}"
   end
   
   def extract_token_from_header
