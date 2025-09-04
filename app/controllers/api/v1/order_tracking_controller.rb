@@ -1,4 +1,4 @@
-class Api::V1::OrderTrackingController < ApplicationController
+class Api::V1::OrderTrackingController < Api::ApplicationController
   before_action :authenticate_user!, except: [:track_by_number]
   
   def my_orders

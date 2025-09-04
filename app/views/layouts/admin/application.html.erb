@@ -77,6 +77,15 @@
       color: white;
     }
     
+    .sidebar-nav a.logout-link {
+      color: #dc3545 !important;
+    }
+    
+    .sidebar-nav a.logout-link:hover {
+      background: #dc3545 !important;
+      color: white !important;
+    }
+    
     .sidebar-nav .nav-icon {
       width: 20px;
       display: inline-block;
@@ -142,6 +151,14 @@
     <nav class="admin-sidebar" id="sidebar">
       <div class="sidebar-header">
         <h3>Admin Panel</h3>
+        <% if current_admin_user %>
+          <div style="margin-top: 10px; font-size: 12px; color: #adb5bd;">
+            <div>👤 <%= current_admin_user.email %></div>
+            <% if current_admin_user.respond_to?(:super_admin?) && current_admin_user.super_admin? %>
+              <div style="color: #28a745; font-weight: bold;">SUPER ADMIN</div>
+            <% end %>
+          </div>
+        <% end %>
       </div>
       
       <ul class="sidebar-nav">
@@ -194,11 +211,20 @@
           </a>
         </li>
         
-        <li style="border-top: 1px solid #495057; margin-top: 20px;">
+        <li style="border-top: 1px solid #495057;">
           <a href="/" target="_blank">
             <span class="nav-icon">🌐</span>
             View Site
           </a>
+        </li>
+        
+        <li style="border-top: 1px solid #495057;">
+          <%= link_to destroy_admin_user_session_path, method: :delete, 
+              data: { confirm: 'Bạn có chắc chắn muốn đăng xuất?' },
+              class: "logout-link" do %>
+            <span class="nav-icon">🚪</span>
+            Đăng xuất
+          <% end %>
         </li>
       </ul>
     </nav>

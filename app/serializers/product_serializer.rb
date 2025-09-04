@@ -3,6 +3,7 @@ class ProductSerializer < ActiveModel::Serializer
   :price, :original_price, :discount_percent, :cost_price,
   :weight, :dimensions, :stock_quantity, :min_stock_alert,
   :is_active, :is_featured, :is_new, :is_hot, :is_preorder,
+  :is_trending, :is_ending_soon, :is_arriving_soon,
   :preorder_quantity, :preorder_end_date, :warranty_period,
   :meta_title, :meta_description, :view_count, :primary_image_url
 

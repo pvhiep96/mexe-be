@@ -1,0 +1,129 @@
+<%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "login-form-content" }) do |f| %>
+  <% if alert %>
+    <div class="alert alert-danger">
+      <strong>⚠️ Lỗi:</strong> <%= alert %>
+    </div>
+  <% end %>
+  
+  <% if notice %>
+    <div class="alert alert-notice">
+      <strong>ℹ️ Thông báo:</strong> <%= notice %>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= f.label :email, "📧 Email" %>
+    <%= f.email_field :email, 
+        autofocus: true, 
+        autocomplete: "email", 
+        class: "form-input",
+        placeholder: "Nhập email của bạn",
+        required: true %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :password, "🔒 Mật khẩu" %>
+    <%= f.password_field :password, 
+        autocomplete: "current-password", 
+        class: "form-input",
+        placeholder: "Nhập mật khẩu",
+        required: true %>
+  </div>
+
+  <% if devise_mapping.rememberable? %>
+    <div class="remember-me">
+      <%= f.check_box :remember_me %>
+      <%= f.label :remember_me, "Ghi nhớ đăng nhập" %>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= f.submit "🚀 Đăng nhập", class: "login-button" %>
+  </div>
+<% end %>
+
+<style>
+  .login-form-content {
+    width: 100%;
+  }
+  
+  .form-group:last-child {
+    margin-bottom: 0;
+  }
+  
+  /* Animation cho form */
+  .form-group {
+    animation: slideInUp 0.6s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  
+  .form-group:nth-child(1) { animation-delay: 0.1s; }
+  .form-group:nth-child(2) { animation-delay: 0.2s; }
+  .form-group:nth-child(3) { animation-delay: 0.3s; }
+  .form-group:nth-child(4) { animation-delay: 0.4s; }
+  
+  @keyframes slideInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Loading state cho button */
+  .login-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+  
+  .login-button:disabled::before {
+    display: none;
+  }
+  
+  /* Focus states */
+  .form-input:focus + label,
+  .form-input:not(:placeholder-shown) + label {
+    color: #2D6294;
+  }
+  
+  /* Error states */
+  .field_with_errors .form-input {
+    border-color: #dc2626;
+    background: #fef2f2;
+  }
+  
+  .field_with_errors label {
+    color: #dc2626;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('.login-form-content');
+    const submitButton = document.querySelector('.login-button');
+    
+    if (form && submitButton) {
+      form.addEventListener('submit', function() {
+        submitButton.disabled = true;
+        submitButton.textContent = '⏳ Đang đăng nhập...';
+      });
+    }
+    
+    // Auto-focus on email field
+    const emailField = document.querySelector('input[type="email"]');
+    if (emailField) {
+      emailField.focus();
+    }
+    
+    // Add enter key support
+    document.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        const form = document.querySelector('.login-form-content');
+        if (form) {
+          form.submit();
+        }
+      }
+    });
+  });
+</script>

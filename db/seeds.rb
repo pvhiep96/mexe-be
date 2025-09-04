@@ -820,6 +820,27 @@ puts "Assigning products to clients..."
 Product.where(brand_id: [4, 6]).update_all(client_id: client1.id) # AUTOLIGHT và đèn LED products
 Product.where(brand_id: [1, 6]).limit(3).update_all(client_id: client2.id) # Honda và WeatherTech products
 
+# Set early order tab flags
+puts "Setting early order tab flags..."
+# Trending products (Dự án thịnh hành)
+Product.where(is_hot: true).or(Product.where(is_featured: true)).update_all(is_trending: true)
+
+# New products (Mới ra mắt) - already has is_new flag
+puts "New products: #{Product.where(is_new: true).count}"
+
+# Ending soon products (Sắp kết thúc) - set some products as ending soon
+Product.where(is_preorder: true).update_all(is_ending_soon: true)
+Product.where(id: [1, 3, 5]).update_all(is_ending_soon: true) # Some specific products
+
+# Arriving soon products (Sắp về hàng) - set some products as arriving soon
+Product.where(id: [2, 4, 6, 8]).update_all(is_arriving_soon: true) # Some specific products
+
+puts "Early order tab flags set:"
+puts "- Trending: #{Product.where(is_trending: true).count}"
+puts "- New: #{Product.where(is_new: true).count}"
+puts "- Ending soon: #{Product.where(is_ending_soon: true).count}"
+puts "- Arriving soon: #{Product.where(is_arriving_soon: true).count}"
+
 puts "Admin users created:"
 puts "- Super Admin: admin@mexe.com / password123"
 puts "- Client 1: client1@mexe.com / password123 (#{client1.client_name})"

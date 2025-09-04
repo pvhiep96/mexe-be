@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
-  devise_for :admin_users
+  devise_for :admin_users, controllers: {
+    sessions: 'admin/sessions'
+  }
   namespace :admin do
     root to: "application#index"
     resources :brands
@@ -36,8 +38,9 @@ Rails.application.routes.draw do
       get 'auth/profile', to: 'auth#profile'
       put 'auth/update_profile', to: 'auth#update_profile'
       
-      # Home route
+      # Home routes
       get 'home', to: 'home#index'
+      get 'home/early_order', to: 'home#early_order'
       
       # Resource routes
       resources :products, only: [:index, :show]

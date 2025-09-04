@@ -1,6 +1,6 @@
 module Api
   module V1
-    class UsersController < ApplicationController
+    class UsersController < Api::ApplicationController
       before_action :authenticate_user!
       before_action :ensure_json_request
 

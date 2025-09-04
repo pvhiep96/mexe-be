@@ -11,6 +11,23 @@ module Api
         }
       end
 
+      def early_order
+        trending_products = get_products_by_flag(:is_trending)
+        new_products = get_products_by_flag(:is_new)
+        ending_soon_products = get_products_by_flag(:is_ending_soon)
+        arriving_soon_products = get_products_by_flag(:is_arriving_soon)
+
+        render json: {
+          success: true,
+          data: {
+            trending: trending_products,
+            new_launched: new_products,
+            ending_soon: ending_soon_products,
+            arriving_soon: arriving_soon_products
+          }
+        }
+      end
+
       private
 
       def get_categories
@@ -94,6 +111,17 @@ module Api
                         .where(category: essential_categories)
                         .order(view_count: :desc, created_at: :desc)
                         .limit(8)
+
+        ActiveModel::Serializer::CollectionSerializer.new(products, serializer: ProductSerializer)
+      end
+
+      def get_products_by_flag(flag_column)
+        products = Product.includes(:brand, :category, :product_images)
+                         .where(is_active: true)
+                         .where('stock_quantity > 0')
+                         .where(flag_column => true)
+                         .order(created_at: :desc)
+                         .limit(15)
 
         ActiveModel::Serializer::CollectionSerializer.new(products, serializer: ProductSerializer)
       end

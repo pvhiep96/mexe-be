@@ -442,6 +442,7 @@ DEPENDENCIES
   importmap-rails
   jbuilder
   jwt
+  kaminari
   mini_magick
   mysql2 (~> 0.5)
   pry

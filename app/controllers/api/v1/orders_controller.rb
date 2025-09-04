@@ -1,7 +1,6 @@
 module Api
   module V1
     class OrdersController < ::Api::ApplicationController
-      before_action :authenticate_user_from_token, only: [:index, :show]
       before_action :authenticate_user!, only: [:index, :show]
 
       def index

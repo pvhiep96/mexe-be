@@ -1,6 +1,6 @@
 module Api
   module V1
-    class AuthController < ApplicationController
+    class AuthController < Api::ApplicationController
       before_action :authenticate_user!, only: [:update_profile, :change_password]
       before_action :ensure_json_request
       # skip_before_action :authenticate_user_from_token, only: [:login, :register, :profile]
