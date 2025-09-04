@@ -10,24 +10,24 @@ class ImageUploader < CarrierWave::Uploader::Base
   end
 
   # Process files as they are uploaded:
-  # process resize_to_limit: [800, 800]
+  process resize_to_limit: [800, 800]
 
   # Create different versions of your uploaded files:
-  # version :large do
-  #   process resize_to_limit: [800, 600]
-  # end
+  version :large do
+    process resize_to_limit: [800, 600]
+  end
 
-  # version :medium do
-  #   process resize_to_limit: [400, 300]
-  # end
+  version :medium do
+    process resize_to_limit: [400, 300]
+  end
 
-  # version :thumb do
-  #   process resize_to_limit: [200, 150]
-  # end
+  version :thumb do
+    process resize_to_limit: [200, 150]
+  end
 
-  # version :small do
-  #   process resize_to_limit: [100, 75]
-  # end
+  version :small do
+    process resize_to_limit: [100, 75]
+  end
 
   # Add a white list of extensions which are allowed to be uploaded.
   def extension_allowlist

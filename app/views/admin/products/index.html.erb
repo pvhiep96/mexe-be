@@ -1,0 +1,328 @@
+<% content_for(:title, "Products") %>
+
+<div class="admin-products-index">
+  <div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h1>Products</h1>
+    <%= link_to "New Product", new_admin_product_path, class: "btn btn-success" %>
+  </div>
+
+  <!-- Search and Filter Form -->
+  <div class="search-filters" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+    <%= form_with url: admin_products_path, method: :get, local: true, class: "search-form" do |form| %>
+      <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: end;">
+        <div style="flex: 1; min-width: 200px;">
+          <%= form.label :search, "Search:", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+          <%= form.text_field :search, value: params[:search], 
+              placeholder: "Search by name or SKU...", 
+              style: "width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" %>
+        </div>
+        
+        <div>
+          <%= form.label :brand_id, "Brand:", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+          <%= form.select :brand_id, 
+              options_from_collection_for_select(Brand.all, :id, :name, params[:brand_id]),
+              { include_blank: "All Brands" },
+              { style: "padding: 8px; border: 1px solid #ddd; border-radius: 4px;" } %>
+        </div>
+        
+        <div>
+          <%= form.label :category_id, "Category:", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+          <%= form.select :category_id, 
+              options_from_collection_for_select(Category.all, :id, :name, params[:category_id]),
+              { include_blank: "All Categories" },
+              { style: "padding: 8px; border: 1px solid #ddd; border-radius: 4px;" } %>
+        </div>
+        
+        <div>
+          <%= form.label :status, "Status:", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+          <%= form.select :status, 
+              options_for_select([
+                ['All Status', ''],
+                ['Active', 'active'],
+                ['Inactive', 'inactive'],
+                ['Featured', 'featured'],
+                ['New', 'new'],
+                ['Hot', 'hot']
+              ], params[:status]),
+              {},
+              { style: "padding: 8px; border: 1px solid #ddd; border-radius: 4px;" } %>
+        </div>
+        
+        <div>
+          <%= form.submit "Search", class: "btn btn-primary" %>
+          <%= link_to "Clear", admin_products_path, class: "btn btn-secondary" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @products.any? %>
+    <div class="table-container">
+      <table class="table" style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="background: #f8f9fa;">
+            <th style="padding: 12px; border: 1px solid #dee2e6;">ID</th>
+            <th style="padding: 12px; border: 1px solid #dee2e6;">Image</th>
+            <th style="padding: 12px; border: 1px solid #dee2e6;">Name</th>
+            <th style="padding: 12px; border: 1px solid #dee2e6;">SKU</th>
+            <th style="padding: 12px; border: 1px solid #dee2e6;">Brand</th>
+            <th style="padding: 12px; border: 1px solid #dee2e6;">Category</th>
+            <th style="padding: 12px; border: 1px solid #dee2e6;">Price</th>
+            <th style="padding: 12px; border: 1px solid #dee2e6;">Stock</th>
+            <th style="padding: 12px; border: 1px solid #dee2e6;">Status</th>
+            <th style="padding: 12px; border: 1px solid #dee2e6;">Created</th>
+            <th style="padding: 12px; border: 1px solid #dee2e6;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @products.each do |product| %>
+            <tr>
+              <td style="padding: 12px; border: 1px solid #dee2e6;"><%= product.id %></td>
+              <td style="padding: 12px; border: 1px solid #dee2e6;">
+                <% if product.product_images.any? %>
+                  <% product_image = product.product_images.first %>
+                  <% if product_image.image.present? %>
+                    <% begin %>
+                      <%= image_tag product_image.image.url(:thumb), 
+                          style: "width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" %>
+                    <% rescue => e %>
+                      <% begin %>
+                        <%= image_tag product_image.image.url, 
+                            style: "width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" %>
+                      <% rescue %>
+                        <div style="width: 50px; height: 50px; background: #f8f9fa; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                          Image Error
+                        </div>
+                      <% end %>
+                    <% end %>
+                  <% else %>
+                    <div style="width: 50px; height: 50px; background: #f8f9fa; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                      No Image
+                    </div>
+                  <% end %>
+                <% else %>
+                  <div style="width: 50px; height: 50px; background: #f8f9fa; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                    No Image
+                  </div>
+                <% end %>
+              </td>
+              <td style="padding: 12px; border: 1px solid #dee2e6;">
+                <strong><%= product.name %></strong>
+                <% if product.short_description.present? %>
+                  <br><small style="color: #6c757d;"><%= truncate(product.short_description, length: 50) %></small>
+                <% end %>
+              </td>
+              <td style="padding: 12px; border: 1px solid #dee2e6;"><%= product.sku %></td>
+              <td style="padding: 12px; border: 1px solid #dee2e6;">
+                <%= product.brand&.name || "N/A" %>
+              </td>
+              <td style="padding: 12px; border: 1px solid #dee2e6;">
+                <%= product.category&.name || "N/A" %>
+              </td>
+              <td style="padding: 12px; border: 1px solid #dee2e6;">
+                <strong><%= number_to_currency(product.price) %></strong>
+                <% if product.original_price.present? && product.original_price != product.price %>
+                  <br><small style="text-decoration: line-through; color: #6c757d;">
+                    <%= number_to_currency(product.original_price) %>
+                  </small>
+                <% end %>
+              </td>
+              <td style="padding: 12px; border: 1px solid #dee2e6;">
+                <span class="<%= product.stock_quantity > 0 ? 'text-success' : 'text-danger' %>">
+                  <%= product.stock_quantity %>
+                </span>
+              </td>
+              <td style="padding: 12px; border: 1px solid #dee2e6;">
+                <span class="badge <%= product.is_active? ? 'badge-success' : 'badge-danger' %>">
+                  <%= product.is_active? ? 'Active' : 'Inactive' %>
+                </span>
+                <% if product.is_featured? %>
+                  <br><span class="badge badge-warning">Featured</span>
+                <% end %>
+                <% if product.is_new? %>
+                  <br><span class="badge badge-info">New</span>
+                <% end %>
+                <% if product.is_hot? %>
+                  <br><span class="badge badge-danger">Hot</span>
+                <% end %>
+              </td>
+              <td style="padding: 12px; border: 1px solid #dee2e6;">
+                <%= product.created_at.strftime("%Y-%m-%d") %>
+              </td>
+              <td style="padding: 12px; border: 1px solid #dee2e6;">
+                <%= link_to "View", admin_product_path(product), class: "btn btn-sm btn-secondary" %>
+                <%= link_to "Edit", edit_admin_product_path(product), class: "btn btn-sm btn-primary" %>
+                <%= link_to "Delete", admin_product_path(product), 
+                    method: :delete,
+                    confirm: "Are you sure you want to delete this product?",
+                    class: "btn btn-sm btn-danger" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="pagination-info" style="margin-top: 20px;">
+      <p>Showing <%= @products.count %> product(s)</p>
+      <% if @products.respond_to?(:current_page) %>
+        <%= paginate @products %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="empty-state" style="text-align: center; padding: 40px; background: #f8f9fa; border-radius: 8px;">
+      <h3>No products yet</h3>
+      <p>Create your first product to get started.</p>
+      <%= link_to "Create First Product", new_admin_product_path, class: "btn btn-success btn-lg" %>
+    </div>
+  <% end %>
+</div>
+
+<div style="margin-top: 30px;">
+  <%= link_to "← Back to Dashboard", admin_root_path, class: "btn btn-secondary" %>
+</div>
+
+<style>
+  .btn {
+    display: inline-block;
+    padding: 8px 16px;
+    margin: 2px;
+    background: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    border: 1px solid #007bff;
+  }
+  
+  .btn:hover {
+    background: #0056b3;
+    border-color: #0056b3;
+  }
+  
+  .btn-primary {
+    background: #007bff;
+    border-color: #007bff;
+  }
+  
+  .btn-secondary {
+    background: #6c757d;
+    border-color: #6c757d;
+  }
+  
+  .btn-success {
+    background: #28a745;
+    border-color: #28a745;
+  }
+  
+  .btn-danger {
+    background: #dc3545;
+    border-color: #dc3545;
+  }
+  
+  .btn-sm {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+  
+  .btn-lg {
+    padding: 12px 24px;
+    font-size: 16px;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 4px;
+    color: white;
+  }
+
+  .badge-success {
+    background-color: #28a745;
+  }
+
+  .badge-danger {
+    background-color: #dc3545;
+  }
+
+  .badge-warning {
+    background-color: #ffc107;
+    color: #212529;
+  }
+
+  .badge-info {
+    background-color: #17a2b8;
+  }
+
+  .text-success {
+    color: #28a745 !important;
+  }
+
+  .text-danger {
+    color: #dc3545 !important;
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+  }
+
+  .pagination li {
+    margin: 0 2px;
+  }
+
+  .pagination a {
+    display: block;
+    padding: 8px 12px;
+    background: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+  }
+
+  .pagination a:hover {
+    background: #0056b3;
+  }
+
+  .pagination .current {
+    display: block;
+    padding: 8px 12px;
+    background: #6c757d;
+    color: white;
+    border-radius: 4px;
+  }
+
+  .search-form input[type="text"], 
+  .search-form select {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px;
+  }
+
+  .search-form input[type="text"]:focus, 
+  .search-form select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  }
+
+  .no-image-placeholder {
+    width: 50px;
+    height: 50px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    font-size: 12px;
+  }
+</style>

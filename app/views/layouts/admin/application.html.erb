@@ -142,6 +142,37 @@
       padding: 10px;
       border-radius: 4px;
     }
+    
+    .alert {
+      margin-bottom: 20px;
+      padding: 12px;
+      border-radius: 4px;
+      border: 1px solid transparent;
+    }
+    
+    .alert-success {
+      background-color: #d4edda;
+      border-color: #c3e6cb;
+      color: #155724;
+    }
+    
+    .alert-danger {
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
+      color: #721c24;
+    }
+    
+    .alert-info {
+      background-color: #d1ecf1;
+      border-color: #bee5eb;
+      color: #0c5460;
+    }
+    
+    .alert-warning {
+      background-color: #fff3cd;
+      border-color: #ffeaa7;
+      color: #856404;
+    }
   </style>
 </head>
 
@@ -232,6 +263,19 @@
     <!-- Main Content -->
     <main class="admin-content">
       <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+      
+      <!-- Flash Messages -->
+      <% if notice %>
+        <div class="alert alert-success">
+          <%= notice %>
+        </div>
+      <% end %>
+      
+      <% if alert %>
+        <div class="alert alert-danger">
+          <%= alert %>
+        </div>
+      <% end %>
       
       <%= content_for(:layout) %>
     </main>

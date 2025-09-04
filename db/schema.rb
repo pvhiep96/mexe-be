@@ -134,17 +134,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_04_064831) do
     t.index ["slug"], name: "index_categories_on_slug", unique: true
   end
 
-  create_table "ckeditor_assets", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.string "data_file_name", null: false
-    t.string "data_content_type"
-    t.integer "data_file_size"
-    t.string "data_fingerprint"
-    t.string "type", limit: 30
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["type"], name: "index_ckeditor_assets_on_type"
-  end
-
   create_table "coupon_usage", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "coupon_id", null: false
     t.bigint "user_id", null: false

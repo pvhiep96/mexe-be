@@ -1,6 +1,46 @@
 module Admin
   class ProductsController < Admin::ApplicationController
 
+    def index
+      @products = Product.includes(:brand, :category, :product_images)
+      
+      # Search functionality
+      if params[:search].present?
+        @products = @products.where("name ILIKE ? OR sku ILIKE ?", 
+                                  "%#{params[:search]}%", 
+                                  "%#{params[:search]}%")
+      end
+      
+      # Filter by brand
+      if params[:brand_id].present?
+        @products = @products.where(brand_id: params[:brand_id])
+      end
+      
+      # Filter by category
+      if params[:category_id].present?
+        @products = @products.where(category_id: params[:category_id])
+      end
+      
+      # Filter by status
+      if params[:status].present?
+        case params[:status]
+        when 'active'
+          @products = @products.where(is_active: true)
+        when 'inactive'
+          @products = @products.where(is_active: false)
+        when 'featured'
+          @products = @products.where(is_featured: true)
+        when 'new'
+          @products = @products.where(is_new: true)
+        when 'hot'
+          @products = @products.where(is_hot: true)
+        end
+      end
+      
+      @products = @products.page(params[:page]).per(20)
+      authorize_resource(resource_class)
+    end
+
     def new
       resource = resource_class.new
       resource.product_images.build
@@ -11,8 +51,42 @@ module Admin
       render locals: { page: Administrate::Page::Form.new(dashboard, resource) }
     end
 
+    def show
+      @product = Product.find(params[:id])
+      authorize_resource(@product)
+    end
+
     def edit
       render locals: { page: Administrate::Page::Form.new(dashboard, requested_resource) }
+    end
+
+    def create
+      @product = Product.new(resource_params)
+      authorize_resource(@product)
+      
+      if @product.save
+        redirect_to admin_product_path(@product), notice: 'Product was successfully created.'
+      else
+        render :new
+      end
+    end
+
+    def update
+      @product = Product.find(params[:id])
+      authorize_resource(@product)
+      
+      if @product.update(resource_params)
+        redirect_to admin_product_path(@product), notice: 'Product was successfully updated.'
+      else
+        render :edit
+      end
+    end
+
+    def destroy
+      @product = Product.find(params[:id])
+      authorize_resource(@product)
+      @product.destroy
+      redirect_to admin_products_path, notice: 'Product was successfully deleted.'
     end
 
     private

@@ -2,9 +2,9 @@
 
 <div class="admin-product-show">
   <div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-    <h1><%= page.resource.name %></h1>
+    <h1><%= @product.name %></h1>
     <div>
-      <%= link_to "Edit", edit_admin_product_path(page.resource), class: "btn btn-primary" %>
+      <%= link_to "Edit", edit_admin_product_path(@product), class: "btn btn-primary" %>
       <%= link_to "← Back to Products", admin_products_path, class: "btn btn-secondary" %>
     </div>
   </div>
@@ -16,17 +16,17 @@
       <h3>Basic Information</h3>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
         <div>
-          <strong>Name:</strong> <%= page.resource.name %><br>
-          <strong>SKU:</strong> <%= page.resource.sku %><br>
-          <strong>Slug:</strong> <%= page.resource.slug %><br>
-          <strong>Brand:</strong> <%= page.resource.brand&.name || 'N/A' %><br>
-          <strong>Category:</strong> <%= page.resource.category&.name || 'N/A' %>
+          <strong>Name:</strong> <%= @product.name %><br>
+          <strong>SKU:</strong> <%= @product.sku %><br>
+          <strong>Slug:</strong> <%= @product.slug %><br>
+          <strong>Brand:</strong> <%= @product.brand&.name || 'N/A' %><br>
+          <strong>Category:</strong> <%= @product.category&.name || 'N/A' %>
         </div>
         <div>
-          <strong>Price:</strong> <%= number_to_currency(page.resource.price, unit: "₫", precision: 0) if page.resource.price %><br>
-          <strong>Original Price:</strong> <%= number_to_currency(page.resource.original_price, unit: "₫", precision: 0) if page.resource.original_price %><br>
-          <strong>Stock:</strong> <%= page.resource.stock_quantity || 0 %><br>
-          <strong>Warranty:</strong> <%= page.resource.warranty_period || 'N/A' %>
+          <strong>Price:</strong> <%= number_to_currency(@product.price, unit: "₫", precision: 0) if @product.price %><br>
+          <strong>Original Price:</strong> <%= number_to_currency(@product.original_price, unit: "₫", precision: 0) if @product.original_price %><br>
+          <strong>Stock:</strong> <%= @product.stock_quantity || 0 %><br>
+          <strong>Warranty:</strong> <%= @product.warranty_period || 'N/A' %>
         </div>
       </div>
     </div>
@@ -35,50 +35,50 @@
     <div class="section" style="margin-bottom: 30px;">
       <h3>Status</h3>
       <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-        <span class="badge <%= page.resource.is_active? ? 'badge-success' : 'badge-danger' %>">
-          <%= page.resource.is_active? ? 'Active' : 'Inactive' %>
+        <span class="badge <%= @product.is_active? ? 'badge-success' : 'badge-danger' %>">
+          <%= @product.is_active? ? 'Active' : 'Inactive' %>
         </span>
-        <% if page.resource.is_featured? %>
+        <% if @product.is_featured? %>
           <span class="badge badge-primary">Featured</span>
         <% end %>
-        <% if page.resource.is_new? %>
+        <% if @product.is_new? %>
           <span class="badge badge-info">New</span>
         <% end %>
-        <% if page.resource.is_hot? %>
+        <% if @product.is_hot? %>
           <span class="badge badge-warning">Hot</span>
         <% end %>
-        <% if page.resource.is_preorder? %>
+        <% if @product.is_preorder? %>
           <span class="badge badge-secondary">Pre-order</span>
         <% end %>
       </div>
     </div>
 
     <!-- Description -->
-    <% if page.resource.description.present? %>
+    <% if @product.description.present? %>
       <div class="section" style="margin-bottom: 30px;">
         <h3>Description</h3>
         <div style="background: #f8f9fa; padding: 15px; border-radius: 4px;">
-          <%= simple_format(page.resource.description) %>
+          <%= simple_format(@product.description) %>
         </div>
       </div>
     <% end %>
 
     <!-- Short Description -->
-    <% if page.resource.short_description.present? %>
+    <% if @product.short_description.present? %>
       <div class="section" style="margin-bottom: 30px;">
         <h3>Short Description</h3>
         <div style="background: #f8f9fa; padding: 15px; border-radius: 4px;">
-          <%= simple_format(page.resource.short_description) %>
+          <%= simple_format(@product.short_description) %>
         </div>
       </div>
     <% end %>
 
     <!-- Product Images -->
-    <% if page.resource.product_images.any? %>
+    <% if @product.product_images.any? %>
       <div class="section" style="margin-bottom: 30px;">
-        <h3>Product Images (<%= page.resource.product_images.count %>)</h3>
+        <h3>Product Images (<%= @product.product_images.count %>)</h3>
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
-          <% page.resource.product_images.each do |image| %>
+          <% @product.product_images.each do |image| %>
             <div style="border: 1px solid #ddd; border-radius: 4px; overflow: hidden;">
               <% if image.image? %>
                 <img src="<%= image.image.url rescue '#' %>" alt="<%= image.alt_text %>" style="width: 100%; height: 150px; object-fit: cover;">
@@ -101,10 +101,10 @@
     <% end %>
 
     <!-- Product Descriptions -->
-    <% if page.resource.product_descriptions.any? %>
+    <% if @product.product_descriptions.any? %>
       <div class="section" style="margin-bottom: 30px;">
-        <h3>Product Descriptions (<%= page.resource.product_descriptions.count %>)</h3>
-        <% page.resource.product_descriptions.order(:sort_order).each_with_index do |desc, index| %>
+        <h3>Product Descriptions (<%= @product.product_descriptions.count %>)</h3>
+        <% @product.product_descriptions.order(:sort_order).each_with_index do |desc, index| %>
           <div style="border: 1px solid #ddd; border-radius: 4px; padding: 15px; margin-bottom: 15px;">
             <h4><%= desc.title %></h4>
             <div style="margin: 10px 0; color: #666; font-size: 12px;">
@@ -119,9 +119,9 @@
     <% end %>
 
     <!-- Product Specifications -->
-    <% if page.resource.product_specifications.any? %>
+    <% if @product.product_specifications.any? %>
       <div class="section" style="margin-bottom: 30px;">
-        <h3>Product Specifications (<%= page.resource.product_specifications.count %>)</h3>
+        <h3>Product Specifications (<%= @product.product_specifications.count %>)</h3>
         <div style="background: white; border-radius: 4px; overflow: hidden; border: 1px solid #ddd;">
           <table style="width: 100%; border-collapse: collapse;">
             <thead style="background: #f8f9fa;">
@@ -132,7 +132,7 @@
               </tr>
             </thead>
             <tbody>
-              <% page.resource.product_specifications.order(:sort_order).each do |spec| %>
+              <% @product.product_specifications.order(:sort_order).each do |spec| %>
                 <tr>
                   <td style="padding: 12px; border-bottom: 1px solid #f8f9fa;"><strong><%= spec.spec_name %></strong></td>
                   <td style="padding: 12px; border-bottom: 1px solid #f8f9fa;"><%= spec.spec_value %></td>
@@ -146,10 +146,10 @@
     <% end %>
 
     <!-- Product Videos -->
-    <% if page.resource.product_videos.any? %>
+    <% if @product.product_videos.any? %>
       <div class="section" style="margin-bottom: 30px;">
-        <h3>Product Videos (<%= page.resource.product_videos.count %>)</h3>
-        <% page.resource.product_videos.ordered.each_with_index do |video, index| %>
+        <h3>Product Videos (<%= @product.product_videos.count %>)</h3>
+        <% @product.product_videos.ordered.each_with_index do |video, index| %>
           <div style="border: 1px solid #ddd; border-radius: 4px; padding: 15px; margin-bottom: 15px;">
             <div style="display: grid; grid-template-columns: 200px 1fr; gap: 15px;">
               <!-- Video Thumbnail/Embed -->
@@ -208,11 +208,11 @@
     <div class="section" style="margin-bottom: 30px;">
       <h3>Metadata</h3>
       <div>
-        <strong>Created:</strong> <%= page.resource.created_at.strftime("%Y-%m-%d %H:%M") %><br>
-        <strong>Updated:</strong> <%= page.resource.updated_at.strftime("%Y-%m-%d %H:%M") %><br>
-        <strong>View Count:</strong> <%= page.resource.view_count || 0 %><br>
-        <strong>Meta Title:</strong> <%= page.resource.meta_title || 'N/A' %><br>
-        <strong>Meta Description:</strong> <%= page.resource.meta_description || 'N/A' %>
+        <strong>Created:</strong> <%= @product.created_at.strftime("%Y-%m-%d %H:%M") %><br>
+        <strong>Updated:</strong> <%= @product.updated_at.strftime("%Y-%m-%d %H:%M") %><br>
+        <strong>View Count:</strong> <%= @product.view_count || 0 %><br>
+        <strong>Meta Title:</strong> <%= @product.meta_title || 'N/A' %><br>
+        <strong>Meta Description:</strong> <%= @product.meta_description || 'N/A' %>
       </div>
     </div>
   </div>
