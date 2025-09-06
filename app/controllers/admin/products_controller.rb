@@ -37,7 +37,7 @@ module Admin
         end
       end
       
-      @products = @products.page(params[:page]).per(20)
+      @products = @products.page(params[:page]).per(5)
       authorize_resource(resource_class)
     end
 

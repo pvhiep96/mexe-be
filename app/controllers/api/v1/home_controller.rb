@@ -3,28 +3,24 @@ module Api
     class HomeController < ApplicationController
       def index
         render json: {
-          categories: get_categories,
-          best_sellers: get_best_sellers,
-          featured_products: get_featured_products,
-          new_brands: get_new_brands,
-          essential_accessories: get_essential_accessories
+          success: true,
+          data: {
+            categories: get_categories,
+            best_sellers: get_best_sellers,
+            early_order_products: get_early_order_products,
+            new_brands: get_new_brands,
+            featured_products: get_featured_products,
+            essential_accessories: get_essential_accessories
+          }
         }
       end
 
-      def early_order
-        trending_products = get_products_by_flag(:is_trending)
-        new_products = get_products_by_flag(:is_new)
-        ending_soon_products = get_products_by_flag(:is_ending_soon)
-        arriving_soon_products = get_products_by_flag(:is_arriving_soon)
-
-        render json: {
-          success: true,
-          data: {
-            trending: trending_products,
-            new_launched: new_products,
-            ending_soon: ending_soon_products,
-            arriving_soon: arriving_soon_products
-          }
+      def get_early_order_products
+        {
+          trending_products: get_products_by_flag(:is_trending),
+          new_products: get_products_by_flag(:is_new),
+          ending_soon_products: get_products_by_flag(:is_ending_soon),
+          arriving_soon_products: get_products_by_flag(:is_arriving_soon)
         }
       end
 

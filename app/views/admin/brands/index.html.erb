@@ -51,8 +51,15 @@
       </table>
     </div>
     
-    <div class="pagination-info" style="margin-top: 20px;">
-      <p>Showing <%= @brands.count %> brand(s)</p>
+    <div class="pagination-info" style="margin-top: 30px; display: flex; justify-content: space-between; align-items: center;">
+      <p style="color: #6c757d; font-size: 14px; margin: 0;">
+        Showing <%= (@brands.current_page - 1) * @brands.limit_value + 1 %>-<%= [@brands.current_page * @brands.limit_value, @brands.total_count].min %> of <%= @brands.total_count %> brand(s)
+      </p>
+      <% if @brands.respond_to?(:current_page) && @brands.total_pages > 1 %>
+        <div class="pagination">
+          <%= paginate @brands %>
+        </div>
+      <% end %>
     </div>
   <% else %>
     <div class="empty-state" style="text-align: center; padding: 40px; background: #f8f9fa; border-radius: 8px;">
@@ -63,9 +70,6 @@
   <% end %>
 </div>
 
-<div style="margin-top: 30px;">
-  <%= link_to "← Back to Dashboard", admin_root_path, class: "btn btn-secondary" %>
-</div>
 
 <style>
   .btn {
@@ -112,5 +116,74 @@
   .btn-lg {
     padding: 12px 24px;
     font-size: 16px;
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    gap: 2px;
+    align-items: center;
+  }
+
+  .pagination li {
+    margin: 0;
+  }
+
+  .pagination a, .pagination .current {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 12px;
+    background: #ffffff;
+    color: #495057;
+    text-decoration: none;
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .pagination a:hover {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  }
+
+  .pagination .current {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+    font-weight: 600;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+  }
+
+  .pagination .disabled a {
+    background: #f8f9fa;
+    color: #adb5bd;
+    border-color: #e9ecef;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  .pagination .disabled a:hover {
+    background: #f8f9fa;
+    color: #adb5bd;
+    border-color: #e9ecef;
+    transform: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .pagination .gap {
+    display: none;
   }
 </style>

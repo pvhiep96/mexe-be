@@ -40,7 +40,6 @@ Rails.application.routes.draw do
       
       # Home routes
       get 'home', to: 'home#index'
-      get 'home/early_order', to: 'home#early_order'
       
       # Resource routes
       resources :products, only: [:index, :show]
