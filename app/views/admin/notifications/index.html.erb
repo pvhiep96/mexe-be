@@ -1,0 +1,125 @@
+<% content_for(:title, "Thông báo") %>
+
+<div class="admin-notifications-index">
+  <div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h1>Thông báo (<%= @notifications.count %> thông báo)</h1>
+    <div>
+      <% if @unread_count > 0 %>
+        <%= link_to "Đánh dấu tất cả đã đọc", mark_all_as_read_admin_notifications_path, 
+                    method: :patch, class: "btn btn-sm btn-secondary",
+                    confirm: "Bạn có chắc muốn đánh dấu tất cả thông báo là đã đọc?" %>
+      <% end %>
+      <span class="badge badge-info">Client: <%= current_admin_user.client_name %></span>
+    </div>
+  </div>
+
+  <% if @unread_count > 0 %>
+    <div class="alert alert-info" style="margin-bottom: 20px; padding: 15px; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 4px;">
+      <strong>Bạn có <%= @unread_count %> thông báo chưa đọc</strong>
+    </div>
+  <% end %>
+
+  <div class="notifications-list" style="background: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); overflow: hidden;">
+    <% if @notifications.any? %>
+      <% @notifications.each do |notification| %>
+        <div class="notification-item" style="
+          padding: 20px; 
+          border-bottom: 1px solid #f8f9fa; 
+          <%= 'background: #f8f9fa; border-left: 4px solid #007bff;' unless notification.is_read? %>
+          display: flex; 
+          justify-content: space-between; 
+          align-items: flex-start;
+        ">
+          <div style="flex: 1;">
+            <h4 style="margin: 0 0 5px 0; color: #333;">
+              <%= notification.title %>
+              <% unless notification.is_read? %>
+                <span class="badge badge-primary" style="margin-left: 10px;">Mới</span>
+              <% end %>
+            </h4>
+            <p style="margin: 0 0 10px 0; color: #666;"><%= notification.message %></p>
+            <div style="font-size: 12px; color: #999;">
+              <span>Đơn hàng: <%= link_to notification.order.order_number, admin_order_path(notification.order), style: "color: #007bff;" %></span>
+              <span style="margin-left: 15px;">Thời gian: <%= notification.created_at.strftime("%d/%m/%Y %H:%M") %></span>
+              <% if notification.is_read? %>
+                <span style="margin-left: 15px;">Đã đọc: <%= notification.read_at.strftime("%d/%m/%Y %H:%M") %></span>
+              <% end %>
+            </div>
+          </div>
+          <div style="margin-left: 20px;">
+            <% unless notification.is_read? %>
+              <%= link_to "Đánh dấu đã đọc", mark_as_read_admin_notification_path(notification), 
+                          method: :patch, class: "btn btn-sm btn-outline-primary" %>
+            <% end %>
+            <%= link_to "Xem đơn hàng", admin_order_path(notification.order), 
+                        class: "btn btn-sm btn-primary" %>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <div style="padding: 40px; text-align: center; color: #666;">
+        <h3>Không có thông báo nào</h3>
+        <p>Khi có đơn hàng mới chứa sản phẩm của bạn, thông báo sẽ xuất hiện tại đây.</p>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<style>
+  .badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  
+  .badge-success { background: #28a745; color: white; }
+  .badge-danger { background: #dc3545; color: white; }
+  .badge-warning { background: #ffc107; color: black; }
+  .badge-info { background: #17a2b8; color: white; }
+  .badge-primary { background: #007bff; color: white; }
+  
+  .btn {
+    display: inline-block;
+    padding: 6px 12px;
+    margin: 2px;
+    background: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    border: 1px solid #007bff;
+    font-size: 12px;
+  }
+  
+  .btn:hover {
+    background: #0056b3;
+    border-color: #0056b3;
+  }
+  
+  .btn-sm {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  
+  .btn-outline-primary {
+    background: transparent;
+    color: #007bff;
+    border-color: #007bff;
+  }
+  
+  .btn-outline-primary:hover {
+    background: #007bff;
+    color: white;
+  }
+  
+  .btn-secondary {
+    background: #6c757d;
+    border-color: #6c757d;
+  }
+  
+  .notification-item:hover {
+    background: #f1f3f4 !important;
+  }
+</style>

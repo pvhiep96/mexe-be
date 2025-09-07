@@ -54,9 +54,10 @@ module Api
           return
         end
         
-        # Set order attributes
-        Rails.logger.info "Order params (except items): #{order_params.except(:order_items).inspect}"
-        order.assign_attributes(order_params.except(:order_items))
+        # Set order attributes (exclude nested parameters)
+        basic_params = order_params.except(:order_items, :shipping_info, :buyer_info)
+        Rails.logger.info "Order basic params: #{basic_params.inspect}"
+        order.assign_attributes(basic_params)
         
         # Set shipping information
         Rails.logger.info "Shipping info: #{order_params[:shipping_info].inspect}"
@@ -99,6 +100,10 @@ module Api
         if order.save
           order.calculate_totals
           order.save
+          
+          # Always create user_order_info record to store buyer information from shipping form
+          create_user_order_info(order)
+          
           render json: OrderSerializer.new(order).to_json, status: :created
         else
           Rails.logger.error("Order creation failed: #{order.errors.full_messages.join(', ')}")
@@ -121,6 +126,10 @@ module Api
             :shipping_name, :shipping_phone, :shipping_city, :shipping_district,
             :shipping_ward, :shipping_postal_code, :delivery_address
           ],
+          buyer_info: [
+            :buyer_name, :buyer_email, :buyer_phone, :buyer_address,
+            :buyer_city, :notes
+          ],
           order_items: [:product_id, :variant_id, :quantity]
         )
       end
@@ -138,6 +147,45 @@ module Api
         ].compact.reject(&:blank?)
         
         address_parts.join(', ')
+      end
+
+      def create_user_order_info(order)
+        # Use shipping_info from checkout form as primary source
+        shipping_info = order_params[:shipping_info]
+        buyer_info = order_params[:buyer_info]
+        
+        # Determine buyer information from shipping form or user data
+        if current_user
+          # For logged in users, use shipping form data or fallback to user profile
+          buyer_name = shipping_info&.dig(:shipping_name) || current_user.full_name
+          buyer_email = current_user.email
+          buyer_phone = shipping_info&.dig(:shipping_phone) || current_user.phone
+        else
+          # For guest users, use shipping form data or guest order data
+          buyer_name = shipping_info&.dig(:shipping_name) || order.guest_name
+          buyer_email = order.guest_email
+          buyer_phone = shipping_info&.dig(:shipping_phone) || order.guest_phone
+        end
+
+        # Use buyer_info if provided, otherwise fall back to shipping_info/order data
+        final_buyer_info = {
+          buyer_name: buyer_info&.dig(:buyer_name) || buyer_name,
+          buyer_email: buyer_info&.dig(:buyer_email) || buyer_email,
+          buyer_phone: buyer_info&.dig(:buyer_phone) || buyer_phone,
+          buyer_address: buyer_info&.dig(:buyer_address) || shipping_info&.dig(:delivery_address) || order.delivery_address,
+          buyer_city: buyer_info&.dig(:buyer_city) || shipping_info&.dig(:shipping_city) || order.shipping_city,
+          notes: buyer_info&.dig(:notes) || order.notes
+        }
+
+        # Only create if we have essential information
+        if final_buyer_info[:buyer_name].present? && final_buyer_info[:buyer_email].present?
+          Rails.logger.info("Creating UserOrderInfo with data: #{final_buyer_info.inspect}")
+          order.create_user_order_info!(final_buyer_info)
+        else
+          Rails.logger.warn("Skipping UserOrderInfo creation - missing essential buyer information")
+        end
+      rescue StandardError => e
+        Rails.logger.error("Failed to create user_order_info: #{e.message}")
       end
     end
   end

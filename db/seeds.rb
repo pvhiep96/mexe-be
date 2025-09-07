@@ -57,7 +57,36 @@ brands = Brand.create([
   { name: '3M', slug: '3m', description: 'Phụ kiện bảo vệ và làm sạch', founded_year: 1902, field: 'Automotive Care', story: 'Công nghệ bảo vệ và chăm sóc xe tiên tiến', sort_order: 8 }
 ])
 
-# Create products
+# Create admin users first (needed for client_id assignment)
+puts "Creating admin users..."
+
+# Super Admin
+super_admin = AdminUser.find_or_create_by(email: 'admin@mexe.com') do |admin|
+  admin.password = 'password123'
+  admin.password_confirmation = 'password123'
+  admin.role = :super_admin
+end
+
+# Client users
+client1 = AdminUser.find_or_create_by(email: 'client1@mexe.com') do |admin|
+  admin.password = 'password123'
+  admin.password_confirmation = 'password123'
+  admin.role = :client
+  admin.client_name = 'AUTOLIGHT Vietnam'
+  admin.client_phone = '0901234567'
+  admin.client_address = '123 Nguyễn Văn Cừ, Q.1, TP.HCM'
+end
+
+client2 = AdminUser.find_or_create_by(email: 'client2@mexe.com') do |admin|
+  admin.password = 'password123'
+  admin.password_confirmation = 'password123'
+  admin.role = :client
+  admin.client_name = 'Honda Parts Dealer'
+  admin.client_phone = '0907654321'
+  admin.client_address = '456 Lê Văn Việt, Q.9, TP.HCM'
+end
+
+# Create products with client_id assignment
 puts "Creating products..."
 products = Product.create([
   {
@@ -68,6 +97,7 @@ products = Product.create([
     short_description: 'Camera hành trình 4K chất lượng cao',
     brand_id: 4,
     category_id: 2,
+    client_id: client1.id, # AUTOLIGHT products to client1
     price: 2500000,
     original_price: 3000000,
     discount_percent: 16.67,
@@ -84,6 +114,7 @@ products = Product.create([
     short_description: 'Camera hành trình 2 kênh cao cấp BlackVue',
     brand_id: 5,
     category_id: 2,
+    client_id: client1.id, # BlackVue products to client1
     price: 4500000,
     original_price: 5000000,
     discount_percent: 10,
@@ -99,6 +130,7 @@ products = Product.create([
     short_description: 'Thảm sàn chính hãng Honda Civic',
     brand_id: 1,
     category_id: 3,
+    client_id: client2.id, # Honda products to client2
     price: 850000,
     original_price: 1000000,
     discount_percent: 15,
@@ -114,6 +146,7 @@ products = Product.create([
     short_description: 'Thảm sàn cao cấp WeatherTech',
     brand_id: 6,
     category_id: 3,
+    client_id: client2.id, # WeatherTech products to client2
     price: 1200000,
     original_price: 1400000,
     discount_percent: 14.29,
@@ -129,6 +162,7 @@ products = Product.create([
     short_description: 'Đèn LED trang trí nội thất đa màu',
     brand_id: 4,
     category_id: 4,
+    client_id: client1.id, # AUTOLIGHT products to client1
     price: 350000,
     original_price: 400000,
     discount_percent: 12.5,
@@ -144,6 +178,7 @@ products = Product.create([
     short_description: 'Đèn LED gầm xe điều khiển từ xa',
     brand_id: 4,
     category_id: 4,
+    client_id: client1.id, # AUTOLIGHT products to client1
     price: 800000,
     original_price: 900000,
     discount_percent: 11.11,
@@ -159,6 +194,7 @@ products = Product.create([
     short_description: 'Bảo vệ gương chiếu hậu chống va đập',
     brand_id: 8,
     category_id: 5,
+    client_id: client1.id, # 3M products to client1
     price: 250000,
     original_price: 300000,
     discount_percent: 16.67,
@@ -174,6 +210,7 @@ products = Product.create([
     short_description: 'Bảo vệ cửa xe chống va đập',
     brand_id: 6,
     category_id: 5,
+    client_id: client2.id, # WeatherTech products to client2
     price: 450000,
     original_price: 500000,
     discount_percent: 10,
@@ -189,6 +226,7 @@ products = Product.create([
     short_description: 'Loa xe hơi Pioneer chất lượng cao',
     brand_id: 7,
     category_id: 6,
+    client_id: client2.id, # Pioneer products to client2
     price: 1200000,
     original_price: 1400000,
     discount_percent: 14.29,
@@ -204,6 +242,7 @@ products = Product.create([
     short_description: 'Amply xe hơi 4 kênh Pioneer',
     brand_id: 7,
     category_id: 6,
+    client_id: client2.id, # Pioneer products to client2
     price: 2800000,
     original_price: 3200000,
     discount_percent: 12.5,
@@ -786,39 +825,7 @@ puts "- #{Coupon.count} coupons"
 puts "- #{Article.count} articles"
 puts "- #{ArticleImage.count} article images"
 
-# Create admin users
-puts "Creating admin users..."
-
-# Super Admin
-super_admin = AdminUser.find_or_create_by(email: 'admin@mexe.com') do |admin|
-  admin.password = 'password123'
-  admin.password_confirmation = 'password123'
-  admin.role = :super_admin
-end
-
-# Client users
-client1 = AdminUser.find_or_create_by(email: 'client1@mexe.com') do |admin|
-  admin.password = 'password123'
-  admin.password_confirmation = 'password123'
-  admin.role = :client
-  admin.client_name = 'AUTOLIGHT Vietnam'
-  admin.client_phone = '0901234567'
-  admin.client_address = '123 Nguyễn Văn Cừ, Q.1, TP.HCM'
-end
-
-client2 = AdminUser.find_or_create_by(email: 'client2@mexe.com') do |admin|
-  admin.password = 'password123'
-  admin.password_confirmation = 'password123'
-  admin.role = :client
-  admin.client_name = 'Honda Parts Dealer'
-  admin.client_phone = '0907654321'
-  admin.client_address = '456 Lê Văn Việt, Q.9, TP.HCM'
-end
-
-# Assign products to clients
-puts "Assigning products to clients..."
-Product.where(brand_id: [4, 6]).update_all(client_id: client1.id) # AUTOLIGHT và đèn LED products
-Product.where(brand_id: [1, 6]).limit(3).update_all(client_id: client2.id) # Honda và WeatherTech products
+# Admin users already created above for client_id assignment
 
 # Set early order tab flags
 puts "Setting early order tab flags..."
@@ -845,3 +852,193 @@ puts "Admin users created:"
 puts "- Super Admin: admin@mexe.com / password123"
 puts "- Client 1: client1@mexe.com / password123 (#{client1.client_name})"
 puts "- Client 2: client2@mexe.com / password123 (#{client2.client_name})"
+
+# Create users for testing
+puts "Creating test users..."
+user1 = User.find_or_create_by(email: 'user1@test.com') do |user|
+  user.full_name = 'Nguyễn Văn A'
+  user.phone = '0912345678'
+  user.password = 'password123'
+  user.password_confirmation = 'password123'
+  user.address = '123 Nguyễn Huệ, Quận 1, TP.HCM'
+  user.is_active = true
+end
+
+user2 = User.find_or_create_by(email: 'user2@test.com') do |user|
+  user.full_name = 'Trần Thị B'
+  user.phone = '0987654321'
+  user.password = 'password123'
+  user.password_confirmation = 'password123'
+  user.address = '456 Lê Lợi, Quận 3, TP.HCM'
+  user.is_active = true
+end
+
+# Create sample orders
+puts "Creating sample orders..."
+orders = []
+
+# Order 1 - Logged in user
+order1 = Order.find_or_create_by(order_number: 'ORD-20250906-001') do |order|
+  order.user = user1
+  order.status = 'confirmed'
+  order.payment_method = 'cod'
+  order.payment_status = 'pending'
+  order.delivery_type = 'home'
+  order.delivery_address = '123 Nguyễn Huệ, Quận 1, TP.HCM'
+  order.shipping_name = 'Nguyễn Văn A'
+  order.shipping_phone = '0912345678'
+  order.shipping_city = 'TP. Hồ Chí Minh'
+  order.shipping_district = 'Quận 1'
+  order.shipping_ward = 'Phường Bến Nghé'
+  order.subtotal = 0
+  order.total_amount = 0
+end
+
+# Order 2 - Guest user  
+order2 = Order.find_or_create_by(order_number: 'ORD-20250906-002') do |order|
+  order.guest_name = 'Lê Văn C'
+  order.guest_email = 'levanc@guest.com'
+  order.guest_phone = '0909876543'
+  order.status = 'pending'
+  order.payment_method = 'cod'
+  order.payment_status = 'pending'
+  order.delivery_type = 'home'
+  order.delivery_address = '789 Điện Biên Phủ, Quận 3, TP.HCM'
+  order.shipping_name = 'Lê Văn C'
+  order.shipping_phone = '0909876543'
+  order.shipping_city = 'TP. Hồ Chí Minh'
+  order.shipping_district = 'Quận 3'
+  order.shipping_ward = 'Phường 1'
+  order.subtotal = 0
+  order.total_amount = 0
+end
+
+# Order 3 - Another logged in user
+order3 = Order.find_or_create_by(order_number: 'ORD-20250906-003') do |order|
+  order.user = user2
+  order.status = 'processing'
+  order.payment_method = 'cod'
+  order.payment_status = 'pending'
+  order.delivery_type = 'home'
+  order.delivery_address = '456 Lê Lợi, Quận 3, TP.HCM'
+  order.shipping_name = 'Trần Thị B'
+  order.shipping_phone = '0987654321'
+  order.shipping_city = 'TP. Hồ Chí Minh'
+  order.shipping_district = 'Quận 3'
+  order.shipping_ward = 'Phường 6'
+  order.subtotal = 0
+  order.total_amount = 0
+end
+
+orders = [order1, order2, order3]
+
+# Create order items for each order
+puts "Creating order items..."
+
+# Order 1 items (products from both clients)
+if Product.exists?(1) && Product.exists?(3)
+  OrderItem.find_or_create_by(order: order1, product_id: 1) do |item|
+    item.product_name = 'Camera Hành Trình 4K AUTOLIGHT AL-2024'
+    item.product_sku = 'CAM-AL-2024'
+    item.quantity = 1
+    item.unit_price = 2500000
+    item.total_price = 2500000
+  end
+  
+  OrderItem.find_or_create_by(order: order1, product_id: 3) do |item|
+    item.product_name = 'Thảm Sàn Ô Tô Cao Cấp Honda Civic'
+    item.product_sku = 'THAM-HC-001'
+    item.quantity = 1
+    item.unit_price = 850000
+    item.total_price = 850000
+  end
+end
+
+# Order 2 items (client1 products)
+if Product.exists?(5) && Product.exists?(6)
+  OrderItem.find_or_create_by(order: order2, product_id: 5) do |item|
+    item.product_name = 'Đèn LED Trang Trí Nội Thất Xe'
+    item.product_sku = 'DEN-LED-001'
+    item.quantity = 2
+    item.unit_price = 350000
+    item.total_price = 700000
+  end
+  
+  OrderItem.find_or_create_by(order: order2, product_id: 6) do |item|
+    item.product_name = 'Bộ Đèn LED Gầm Xe AUTOLIGHT'
+    item.product_sku = 'DEN-GAM-001'
+    item.quantity = 1
+    item.unit_price = 800000
+    item.total_price = 800000
+  end
+end
+
+# Order 3 items (client2 products)
+if Product.exists?(4)
+  OrderItem.find_or_create_by(order: order3, product_id: 4) do |item|
+    item.product_name = 'Thảm Sàn WeatherTech Custom Fit'
+    item.product_sku = 'THAM-WT-001'
+    item.quantity = 1
+    item.unit_price = 1200000
+    item.total_price = 1200000
+  end
+end
+
+# Calculate totals for each order
+orders.each do |order|
+  order.calculate_totals
+  order.save!
+end
+
+# Manually trigger client notifications after order items are created
+puts "Creating client notifications..."
+orders.each do |order|
+  order.send(:notify_clients_about_new_order)
+end
+
+# Create user_order_info records
+puts "Creating user order info records..."
+UserOrderInfo.find_or_create_by(order: order1) do |info|
+  info.buyer_name = 'Nguyễn Văn A'
+  info.buyer_email = 'user1@test.com'
+  info.buyer_phone = '0912345678'
+  info.buyer_address = '123 Nguyễn Huệ, Quận 1'
+  info.buyer_city = 'TP. Hồ Chí Minh'
+  info.notes = 'Giao hàng trong giờ hành chính'
+end
+
+UserOrderInfo.find_or_create_by(order: order2) do |info|
+  info.buyer_name = 'Lê Văn C'
+  info.buyer_email = 'levanc@guest.com'
+  info.buyer_phone = '0909876543'
+  info.buyer_address = '789 Điện Biên Phủ, Quận 3'
+  info.buyer_city = 'TP. Hồ Chí Minh'
+  info.notes = 'Để hàng với bảo vệ nếu không có người'
+end
+
+UserOrderInfo.find_or_create_by(order: order3) do |info|
+  info.buyer_name = 'Trần Thị B'
+  info.buyer_email = 'user2@test.com'
+  info.buyer_phone = '0987654321'
+  info.buyer_address = '456 Lê Lợi, Quận 3'
+  info.buyer_city = 'TP. Hồ Chí Minh'
+  info.notes = 'Gọi trước khi giao'
+end
+
+# Client notifications are now created automatically via callback
+
+puts "\nSample data created successfully!"
+puts "Created:"
+puts "- #{User.count} test users"
+puts "- #{Order.count} sample orders"
+puts "- #{OrderItem.count} order items"
+puts "- #{UserOrderInfo.count} user order info records"
+puts "- #{ClientNotification.count} client notifications"
+
+puts "\nTest Users:"
+puts "- user1@test.com / password123 (Nguyễn Văn A)"
+puts "- user2@test.com / password123 (Trần Thị B)"
+
+puts "\nClient Notifications Summary:"
+puts "- Client 1 (AUTOLIGHT): #{ClientNotification.where(admin_user: client1).count} notifications (#{ClientNotification.where(admin_user: client1, is_read: false).count} unread)"
+puts "- Client 2 (Honda Parts): #{ClientNotification.where(admin_user: client2).count} notifications (#{ClientNotification.where(admin_user: client2, is_read: false).count} unread)"
