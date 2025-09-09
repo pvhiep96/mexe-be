@@ -12,36 +12,36 @@
       <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: end;">
         <div style="flex: 1; min-width: 200px;">
           <%= form.label :search, "Search:", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-          <%= form.text_field :search, value: params[:search], 
-              placeholder: "Search by name or SKU...", 
+          <%= form.text_field :search, value: params[:search],
+              placeholder: "Search by name or SKU...",
               style: "width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" %>
         </div>
-        
+
         <div>
           <%= form.label :brand_id, "Brand:", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-          <%= form.select :brand_id, 
+          <%= form.select :brand_id,
               options_from_collection_for_select(Brand.all, :id, :name, params[:brand_id]),
               { include_blank: "All Brands" },
               { style: "padding: 8px; border: 1px solid #ddd; border-radius: 4px;" } %>
         </div>
-        
+
         <div>
           <%= form.label :category_id, "Category:", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-          <%= form.select :category_id, 
+          <%= form.select :category_id,
               options_from_collection_for_select(Category.all, :id, :name, params[:category_id]),
               { include_blank: "All Categories" },
               { style: "padding: 8px; border: 1px solid #ddd; border-radius: 4px;" } %>
         </div>
-        
+
         <div>
           <%= form.label :status, "Status:", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-          <%= form.select :status, 
+          <%= form.select :status,
               options_for_select([
                 ['All Status', ''],
                 ['Active', 'active'],
                 ['Inactive', 'inactive'],
                 ['⭐ Featured', 'featured'],
-                ['🆕 New', 'new'], 
+                ['🆕 New', 'new'],
                 ['🔥 Hot', 'hot'],
                 ['📦 Preorder', 'preorder'],
                 ['📈 Trending', 'trending'],
@@ -51,7 +51,7 @@
               {},
               { style: "padding: 8px; border: 1px solid #ddd; border-radius: 4px;" } %>
         </div>
-        
+
         <div>
           <%= form.submit "Search", class: "btn btn-primary" %>
           <%= link_to "Clear", admin_products_path, class: "btn btn-secondary" %>
@@ -182,7 +182,7 @@
         </tbody>
       </table>
     </div>
-    
+
     <div class="pagination-info" style="margin-top: 30px; display: flex; justify-content: space-between; align-items: center;">
       <p style="color: #6c757d; font-size: 14px; margin: 0;">
         Showing <%= (@products.current_page - 1) * @products.limit_value + 1 %>-<%= [@products.current_page * @products.limit_value, @products.total_count].min %> of <%= @products.total_count %> product(s)
@@ -214,37 +214,126 @@
     border-radius: 4px;
     border: 1px solid #007bff;
   }
-  
+
   .btn:hover {
     background: #0056b3;
     border-color: #0056b3;
+    color: white !important;
   }
-  
+
   .btn-primary {
     background: #007bff;
     border-color: #007bff;
+    color: white;
   }
-  
+
+  .btn-primary:hover {
+    background: #0056b3;
+    border-color: #0056b3;
+    color: white !important;
+  }
+
   .btn-secondary {
     background: #6c757d;
     border-color: #6c757d;
+    color: white;
   }
-  
+
+  .btn-secondary:hover {
+    background: #545b62;
+    border-color: #545b62;
+    color: white !important;
+  }
+
   .btn-success {
     background: #28a745;
     border-color: #28a745;
+    color: white;
   }
-  
+
+  .btn-success:hover {
+    background: #218838;
+    border-color: #218838;
+    color: white !important;
+  }
+
   .btn-danger {
     background: #dc3545;
     border-color: #dc3545;
+    color: white;
   }
-  
+
+  .btn-danger:hover {
+    background: #c82333;
+    border-color: #c82333;
+    color: white !important;
+  }
+
+  .btn-outline-primary {
+    background: transparent;
+    border-color: #007bff;
+    color: #007bff;
+  }
+
+  .btn-outline-primary:hover {
+    background: #007bff;
+    border-color: #007bff;
+    color: white !important;
+  }
+
+  .btn-outline-secondary {
+    background: transparent;
+    border-color: #6c757d;
+    color: #6c757d;
+  }
+
+  .btn-outline-secondary:hover {
+    background: #6c757d;
+    border-color: #6c757d;
+    color: white !important;
+  }
+
+  .btn-outline-success {
+    background: transparent;
+    border-color: #28a745;
+    color: #28a745;
+  }
+
+  .btn-outline-success:hover {
+    background: #28a745;
+    border-color: #28a745;
+    color: white !important;
+  }
+
+  .btn-outline-danger {
+    background: transparent;
+    border-color: #dc3545;
+    color: #dc3545;
+  }
+
+  .btn-outline-danger:hover {
+    background: #dc3545;
+    border-color: #dc3545;
+    color: white !important;
+  }
+
+  .btn-warning {
+    background: #ffc107;
+    border-color: #ffc107;
+    color: #212529;
+  }
+
+  .btn-warning:hover {
+    background: #e0a800;
+    border-color: #e0a800;
+    color: #212529 !important;
+  }
+
   .btn-sm {
     padding: 4px 8px;
     font-size: 12px;
   }
-  
+
   .btn-lg {
     padding: 12px 24px;
     font-size: 16px;

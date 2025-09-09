@@ -56,6 +56,7 @@ module Admin
       resource.product_specifications.build
       resource.product_videos.build
       authorize_resource(resource)
+      @page_title = "Tạo Sản Phẩm Mới"
       render locals: { page: Administrate::Page::Form.new(dashboard, resource) }
     end
 

@@ -1,3 +1,5 @@
+<% content_for(:title, "Tạo Sản Phẩm Mới") %>
+
 <%= form_with(model: [:admin, page.resource], local: true, multipart: true) do |form| %>
   <%= render "admin/application/form_errors", resource: page.resource %>
   
@@ -7,29 +9,29 @@
     <%= form.text_field :name, class: "text-field" %>
   </div>
   
-  <div class="field-unit">
-    <%= form.label :slug %>
-    <%= form.text_field :slug, class: "text-field" %>
+  <!-- Two-column layout for short fields -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+    <div class="field-unit">
+      <%= form.label :slug %>
+      <%= form.text_field :slug, class: "text-field" %>
+    </div>
+    
+    <div class="field-unit">
+      <%= form.label :sku %>
+      <%= form.text_field :sku, class: "text-field" %>
+    </div>
   </div>
   
-  <div class="field-unit">
-    <%= form.label :sku %>
-    <%= form.text_field :sku, class: "text-field" %>
-  </div>
-  
-  <div class="field-unit">
-    <%= form.label :brand_id %>
-    <%= form.collection_select :brand_id, Brand.all, :id, :name, { prompt: "Select a brand" }, class: "select" %>
-  </div>
-  
-  <div class="field-unit">
-    <%= form.label :category_id %>
-    <%= form.collection_select :category_id, Category.all, :id, :name, { prompt: "Select a category" }, class: "select" %>
-  </div>
-  
-  <div class="field-unit">
-    <%= form.label :description %>
-    <%= form.text_area :description, rows: 5, class: "text-field" %>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+    <div class="field-unit">
+      <%= form.label :brand_id %>
+      <%= form.collection_select :brand_id, Brand.all, :id, :name, { prompt: "Select a brand" }, class: "select" %>
+    </div>
+    
+    <div class="field-unit">
+      <%= form.label :category_id %>
+      <%= form.collection_select :category_id, Category.all, :id, :name, { prompt: "Select a category" }, class: "select" %>
+    </div>
   </div>
   
   <div class="field-unit">
@@ -38,28 +40,49 @@
   </div>
   
   <div class="field-unit">
-    <%= form.label :price %>
-    <%= form.number_field :price, step: 0.01, class: "text-field" %>
+    <%= form.label :description %>
+    <%= form.text_area :description, rows: 5, class: "text-field" %>
   </div>
   
-  <div class="field-unit">
-    <%= form.label :original_price %>
-    <%= form.number_field :original_price, step: 0.01, class: "text-field" %>
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+    <div class="field-unit">
+      <%= form.label :original_price %>
+      <%= form.number_field :original_price, step: 0.01, class: "text-field" %>
+    </div>
+    
+    <div class="field-unit">
+      <%= form.label :price %>
+      <%= form.number_field :price, step: 0.01, class: "text-field" %>
+    </div>
+    
+    <div class="field-unit">
+      <%= form.label :stock_quantity %>
+      <%= form.number_field :stock_quantity, class: "text-field" %>
+    </div>
+    
+    <div class="field-unit">
+      <%= form.label :warranty_period %>
+      <%= form.text_field :warranty_period, class: "text-field" %>
+    </div>
   </div>
   
-  <div class="field-unit">
-    <%= form.label :stock_quantity %>
-    <%= form.number_field :stock_quantity, class: "text-field" %>
-  </div>
-  
-  <div class="field-unit">
-    <%= form.label :warranty_period %>
-    <%= form.text_field :warranty_period, class: "text-field" %>
-  </div>
-  
-  <div class="field-unit">
-    <%= form.check_box :is_active %>
-    <%= form.label :is_active, "Active" %>
+  <div class="field-unit" style="margin-bottom: 20px;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div class="toggle">
+        <%= form.check_box :is_active, { class: "toggle-input", id: "product_is_active" } %>
+        <label for="product_is_active" class="toggle-label">
+          <span class="toggle-knob"></span>
+        </label>
+      </div>
+      <div>
+        <div id="active-label" style="font-weight: 700; color: #1f2937;">
+          Hiển thị sản phẩm trên website
+        </div>
+        <div style="font-size: 12px; color: #6b7280;">
+          Bật để sản phẩm được phép xuất hiện trên trang bán hàng. Tắt để ẩn sản phẩm khỏi website.
+        </div>
+      </div>
+    </div>
   </div>
   
   <!-- Product Status Flags Section -->
@@ -68,39 +91,39 @@
       <label style="font-weight: bold;">🏷️ Product Status Flags</label>
     </div>
     <div class="field-unit__field" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 4px; background: #f8f9fa;">
-      <div>
-        <%= form.check_box :is_featured %>
-        <%= form.label :is_featured, "⭐ Featured (Nổi bật)" %>
-      </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <%= form.check_box :is_featured %>
+          <%= form.label :is_featured, "⭐ Featured (Nổi bật)", class: "status-flag-label" %>
+        </div>
       
-      <div>
+      <div style="display: flex; align-items: center; gap: 8px;">
         <%= form.check_box :is_new %>
-        <%= form.label :is_new, "🆕 New (Mới)" %>
+        <%= form.label :is_new, "🆕 New (Mới)", class: "status-flag-label" %>
       </div>
       
-      <div>
+      <div style="display: flex; align-items: center; gap: 8px;">
         <%= form.check_box :is_hot %>
-        <%= form.label :is_hot, "🔥 Hot (Bán chạy)" %>
+        <%= form.label :is_hot, "🔥 Hot (Bán chạy)", class: "status-flag-label" %>
       </div>
       
-      <div>
+      <div style="display: flex; align-items: center; gap: 8px;">
         <%= form.check_box :is_preorder %>
-        <%= form.label :is_preorder, "📦 Preorder (Đặt trước)" %>
+        <%= form.label :is_preorder, "📦 Preorder (Đặt trước)", class: "status-flag-label" %>
       </div>
       
-      <div>
+      <div style="display: flex; align-items: center; gap: 8px;">
         <%= form.check_box :is_trending %>
-        <%= form.label :is_trending, "📈 Trending (Xu hướng)" %>
+        <%= form.label :is_trending, "📈 Trending (Xu hướng)", class: "status-flag-label" %>
       </div>
       
-      <div>
+      <div style="display: flex; align-items: center; gap: 8px;">
         <%= form.check_box :is_ending_soon %>
-        <%= form.label :is_ending_soon, "⏰ Ending Soon (Sắp kết thúc)" %>
+        <%= form.label :is_ending_soon, "⏰ Ending Soon (Sắp kết thúc)", class: "status-flag-label" %>
       </div>
       
-      <div>
+      <div style="display: flex; align-items: center; gap: 8px;">
         <%= form.check_box :is_arriving_soon %>
-        <%= form.label :is_arriving_soon, "🚚 Arriving Soon (Sắp về hàng)" %>
+        <%= form.label :is_arriving_soon, "🚚 Arriving Soon (Sắp về hàng)", class: "status-flag-label" %>
       </div>
     </div>
   </div>
@@ -119,7 +142,7 @@
         </p>
         <input type="file" id="bulk-image-upload" multiple accept="image/jpeg,image/jpg,image/png,image/webp" style="margin-bottom: 10px;">
         <div id="bulk-preview-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 15px;"></div>
-        <button type="button" id="add-bulk-images" class="btn btn-primary" style="margin-top: 10px; display: none;">Add Selected Images</button>
+        <button type="button" id="add-bulk-images" class="btn btn-primary" style="margin-top: 10px; display: none;">📸 Add Selected Images</button>
       </div>
       
       <div id="product-images-container">
@@ -146,14 +169,10 @@
               <div id="image_preview_<%= image_form.object.object_id %>" class="image-preview" style="margin-top: 10px; display: none;">
                 <label>Preview:</label><br>
                 <img class="preview-image" style="max-width: 200px; max-height: 150px; border: 1px solid #ddd; border-radius: 4px;">
-                <button type="button" class="remove-preview btn btn-secondary btn-xs" style="margin-left: 10px;">Remove</button>
+                <button type="button" class="remove-preview btn btn-outline-danger btn-xs" style="margin-left: 10px;">🗑️ Remove</button>
               </div>
             </div>
             
-            <div class="field-unit">
-              <label>Alt Text</label>
-              <%= image_form.text_field :alt_text, class: "text-field" %>
-            </div>
             <div class="field-unit">
               <label>Sort Order</label>
               <%= image_form.number_field :sort_order, value: image_form.object.sort_order || 0, class: "text-field" %>
@@ -162,15 +181,17 @@
               <%= image_form.check_box :is_primary %>
               <%= image_form.label :is_primary, "Primary Image" %>
             </div>
-            <div class="field-unit">
+            <div class="field-unit" style="display: flex; justify-content: flex-end; margin-top: 15px;">
               <%= image_form.hidden_field :_destroy %>
-              <button type="button" class="remove-nested-field btn btn-danger btn-sm">Remove Image</button>
+              <button type="button" class="remove-nested-field btn btn-outline-danger btn-sm">🗑️ Remove Image</button>
             </div>
           </div>
         <% end %>
       </div>
       
-      <button type="button" id="add-product-image" class="btn btn-secondary">Add Image</button>
+      <div style="display: flex; justify-content: flex-end; margin-top: 15px;">
+        <button type="button" id="add-product-image" class="btn btn-success">📸 Add Image</button>
+      </div>
     </div>
   </div>
 
@@ -187,26 +208,30 @@
               <label>Title</label>
               <%= desc_form.text_field :title, class: "text-field" %>
             </div>
-            <div class="field-unit">
+             <div class="field-unit">
               <label>Content</label>
-              <%= desc_form.text_area :content, 
-                  class: "ckeditor text-field", 
-                  id: "product_descriptions_content_#{desc_form.object.object_id}",
-                  rows: 10 %>
-            </div>
+               <div class="field-unit__field" style="margin-left: 0;">
+                 <%= desc_form.text_area :content,
+                     class: "ckeditor text-field",
+                     id: "product_descriptions_content_#{desc_form.object.object_id}",
+                     rows: 10 %>
+               </div>
+             </div>
             <div class="field-unit">
               <label>Sort Order</label>
               <%= desc_form.number_field :sort_order, value: desc_form.object.sort_order || 0, class: "text-field" %>
             </div>
-            <div class="field-unit">
+            <div class="field-unit" style="display: flex; justify-content: flex-end; margin-top: 15px;">
               <%= desc_form.hidden_field :_destroy %>
-              <button type="button" class="remove-nested-field btn btn-danger btn-sm">Remove Description</button>
+              <button type="button" class="remove-nested-field btn btn-outline-danger btn-sm">🗑️ Remove Description</button>
             </div>
           </div>
         <% end %>
       </div>
       
-      <button type="button" id="add-product-description" class="btn btn-secondary">Add Description</button>
+      <div style="display: flex; justify-content: flex-end; margin-top: 15px;">
+        <button type="button" id="add-product-description" class="btn btn-success">📝 Add Description</button>
+      </div>
     </div>
   </div>
 
@@ -235,15 +260,17 @@
               <label>Sort Order</label>
               <%= spec_form.number_field :sort_order, value: spec_form.object.sort_order || 0, class: "text-field" %>
             </div>
-            <div class="field-unit">
+            <div class="field-unit" style="display: flex; justify-content: flex-end; margin-top: 15px;">
               <%= spec_form.hidden_field :_destroy %>
-              <button type="button" class="remove-nested-field btn btn-danger btn-sm">Remove Specification</button>
+              <button type="button" class="remove-nested-field btn btn-outline-danger btn-sm">🗑️ Remove Specification</button>
             </div>
           </div>
         <% end %>
       </div>
-      
-      <button type="button" id="add-product-specification" class="btn btn-secondary">Add Specification</button>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 15px;">
+        <button type="button" id="add-product-specification" class="btn btn-success">⚙️ Add Specification</button>
+      </div>
     </div>
   </div>
 
@@ -256,7 +283,7 @@
       <div style="margin-bottom: 15px; padding: 10px; background: #e7f3ff; border-radius: 4px; font-size: 14px;">
         📹 <strong>Hỗ trợ:</strong> YouTube và Vimeo URLs. Ví dụ: https://www.youtube.com/watch?v=ABC123 hoặc https://youtu.be/ABC123
       </div>
-      
+
       <div id="product-videos-container">
         <%= form.fields_for :product_videos do |video_form| %>
           <div class="nested-field-wrapper product-video-fields" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0;">
@@ -277,18 +304,34 @@
               <%= video_form.number_field :sort_order, value: video_form.object.sort_order || 0, class: "text-field" %>
             </div>
             <div class="field-unit">
-              <%= video_form.check_box :is_active, checked: video_form.object.is_active != false %>
-              <%= video_form.label :is_active, "Active" %>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="toggle">
+                  <%= video_form.check_box :is_active, { class: "toggle-input", id: "video_is_active_#{video_form.object.object_id}" } %>
+                  <label for="video_is_active_<%= video_form.object.object_id %>" class="toggle-label">
+                    <span class="toggle-knob"></span>
+                  </label>
+                </div>
+                <div>
+                  <div id="video-active-label-<%= video_form.object.object_id %>" style="font-weight: 700; color: #1f2937;">
+                    Video đang hoạt động
+                  </div>
+                  <div style="font-size: 12px; color: #6b7280;">
+                    Bật để video được hiển thị trên website
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="field-unit">
+            <div class="field-unit" style="display: flex; justify-content: flex-end; margin-top: 15px;">
               <%= video_form.hidden_field :_destroy %>
-              <button type="button" class="remove-nested-field btn btn-danger btn-sm">Remove Video</button>
+              <button type="button" class="remove-nested-field btn btn-outline-danger btn-sm">🗑️ Remove Video</button>
             </div>
           </div>
         <% end %>
       </div>
       
-      <button type="button" id="add-product-video" class="btn btn-secondary">Add Video</button>
+      <div style="display: flex; justify-content: flex-end; margin-top: 15px;">
+        <button type="button" id="add-product-video" class="btn btn-success">🎬 Add Video</button>
+      </div>
     </div>
   </div>
 
@@ -299,20 +342,16 @@
         <label>Image</label>
         <input type="file" name="product[product_images_attributes][NEW_RECORD][image]" accept="image/jpeg,image/jpg,image/png,image/webp" class="text-field image-upload" data-preview-target="image_preview_NEW_RECORD">
       </div>
-      
+
       <!-- New Image Preview -->
       <div class="field-unit">
         <div id="image_preview_NEW_RECORD" class="image-preview" style="margin-top: 10px; display: none;">
           <label>Preview:</label><br>
           <img class="preview-image" style="max-width: 200px; max-height: 150px; border: 1px solid #ddd; border-radius: 4px;">
-          <button type="button" class="remove-preview btn btn-secondary btn-xs" style="margin-left: 10px;">Remove</button>
+          <button type="button" class="remove-preview btn btn-outline-danger btn-xs" style="margin-left: 10px;">🗑️ Remove</button>
         </div>
       </div>
-      
-      <div class="field-unit">
-        <label>Alt Text</label>
-        <input type="text" name="product[product_images_attributes][NEW_RECORD][alt_text]" class="text-field">
-      </div>
+
       <div class="field-unit">
         <label>Sort Order</label>
         <input type="number" name="product[product_images_attributes][NEW_RECORD][sort_order]" value="0" class="text-field">
@@ -321,8 +360,8 @@
         <input type="checkbox" name="product[product_images_attributes][NEW_RECORD][is_primary]" value="1">
         <label>Primary Image</label>
       </div>
-      <div class="field-unit">
-        <button type="button" class="remove-nested-field btn btn-danger btn-sm">Remove Image</button>
+      <div class="field-unit" style="display: flex; justify-content: flex-end; margin-top: 15px;">
+        <button type="button" class="remove-nested-field btn btn-outline-danger btn-sm">🗑️ Remove Image</button>
       </div>
     </div>
   </script>
@@ -344,8 +383,8 @@
         <label>Sort Order</label>
         <input type="number" name="product[product_descriptions_attributes][NEW_RECORD][sort_order]" value="0" class="text-field">
       </div>
-      <div class="field-unit">
-        <button type="button" class="remove-nested-field btn btn-danger btn-sm">Remove Description</button>
+      <div class="field-unit" style="display: flex; justify-content: flex-end; margin-top: 15px;">
+        <button type="button" class="remove-nested-field btn btn-outline-danger btn-sm">🗑️ Remove Description</button>
       </div>
     </div>
   </script>
@@ -368,8 +407,8 @@
         <label>Sort Order</label>
         <input type="number" name="product[product_specifications_attributes][NEW_RECORD][position]" value="0" class="text-field">
       </div>
-      <div class="field-unit">
-        <button type="button" class="remove-nested-field btn btn-danger btn-sm">Remove Specification</button>
+      <div class="field-unit" style="display: flex; justify-content: flex-end; margin-top: 15px;">
+        <button type="button" class="remove-nested-field btn btn-outline-danger btn-sm">🗑️ Remove Specification</button>
       </div>
     </div>
   </script>
@@ -393,18 +432,31 @@
         <input type="number" name="product[product_videos_attributes][NEW_RECORD][sort_order]" value="0" class="text-field">
       </div>
       <div class="field-unit">
-        <input type="checkbox" name="product[product_videos_attributes][NEW_RECORD][is_active]" value="1" checked>
-        <label>Active</label>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="toggle">
+            <input type="checkbox" name="product[product_videos_attributes][NEW_RECORD][is_active]" value="1" checked class="toggle-input" id="video_is_active_NEW_RECORD">
+            <label for="video_is_active_NEW_RECORD" class="toggle-label">
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+          <div>
+            <div id="video-active-label-NEW_RECORD" style="font-weight: 700; color: #1f2937;">
+              Video đang hoạt động
+            </div>
+            <div style="font-size: 12px; color: #6b7280;">
+              Bật để video được hiển thị trên website
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="field-unit">
-        <button type="button" class="remove-nested-field btn btn-danger btn-sm">Remove Video</button>
+      <div class="field-unit" style="display: flex; justify-content: flex-end; margin-top: 15px;">
+        <button type="button" class="remove-nested-field btn btn-outline-danger btn-sm">🗑️ Remove Video</button>
       </div>
     </div>
   </script>
 
-  <div class="form-actions">
-    <%= form.submit %>
-    <%= link_to "Cancel", [:admin, page.resource.class], class: "btn btn-secondary" %>
+  <div class="form-actions" style="display: flex; justify-content: flex-end; margin-top: 30px;">
+    <%= form.submit "✨ Tạo Sản Phẩm Mới", class: "btn btn-primary btn-create-product" %>
   </div>
 <% end %>
 
@@ -431,11 +483,11 @@
       if (CKEDITOR.instances[textarea.id]) {
         return;
       }
-      
+
       if (textarea.offsetParent === null) {
         return;
       }
-      
+
       try {
         CKEDITOR.replace(textarea.id, {
           height: 400,
@@ -816,4 +868,266 @@
     border-color: #218838;
     transform: translateY(-1px);
   }
+  
+  /* Custom Select Box Styling */
+  .select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: white;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 14px;
+    color: #495057;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+    min-height: 48px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .select:hover {
+    border-color: #007bff;
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.1);
+    transform: translateY(-1px);
+  }
+  
+  .select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+    transform: translateY(-1px);
+  }
+  
+  .select option {
+    padding: 8px 12px;
+    color: #495057;
+    background: white;
+  }
+  
+  .select option:hover {
+    background: #f8f9fa;
+  }
+  
+  .select option:checked {
+    background: #007bff;
+    color: white;
+  }
+  
+  /* Label styling for select boxes */
+  .field-unit label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 8px;
+    display: block;
+    font-size: 14px;
+  }
+  /* Toggle switch styles */
+  .toggle { position: relative; width: 48px; height: 28px; }
+  .toggle-input { display: none; }
+  .toggle-label {
+    position: absolute; inset: 0; cursor: pointer; background: #e5e7eb;
+    border-radius: 9999px; transition: background 0.25s ease;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.08);
+    display: flex; align-items: center; padding: 2px;
+  }
+  .toggle-knob {
+    width: 15px; height: 15px; background: #ffffff;
+    border-radius: 50%; transition: transform 0.25s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    flex-shrink: 0;
+    display: block; /* Đảm bảo hiển thị */
+  }
+  .toggle-input:checked + .toggle-label { background: #16a34a; }
+  .toggle-input:checked + .toggle-label .toggle-knob {
+    transform: translateX(28px);
+  }
+
+  /* Enhanced Button Styles */
+  .btn {
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  }
+
+  .btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  /* Add buttons - Success colors */
+  .btn-success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border: none;
+    color: white;
+  }
+
+  .btn-success:hover {
+    background: linear-gradient(135deg, #218838, #1ea085);
+    color: white;
+  }
+
+  /* Add buttons - Info colors */
+  .btn-info {
+    background: linear-gradient(135deg, #17a2b8, #6f42c1);
+    border: none;
+    color: white;
+  }
+
+  .btn-info:hover {
+    background: linear-gradient(135deg, #138496, #5a32a3);
+    color: white;
+  }
+
+  /* Add buttons - Warning colors */
+  .btn-warning {
+    background: linear-gradient(135deg, #ffc107, #fd7e14);
+    border: none;
+    color: white;
+  }
+
+  .btn-warning:hover {
+    background: linear-gradient(135deg, #e0a800, #e55a00);
+    color: white;
+  }
+
+  /* Add buttons - Primary colors */
+  .btn-primary {
+    background: linear-gradient(135deg, #007bff, #6610f2);
+    border: none;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #0056b3, #520dc2);
+    color: white;
+  }
+
+  /* Remove buttons - Outline danger */
+  .btn-outline-danger {
+    border: 2px solid #dc3545;
+    color: #dc3545;
+    background: white;
+  }
+
+  .btn-outline-danger:hover {
+    background: #dc3545;
+    color: white;
+    border-color: #dc3545;
+  }
+
+  /* Create Product Button Styling */
+  .btn-create-product {
+    background: linear-gradient(135deg, #007bff, #0056b3) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 700 !important;
+    font-size: 16px !important;
+    padding: 12px 24px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3) !important;
+    transition: all 0.3s ease !important;
+    text-transform: none !important;
+    letter-spacing: 0.5px !important;
+  }
+
+  .btn-create-product:hover {
+    background: linear-gradient(135deg, #0056b3, #004085) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 16px rgba(0, 123, 255, 0.4) !important;
+    color: white !important;
+  }
+
+  .btn-create-product:active {
+    transform: translateY(0) !important;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3) !important;
+  }
+
+  .btn-create-product:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25) !important;
+  }
+
+  /* Product Status Flags - Remove margin from labels */
+  .status-flag-label {
+    margin-bottom: 0 !important;
+  }
+
+  /* Back button styling */
+  .btn-outline-secondary {
+    background: white !important;
+    color: #333 !important;
+    border: 2px solid #6c757d !important;
+    font-weight: 600;
+  }
+
+  .btn-outline-secondary:hover {
+    background: #f8f9fa !important;
+    color: #333 !important;
+    border-color: #5a6268 !important;
+  }
 </style>
+
+<script>
+  (function(){
+    const input = document.getElementById('product_is_active');
+    const label = document.getElementById('active-label');
+    function syncLabel(){
+      if (!input || !label) return;
+      label.textContent = input.checked ? 'Hiển thị sản phẩm trên website' : 'Ẩn sản phẩm khỏi website';
+      label.style.color = input.checked ? '#065f46' : '#6b7280';
+    }
+    document.addEventListener('turbo:load', syncLabel);
+    document.addEventListener('DOMContentLoaded', syncLabel);
+    if (input) input.addEventListener('change', syncLabel);
+  })();
+</script>
+
+<script>
+  // Override page title
+  document.addEventListener('DOMContentLoaded', function() {
+    const titleElement = document.querySelector('h1');
+    if (titleElement && titleElement.textContent.includes('Mới Sản Phẩm')) {
+      titleElement.textContent = 'Tạo Sản Phẩm Mới';
+    }
+  });
+
+  // Video active toggle functionality
+  function initializeVideoToggles() {
+    const videoToggles = document.querySelectorAll('input[id^="video_is_active_"]');
+    videoToggles.forEach(function(toggle) {
+      const labelId = 'video-active-label-' + toggle.id.split('_').pop();
+      const label = document.getElementById(labelId);
+
+      if (label) {
+        function updateLabel() {
+          if (toggle.checked) {
+            label.textContent = 'Video đang hoạt động';
+            label.style.color = '#065f46';
+          } else {
+            label.textContent = 'Video đã tắt';
+            label.style.color = '#6b7280';
+          }
+        }
+
+        toggle.addEventListener('change', updateLabel);
+        updateLabel(); // Set initial state
+      }
+    });
+  }
+
+  // Initialize video toggles on page load and when new videos are added
+  document.addEventListener('DOMContentLoaded', initializeVideoToggles);
+  document.addEventListener('turbo:load', initializeVideoToggles);
+</script>
