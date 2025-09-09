@@ -3,7 +3,7 @@ module Admin
     before_action :set_order, only: [:show, :update_shipping]
 
     def index
-      @orders = filtered_orders.includes(:user, :products, :order_items)
+      @orders = filtered_orders.includes(:user, :user_order_info, :products, :order_items)
                               .order(created_at: :desc)
                               .page(params[:page])
     end

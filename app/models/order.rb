@@ -1,5 +1,6 @@
 class Order < ApplicationRecord
   belongs_to :user, optional: true
+  has_one :user_order_info, dependent: :destroy
   has_many :order_items, dependent: :destroy
   has_many :products, through: :order_items
   has_many :product_reviews, dependent: :destroy
@@ -11,6 +12,7 @@ class Order < ApplicationRecord
   # validates :payment_method, presence: true
 
   before_validation :calculate_totals, on: :create
+  after_create :notify_clients_about_new_order
 
   enum status: {
     pending: 'pending',
@@ -40,6 +42,8 @@ class Order < ApplicationRecord
     store_pickup: 'store'
   }
 
+  attribute :status_processed, :integer, default: 0
+  
   enum status_processed: {
     not_processed: 0,
     shipped_to_carrier: 1,
@@ -58,7 +62,7 @@ class Order < ApplicationRecord
   end
 
   def self.ransackable_associations(auth_object = nil)
-    %w[user order_items products product_reviews coupon_usages]
+    %w[user user_order_info order_items products product_reviews coupon_usages]
   end
 
   # Get all clients related to this order
@@ -112,5 +116,58 @@ class Order < ApplicationRecord
     self.total_amount = 0
     self.total_amount = subtotal - discount_amount + shipping_fee + tax_amount
     # save
+  end
+
+  private
+
+  def notify_clients_about_new_order
+    # Get all clients who have products in this order
+    client_ids = products.pluck(:client_id).compact.uniq
+    
+    client_ids.each do |client_id|
+      client = AdminUser.find_by(id: client_id)
+      next unless client&.client?
+      
+      # Create notification for this client
+      create_client_notification(client)
+    end
+  end
+
+  def create_client_notification(client)
+    buyer_name = user_order_info&.buyer_name || guest_name || (user&.full_name) || 'Khách hàng'
+    client_products = products.where(client_id: client.id)
+    
+    title = "Đơn hàng mới ##{order_number}"
+    message = "Bạn có đơn hàng mới từ #{buyer_name}. "
+    message += "Đơn hàng bao gồm: #{client_products.pluck(:name).join(', ')}. "
+    
+    # Calculate total amount for client's products only
+    client_total = order_items.joins(:product)
+                             .where(products: { client_id: client.id })
+                             .sum('order_items.quantity * order_items.unit_price')
+    
+    message += "Tổng giá trị sản phẩm của bạn: #{client_total.to_i}₫"
+    
+    # Create notification record
+    ClientNotification.create!(
+      admin_user: client,
+      order: self,
+      title: title,
+      message: message,
+      notification_type: 'new_order',
+      data: {
+        order_number: order_number,
+        buyer_name: buyer_name,
+        client_products: client_products.pluck(:name),
+        client_total: client_total
+      }
+    )
+    
+    Rails.logger.info("Created notification for client #{client.client_name}: #{title}")
+    
+    # You can also send email notification here if needed
+    # ClientOrderNotificationMailer.new_order(client, self).deliver_later
+  rescue StandardError => e
+    Rails.logger.error("Failed to create notification for client #{client&.id}: #{e.message}")
   end
 end

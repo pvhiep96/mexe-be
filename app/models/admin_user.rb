@@ -13,6 +13,7 @@ class AdminUser < ApplicationRecord
   # Associations
   has_many :products, foreign_key: :client_id, dependent: :destroy
   has_many :orders_as_client, through: :products, source: :orders
+  has_many :client_notifications, dependent: :destroy
 
   # Validations
   validates :client_name, presence: true, if: :client?

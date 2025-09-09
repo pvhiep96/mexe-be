@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_09_04_064831) do
+ActiveRecord::Schema[7.2].define(version: 2025_09_06_162343) do
   create_table "active_admin_comments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
@@ -129,20 +129,26 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_04_064831) do
     t.text "meta_description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "image_url"
     t.index ["parent_id"], name: "index_categories_on_parent_id"
     t.index ["slug"], name: "index_categories_on_slug", unique: true
   end
 
-  create_table "ckeditor_assets", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.string "data_file_name", null: false
-    t.string "data_content_type"
-    t.integer "data_file_size"
-    t.string "data_fingerprint"
-    t.string "type", limit: 30
+  create_table "client_notifications", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "admin_user_id", null: false
+    t.bigint "order_id", null: false
+    t.string "title", null: false
+    t.text "message", null: false
+    t.string "notification_type", default: "new_order"
+    t.boolean "is_read", default: false
+    t.datetime "read_at"
+    t.json "data"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["type"], name: "index_ckeditor_assets_on_type"
+    t.index ["admin_user_id"], name: "idx_client_notifications_on_admin_user_id"
+    t.index ["admin_user_id"], name: "index_client_notifications_on_admin_user_id"
+    t.index ["is_read"], name: "idx_client_notifications_on_is_read"
+    t.index ["notification_type"], name: "idx_client_notifications_on_notification_type"
+    t.index ["order_id"], name: "index_client_notifications_on_order_id"
   end
 
   create_table "coupon_usage", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -226,19 +232,17 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_04_064831) do
     t.decimal "coupon_discount", precision: 10, scale: 2, default: "0.0"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "status_processed", default: 0, null: false
-    t.string "shipping_provider"
-    t.string "tracking_number"
-    t.string "tracking_url"
-    t.datetime "shipped_at"
-    t.datetime "delivered_at"
     t.string "shipping_name"
     t.string "shipping_phone"
     t.string "shipping_city"
     t.string "shipping_district"
     t.string "shipping_ward"
     t.string "shipping_postal_code"
+    t.integer "status_processed", default: 0, null: false
+    t.string "tracking_number"
+    t.string "shipping_provider"
     t.index ["order_number"], name: "index_orders_on_order_number", unique: true
+    t.index ["status_processed"], name: "index_orders_on_status_processed"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
@@ -345,10 +349,10 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_04_064831) do
     t.integer "view_count", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "client_id"
     t.boolean "is_trending", default: false
     t.boolean "is_ending_soon", default: false
     t.boolean "is_arriving_soon", default: false
+    t.bigint "client_id"
     t.index ["brand_id"], name: "index_products_on_brand_id"
     t.index ["category_id"], name: "index_products_on_category_id"
     t.index ["client_id"], name: "index_products_on_client_id"
@@ -406,6 +410,20 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_04_064831) do
     t.index ["user_id"], name: "index_user_addresses_on_user_id"
   end
 
+  create_table "user_order_infos", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "order_id", null: false
+    t.string "buyer_name", null: false
+    t.string "buyer_email", null: false
+    t.string "buyer_phone", null: false
+    t.text "buyer_address", null: false
+    t.string "buyer_city"
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["buyer_email"], name: "idx_user_order_infos_on_buyer_email"
+    t.index ["order_id"], name: "idx_user_order_infos_on_order_id", unique: true
+  end
+
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "email", null: false
     t.string "full_name", null: false
@@ -440,6 +458,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_04_064831) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "article_images", "articles"
   add_foreign_key "categories", "categories", column: "parent_id"
+  add_foreign_key "client_notifications", "admin_users"
+  add_foreign_key "client_notifications", "orders"
   add_foreign_key "coupon_usage", "coupons"
   add_foreign_key "coupon_usage", "orders"
   add_foreign_key "coupon_usage", "users"
@@ -459,6 +479,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_04_064831) do
   add_foreign_key "products", "brands"
   add_foreign_key "products", "categories"
   add_foreign_key "user_addresses", "users"
+  add_foreign_key "user_order_infos", "orders"
   add_foreign_key "wishlists", "products"
   add_foreign_key "wishlists", "users"
 end

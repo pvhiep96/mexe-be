@@ -16,12 +16,18 @@
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
         <div>
           <strong>Mã đơn hàng:</strong> <%= @order.order_number %><br>
-          <strong>Khách hàng:</strong> <%= @order.user ? @order.user.email : @order.guest_email %><br>
-          <% if @order.guest_name.present? %>
-            <strong>Tên:</strong> <%= @order.guest_name %><br>
-          <% end %>
-          <% if @order.guest_phone.present? %>
-            <strong>Điện thoại:</strong> <%= @order.guest_phone %><br>
+          <% if @order.user_order_info %>
+            <strong>Khách hàng:</strong> <%= @order.user_order_info.buyer_name %><br>
+            <strong>Email:</strong> <%= @order.user_order_info.buyer_email %><br>
+            <strong>Điện thoại:</strong> <%= @order.user_order_info.buyer_phone %><br>
+          <% else %>
+            <strong>Khách hàng:</strong> <%= @order.user ? @order.user.email : @order.guest_email %><br>
+            <% if @order.guest_name.present? %>
+              <strong>Tên:</strong> <%= @order.guest_name %><br>
+            <% end %>
+            <% if @order.guest_phone.present? %>
+              <strong>Điện thoại:</strong> <%= @order.guest_phone %><br>
+            <% end %>
           <% end %>
         </div>
         <div>
@@ -41,24 +47,59 @@
       </div>
     </div>
 
+    <!-- Buyer Information (if available from user_order_info) -->
+    <% if @order.user_order_info %>
+      <div class="section" style="margin-bottom: 30px;">
+        <h3>Thông tin người mua</h3>
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 4px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div>
+              <strong>Tên người mua:</strong> <%= @order.user_order_info.buyer_name %><br>
+              <strong>Email:</strong> <%= @order.user_order_info.buyer_email %><br>
+              <strong>Số điện thoại:</strong> <%= @order.user_order_info.buyer_phone %><br>
+            </div>
+            <div>
+              <strong>Địa chỉ:</strong> <%= @order.user_order_info.buyer_address %><br>
+              <% if @order.user_order_info.buyer_city.present? %>
+                <strong>Thành phố:</strong> <%= @order.user_order_info.buyer_city %><br>
+              <% end %>
+            </div>
+          </div>
+          <% if @order.user_order_info.notes.present? %>
+            <div style="margin-top: 10px;">
+              <strong>Ghi chú:</strong><br>
+              <div style="margin-left: 10px; margin-top: 5px; font-style: italic;">
+                <%= simple_format(@order.user_order_info.notes) %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
     <!-- Shipping Information -->
-    <% if @order.shipping_provider.present? || @order.tracking_number.present? %>
+    <% if (@order.respond_to?(:shipping_provider) && @order.shipping_provider.present?) || (@order.respond_to?(:tracking_number) && @order.tracking_number.present?) %>
       <div class="section" style="margin-bottom: 30px;">
         <h3>Thông tin vận chuyển</h3>
         <div style="background: #f8f9fa; padding: 15px; border-radius: 4px;">
-          <% if @order.shipping_provider.present? %>
-            <strong>Đơn vị vận chuyển:</strong> <%= @order.shipping_provider_name %><br>
+          <% if @order.respond_to?(:shipping_provider) && @order.shipping_provider.present? %>
+            <strong>Đơn vị vận chuyển:</strong> 
+            <% if @order.respond_to?(:shipping_provider_name) %>
+              <%= @order.shipping_provider_name %>
+            <% else %>
+              <%= @order.shipping_provider %>
+            <% end %><br>
           <% end %>
-          <% if @order.tracking_number.present? %>
+          <% if @order.respond_to?(:tracking_number) && @order.tracking_number.present? %>
             <strong>Mã vận đơn:</strong> <%= @order.tracking_number %><br>
           <% end %>
-          <% if @order.full_tracking_url.present? %>
+          <% if @order.respond_to?(:full_tracking_url) && @order.full_tracking_url.present? %>
             <strong>Link theo dõi:</strong> 
             <a href="<%= @order.full_tracking_url %>" target="_blank" style="color: #007bff;">
               <%= @order.full_tracking_url %>
             </a><br>
           <% end %>
-          <% if @order.shipped_at.present? %>
+          <% if @order.respond_to?(:shipped_at) && @order.shipped_at.present? %>
             <strong>Thời gian giao vận chuyển:</strong> <%= @order.shipped_at.strftime("%d/%m/%Y %H:%M") %><br>
           <% end %>
         </div>
@@ -74,13 +115,14 @@
             <div>
               <%= form.label :shipping_provider, "Đơn vị vận chuyển", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
               <%= form.select :shipping_provider, 
-                              options_for_select(Order::SHIPPING_PROVIDERS, @order.shipping_provider),
+                              options_for_select(Order::SHIPPING_PROVIDERS, @order.respond_to?(:shipping_provider) ? @order.shipping_provider : nil),
                               { prompt: 'Chọn đơn vị vận chuyển' },
                               { style: "width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" } %>
             </div>
             <div>
               <%= form.label :tracking_number, "Mã vận đơn", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
               <%= form.text_field :tracking_number, 
+                                  value: @order.respond_to?(:tracking_number) ? @order.tracking_number : nil,
                                   placeholder: "Nhập mã vận đơn",
                                   style: "width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" %>
             </div>

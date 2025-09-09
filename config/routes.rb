@@ -16,6 +16,14 @@ Rails.application.routes.draw do
         patch :update_shipping
       end
     end
+    resources :notifications, only: [:index, :show] do
+      member do
+        patch :mark_as_read
+      end
+      collection do
+        patch :mark_all_as_read
+      end
+    end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

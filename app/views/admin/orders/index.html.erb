@@ -29,9 +29,15 @@
               <strong><%= order.order_number %></strong>
             </td>
             <td style="padding: 15px;">
-              <%= order.user ? order.user.email : order.guest_email %>
-              <% if order.guest_name.present? %>
-                <br><small><%= order.guest_name %></small>
+              <% if order.user_order_info %>
+                <strong><%= order.user_order_info.buyer_name %></strong><br>
+                <%= order.user_order_info.buyer_email %><br>
+                <small><%= order.user_order_info.buyer_phone %></small>
+              <% else %>
+                <%= order.user ? order.user.email : order.guest_email %>
+                <% if order.guest_name.present? %>
+                  <br><small><%= order.guest_name %></small>
+                <% end %>
               <% end %>
             </td>
             <td style="padding: 15px;">
@@ -66,7 +72,7 @@
               <span class="badge badge-<%= order.processing_not_processed? ? 'danger' : order.processing_processing_delivered? ? 'success' : 'warning' %>">
                 <%= order.processing_status_text %>
               </span>
-              <% if order.tracking_number.present? %>
+              <% if order.respond_to?(:tracking_number) && order.tracking_number.present? %>
                 <br><small>Mã vận đơn: <%= order.tracking_number %></small>
               <% end %>
             </td>
