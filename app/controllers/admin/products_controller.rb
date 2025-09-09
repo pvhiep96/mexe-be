@@ -34,6 +34,14 @@ module Admin
           @products = @products.where(is_new: true)
         when 'hot'
           @products = @products.where(is_hot: true)
+        when 'preorder'
+          @products = @products.where(is_preorder: true)
+        when 'trending'
+          @products = @products.where(is_trending: true)
+        when 'ending_soon'
+          @products = @products.where(is_ending_soon: true)
+        when 'arriving_soon'
+          @products = @products.where(is_arriving_soon: true)
         end
       end
       
@@ -95,6 +103,7 @@ module Admin
       params.require(resource_class.model_name.param_key).permit(
         dashboard.permitted_attributes(action_name) +
         [
+          :is_featured, :is_new, :is_hot, :is_preorder, :is_trending, :is_ending_soon, :is_arriving_soon,
           product_images_attributes: [:id, :image, :alt_text, :sort_order, :is_primary, :_destroy],
           product_descriptions_attributes: [:id, :title, :content, :sort_order, :_destroy],
           product_specifications_attributes: [:id, :spec_name, :spec_value, :unit, :position, :_destroy],
