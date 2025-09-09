@@ -33,22 +33,31 @@
 
     <!-- Status -->
     <div class="section" style="margin-bottom: 30px;">
-      <h3>Status</h3>
-      <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-        <span class="badge <%= @product.is_active? ? 'badge-success' : 'badge-danger' %>">
-          <%= @product.is_active? ? 'Active' : 'Inactive' %>
+      <h3>🏷️ Product Status & Flags</h3>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+        <span class="badge <%= @product.is_active? ? 'badge-success' : 'badge-danger' %>" style="font-size: 14px; padding: 6px 12px;">
+          <%= @product.is_active? ? '✅ Active' : '❌ Inactive' %>
         </span>
         <% if @product.is_featured? %>
-          <span class="badge badge-primary">Featured</span>
+          <span class="badge badge-warning">⭐ Featured</span>
         <% end %>
         <% if @product.is_new? %>
-          <span class="badge badge-info">New</span>
+          <span class="badge badge-info">🆕 New</span>
         <% end %>
         <% if @product.is_hot? %>
-          <span class="badge badge-warning">Hot</span>
+          <span class="badge badge-danger">🔥 Hot</span>
         <% end %>
         <% if @product.is_preorder? %>
-          <span class="badge badge-secondary">Pre-order</span>
+          <span class="badge badge-secondary">📦 Preorder</span>
+        <% end %>
+        <% if @product.is_trending? %>
+          <span class="badge badge-primary">📈 Trending</span>
+        <% end %>
+        <% if @product.is_ending_soon? %>
+          <span class="badge badge-warning-dark">⏰ Ending Soon</span>
+        <% end %>
+        <% if @product.is_arriving_soon? %>
+          <span class="badge badge-success-light">🚚 Arriving Soon</span>
         <% end %>
       </div>
     </div>
@@ -234,6 +243,8 @@
   .badge-info { background: #17a2b8; color: white; }
   .badge-warning { background: #ffc107; color: black; }
   .badge-secondary { background: #6c757d; color: white; }
+  .badge-warning-dark { background: #e65100; color: white; }
+  .badge-success-light { background: #66bb6a; color: white; }
   
   .btn {
     display: inline-block;

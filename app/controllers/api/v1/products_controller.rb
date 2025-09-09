@@ -34,7 +34,10 @@ module Api
       end
 
       def show
-        product = Product.find_by(id: params[:id]) || Product.find_by(slug: params[:id])
+        product = Product.includes(:brand, :category, :images, :variants, :specifications, :descriptions)
+                         .find_by(id: params[:id]) || 
+                  Product.includes(:brand, :category, :images, :variants, :specifications, :descriptions)
+                         .find_by(slug: params[:id])
         
         if product
           render json: ProductDetailSerializer.new(product).as_json

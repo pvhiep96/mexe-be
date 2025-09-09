@@ -40,9 +40,13 @@
                 ['All Status', ''],
                 ['Active', 'active'],
                 ['Inactive', 'inactive'],
-                ['Featured', 'featured'],
-                ['New', 'new'],
-                ['Hot', 'hot']
+                ['⭐ Featured', 'featured'],
+                ['🆕 New', 'new'], 
+                ['🔥 Hot', 'hot'],
+                ['📦 Preorder', 'preorder'],
+                ['📈 Trending', 'trending'],
+                ['⏰ Ending Soon', 'ending_soon'],
+                ['🚚 Arriving Soon', 'arriving_soon']
               ], params[:status]),
               {},
               { style: "padding: 8px; border: 1px solid #ddd; border-radius: 4px;" } %>
@@ -133,18 +137,34 @@
                 </span>
               </td>
               <td style="padding: 12px; border: 1px solid #dee2e6;">
-                <span class="badge <%= product.is_active? ? 'badge-success' : 'badge-danger' %>">
-                  <%= product.is_active? ? 'Active' : 'Inactive' %>
-                </span>
-                <% if product.is_featured? %>
-                  <br><span class="badge badge-warning">Featured</span>
-                <% end %>
-                <% if product.is_new? %>
-                  <br><span class="badge badge-info">New</span>
-                <% end %>
-                <% if product.is_hot? %>
-                  <br><span class="badge badge-danger">Hot</span>
-                <% end %>
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                  <span class="badge <%= product.is_active? ? 'badge-success' : 'badge-danger' %>">
+                    <%= product.is_active? ? 'Active' : 'Inactive' %>
+                  </span>
+                  <div style="display: flex; flex-wrap: wrap; gap: 2px;">
+                    <% if product.is_featured? %>
+                      <span class="badge badge-warning">⭐ Featured</span>
+                    <% end %>
+                    <% if product.is_new? %>
+                      <span class="badge badge-info">🆕 New</span>
+                    <% end %>
+                    <% if product.is_hot? %>
+                      <span class="badge badge-danger">🔥 Hot</span>
+                    <% end %>
+                    <% if product.is_preorder? %>
+                      <span class="badge badge-secondary">📦 Preorder</span>
+                    <% end %>
+                    <% if product.is_trending? %>
+                      <span class="badge badge-primary">📈 Trending</span>
+                    <% end %>
+                    <% if product.is_ending_soon? %>
+                      <span class="badge badge-warning-dark">⏰ Ending Soon</span>
+                    <% end %>
+                    <% if product.is_arriving_soon? %>
+                      <span class="badge badge-success-light">🚚 Arriving Soon</span>
+                    <% end %>
+                  </div>
+                </div>
               </td>
               <td style="padding: 12px; border: 1px solid #dee2e6;">
                 <%= product.created_at.strftime("%Y-%m-%d") %>
@@ -258,6 +278,23 @@
 
   .badge-info {
     background-color: #17a2b8;
+  }
+
+  .badge-primary {
+    background-color: #007bff;
+  }
+
+  .badge-secondary {
+    background-color: #6c757d;
+  }
+
+  .badge-warning-dark {
+    background-color: #e65100;
+    color: white;
+  }
+
+  .badge-success-light {
+    background-color: #66bb6a;
   }
 
   .text-success {

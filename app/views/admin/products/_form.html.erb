@@ -62,14 +62,47 @@
     <%= form.label :is_active, "Active" %>
   </div>
   
+  <!-- Product Status Flags Section -->
   <div class="field-unit">
-    <%= form.check_box :is_featured %>
-    <%= form.label :is_featured, "Featured" %>
-  </div>
-  
-  <div class="field-unit">
-    <%= form.check_box :is_new %>
-    <%= form.label :is_new, "New" %>
+    <div class="field-unit__label">
+      <label style="font-weight: bold;">🏷️ Product Status Flags</label>
+    </div>
+    <div class="field-unit__field" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 4px; background: #f8f9fa;">
+      <div>
+        <%= form.check_box :is_featured %>
+        <%= form.label :is_featured, "⭐ Featured (Nổi bật)" %>
+      </div>
+      
+      <div>
+        <%= form.check_box :is_new %>
+        <%= form.label :is_new, "🆕 New (Mới)" %>
+      </div>
+      
+      <div>
+        <%= form.check_box :is_hot %>
+        <%= form.label :is_hot, "🔥 Hot (Bán chạy)" %>
+      </div>
+      
+      <div>
+        <%= form.check_box :is_preorder %>
+        <%= form.label :is_preorder, "📦 Preorder (Đặt trước)" %>
+      </div>
+      
+      <div>
+        <%= form.check_box :is_trending %>
+        <%= form.label :is_trending, "📈 Trending (Xu hướng)" %>
+      </div>
+      
+      <div>
+        <%= form.check_box :is_ending_soon %>
+        <%= form.label :is_ending_soon, "⏰ Ending Soon (Sắp kết thúc)" %>
+      </div>
+      
+      <div>
+        <%= form.check_box :is_arriving_soon %>
+        <%= form.label :is_arriving_soon, "🚚 Arriving Soon (Sắp về hàng)" %>
+      </div>
+    </div>
   </div>
 
   <!-- Product Images Section -->
