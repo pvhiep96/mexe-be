@@ -3,6 +3,8 @@ class ProductImageSerializer < ActiveModel::Serializer
 
   # Add image_url method for API compatibility
   def image_url
-    object.image.url if object.image.present?
+    return nil unless object.image.present?
+    url = object.image.url
+    url.present? ? url : nil
   end
 end

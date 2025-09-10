@@ -15,7 +15,7 @@
 - ✅ `price` → "Giá"
 - ✅ `stock_quantity` → "Số lượng tồn kho"
 - ✅ `is_active` → "Kích hoạt"
-- ✅ `is_featured` → "Nổi bật"
+- ✅ `is_essential_accessories` → "Nổi bật"
 - ✅ `is_new` → "Mới"
 - ✅ `created_at` → "Ngày tạo"
 

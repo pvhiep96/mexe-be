@@ -3,7 +3,7 @@ class Product < ApplicationRecord
   belongs_to :category, optional: true
   belongs_to :client, class_name: 'AdminUser', optional: true
   has_many :product_images, dependent: :destroy
-  has_many :product_descriptions, dependent: :destroy  
+  has_many :product_descriptions, dependent: :destroy
   has_many :product_specifications, dependent: :destroy
   has_many :product_videos, dependent: :destroy
   has_many :product_variants, dependent: :destroy
@@ -28,8 +28,11 @@ class Product < ApplicationRecord
   validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :stock_quantity, numericality: { greater_than_or_equal_to: 0 }
 
+  # Custom validation for is_active field
+  validate :can_update_is_active?, if: :is_active_changed?
+
   scope :active, -> { where(is_active: true) }
-  scope :featured, -> { where(is_featured: true) }
+  scope :essential_accessories, -> { where(is_essential_accessories: true) }
   scope :new_products, -> { where(is_new: true) }
   scope :hot_products, -> { where(is_hot: true) }
   scope :preorder, -> { where(is_preorder: true) }
@@ -37,7 +40,7 @@ class Product < ApplicationRecord
   scope :filter_by_brand, ->(brand_id) { where(brand_id: brand_id) if brand_id.present? }
 
   def self.ransackable_attributes(auth_object = nil)
-    %w[id name slug sku description short_description brand_id category_id price original_price discount_percent cost_price weight dimensions stock_quantity min_stock_alert is_active is_featured is_new is_hot is_preorder preorder_quantity preorder_end_date warranty_period meta_title meta_description view_count created_at updated_at]
+    %w[id name slug sku description short_description brand_id category_id price original_price discount_percent cost_price weight dimensions stock_quantity min_stock_alert is_active is_essential_accessories is_new is_hot is_preorder preorder_quantity preorder_end_date warranty_period meta_title meta_description view_count created_at updated_at]
   end
 
   def self.ransackable_associations(auth_object = nil)
@@ -51,6 +54,18 @@ class Product < ApplicationRecord
 
   # Get primary image URL
   def primary_image_url
-    primary_image&.image_url
+    return nil unless primary_image&.image_url.present?
+    primary_image.image_url
+  end
+
+  private
+
+  def can_update_is_active?
+    # Get current admin user from Thread.current (set by controller)
+    current_admin = Thread.current[:current_admin_user]
+
+    if current_admin.present? && !current_admin.super_admin?
+      errors.add(:is_active, "Chỉ Super Admin mới có quyền thay đổi trạng thái hiển thị sản phẩm")
+    end
   end
 end

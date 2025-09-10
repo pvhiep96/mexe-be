@@ -84,7 +84,7 @@ vi:
         stock_quantity: "Số lượng tồn kho"
         min_stock_alert: "Cảnh báo tồn kho tối thiểu"
         is_active: "Kích hoạt"
-        is_featured: "Nổi bật"
+        is_essential_accessories: "Phụ kiện thiết yếu"
         is_new: "Mới"
         is_hot: "Hot"
         is_preorder: "Đặt trước"

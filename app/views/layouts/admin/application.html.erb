@@ -342,7 +342,111 @@
 
     document.addEventListener('DOMContentLoaded', function() {
       initializeCKEditorWhenReady();
+      
+      // Fix back button styling to match "Back to Products"
+      const backButtons = document.querySelectorAll('a.btn-primary');
+      backButtons.forEach(button => {
+        if (button.textContent.includes('Trở lại') || button.textContent.includes('Back')) {
+          button.classList.remove('btn-primary');
+          button.classList.add('btn-secondary');
+        }
+      });
     });
   </script>
+
+  <!-- Global Button Hover Fix -->
+  <style>
+    /* Fix button hover text color issues across all admin pages */
+    .btn:hover {
+      color: white !important;
+    }
+
+    .btn-primary:hover {
+      background: #0056b3 !important;
+      border-color: #0056b3 !important;
+      color: white !important;
+    }
+
+    .btn-secondary:hover {
+      background: #545b62 !important;
+      border-color: #545b62 !important;
+      color: white !important;
+    }
+
+    .btn-success:hover {
+      background: #1e7e34 !important;
+      border-color: #1e7e34 !important;
+      color: white !important;
+    }
+
+    .btn-danger:hover {
+      background: #bd2130 !important;
+      border-color: #bd2130 !important;
+      color: white !important;
+    }
+
+    .btn-warning:hover {
+      background: #e0a800 !important;
+      border-color: #e0a800 !important;
+      color: #212529 !important;
+    }
+
+    .btn-info:hover {
+      background: #117a8b !important;
+      border-color: #117a8b !important;
+      color: white !important;
+    }
+
+    .btn-outline-primary:hover {
+      background: #007bff !important;
+      border-color: #007bff !important;
+      color: white !important;
+    }
+
+    .btn-outline-secondary:hover {
+      background: #6c757d !important;
+      border-color: #6c757d !important;
+      color: white !important;
+    }
+
+    .btn-outline-success:hover {
+      background: #28a745 !important;
+      border-color: #28a745 !important;
+      color: white !important;
+    }
+
+    .btn-outline-danger:hover {
+      background: #dc3545 !important;
+      border-color: #dc3545 !important;
+      color: white !important;
+    }
+
+    .btn-outline-warning:hover {
+      background: #ffc107 !important;
+      border-color: #ffc107 !important;
+      color: #212529 !important;
+    }
+
+    .btn-outline-info:hover {
+      background: #17a2b8 !important;
+      border-color: #17a2b8 !important;
+      color: white !important;
+    }
+
+    /* Fix back button styling to match "Back to Products" */
+    .btn-primary[href*="admin_products_path"],
+    .btn-primary[href*="admin_products"] {
+      background: #6c757d !important;
+      border-color: #6c757d !important;
+      color: white !important;
+    }
+
+    .btn-primary[href*="admin_products_path"]:hover,
+    .btn-primary[href*="admin_products"]:hover {
+      background: #545b62 !important;
+      border-color: #545b62 !important;
+      color: white !important;
+    }
+  </style>
 </body>
 </html>

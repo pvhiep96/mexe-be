@@ -69,14 +69,21 @@
   <div class="field-unit" style="margin-bottom: 20px;">
     <div style="display: flex; align-items: center; gap: 12px;">
       <div class="toggle">
-        <%= form.check_box :is_active, { class: "toggle-input", id: "product_is_active" } %>
-        <label for="product_is_active" class="toggle-label">
+        <% if current_admin_user&.super_admin? %>
+          <%= form.check_box :is_active, { class: "toggle-input", id: "product_is_active" } %>
+        <% else %>
+          <%= form.check_box :is_active, { class: "toggle-input", id: "product_is_active", disabled: true } %>
+        <% end %>
+        <label for="product_is_active" class="toggle-label <%= 'disabled' unless current_admin_user&.super_admin? %>">
           <span class="toggle-knob"></span>
         </label>
       </div>
       <div>
         <div id="active-label" style="font-weight: 700; color: #1f2937;">
           Hiển thị sản phẩm trên website
+          <% unless current_admin_user&.super_admin? %>
+            <span style="color: #dc3545; font-size: 12px; margin-left: 8px;">(Chỉ Super Admin mới có quyền chỉnh sửa)</span>
+          <% end %>
         </div>
         <div style="font-size: 12px; color: #6b7280;">
           Bật để sản phẩm được phép xuất hiện trên trang bán hàng. Tắt để ẩn sản phẩm khỏi website.
@@ -92,8 +99,13 @@
     </div>
     <div class="field-unit__field" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 4px; background: #f8f9fa;">
         <div style="display: flex; align-items: center; gap: 8px;">
-          <%= form.check_box :is_featured %>
-          <%= form.label :is_featured, "⭐ Featured (Nổi bật)", class: "status-flag-label" %>
+          <%= form.check_box :is_essential_accessories %>
+          <%= form.label :is_essential_accessories, "🔧 Essential Accessories (Phụ kiện thiết yếu)", class: "status-flag-label" %>
+        </div>
+        
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <%= form.check_box :is_best_seller %>
+          <%= form.label :is_best_seller, "🏆 Best Seller (Bán chạy nhất)", class: "status-flag-label" %>
         </div>
       
       <div style="display: flex; align-items: center; gap: 8px;">
@@ -103,7 +115,7 @@
       
       <div style="display: flex; align-items: center; gap: 8px;">
         <%= form.check_box :is_hot %>
-        <%= form.label :is_hot, "🔥 Hot (Bán chạy)", class: "status-flag-label" %>
+        <%= form.label :is_hot, "🔥 Hot (Thương Hiệu Mới - Ưu Đãi Đặc Biệt Nóng)", class: "status-flag-label" %>
       </div>
       
       <div style="display: flex; align-items: center; gap: 8px;">
@@ -145,9 +157,12 @@
         <button type="button" id="add-bulk-images" class="btn btn-primary" style="margin-top: 10px; display: none;">📸 Add Selected Images</button>
       </div>
       
-      <div id="product-images-container">
+      <div id="product-images-container" class="sortable-container">
         <%= form.fields_for :product_images do |image_form| %>
-          <div class="nested-field-wrapper product-image-fields" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0;">
+          <div class="nested-field-wrapper product-image-fields sortable-item" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; position: relative; cursor: move;" data-sort-order="<%= image_form.object.sort_order || 0 %>">
+            <!-- Drag Handle -->
+            <div class="drag-handle" style="position: absolute; top: 10px; right: 10px; cursor: grab; color: #666; font-size: 18px; z-index: 10;">⋮⋮</div>
+            
             <!-- Current Image Preview -->
             <% if image_form.object.image? %>
               <div class="current-image-preview" style="margin-bottom: 15px;">
@@ -175,11 +190,25 @@
             
             <div class="field-unit">
               <label>Sort Order</label>
-              <%= image_form.number_field :sort_order, value: image_form.object.sort_order || 0, class: "text-field" %>
+              <%= image_form.number_field :sort_order, value: image_form.object.sort_order || 0, class: "text-field sort-order-field" %>
             </div>
             <div class="field-unit">
-              <%= image_form.check_box :is_primary %>
-              <%= image_form.label :is_primary, "Primary Image" %>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="toggle">
+                  <%= image_form.check_box :is_primary, { class: "toggle-input", id: "image_is_primary_#{image_form.object.object_id}" } %>
+                  <label for="image_is_primary_<%= image_form.object.object_id %>" class="toggle-label">
+                    <span class="toggle-knob"></span>
+                  </label>
+                </div>
+                <div>
+                  <div id="image-primary-label-<%= image_form.object.object_id %>" style="font-weight: 700; color: #1f2937;">
+                    <%= image_form.object.is_primary ? 'Hình ảnh chính' : 'Hình ảnh phụ' %>
+                  </div>
+                  <div style="font-size: 12px; color: #6b7280;">
+                    Bật để đặt làm hình ảnh chính của sản phẩm
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="field-unit" style="display: flex; justify-content: flex-end; margin-top: 15px;">
               <%= image_form.hidden_field :_destroy %>
@@ -337,7 +366,10 @@
 
   <!-- Templates for new nested fields -->
   <script type="text/template" id="product-image-template">
-    <div class="nested-field-wrapper product-image-fields" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0;">
+    <div class="nested-field-wrapper product-image-fields sortable-item" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; position: relative; cursor: move;" data-sort-order="0">
+      <!-- Drag Handle -->
+      <div class="drag-handle" style="position: absolute; top: 10px; right: 10px; cursor: grab; color: #666; font-size: 18px; z-index: 10;">⋮⋮</div>
+      
       <div class="field-unit">
         <label>Image</label>
         <input type="file" name="product[product_images_attributes][NEW_RECORD][image]" accept="image/jpeg,image/jpg,image/png,image/webp" class="text-field image-upload" data-preview-target="image_preview_NEW_RECORD">
@@ -354,11 +386,25 @@
 
       <div class="field-unit">
         <label>Sort Order</label>
-        <input type="number" name="product[product_images_attributes][NEW_RECORD][sort_order]" value="0" class="text-field">
+        <input type="number" name="product[product_images_attributes][NEW_RECORD][sort_order]" value="0" class="text-field sort-order-field">
       </div>
       <div class="field-unit">
-        <input type="checkbox" name="product[product_images_attributes][NEW_RECORD][is_primary]" value="1">
-        <label>Primary Image</label>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="toggle">
+            <input type="checkbox" name="product[product_images_attributes][NEW_RECORD][is_primary]" value="1" class="toggle-input primary-toggle-hidden" id="image_is_primary_NEW_RECORD">
+            <label for="image_is_primary_NEW_RECORD" class="toggle-label">
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+          <div>
+            <div id="image-primary-label-NEW_RECORD" style="font-weight: 700; color: #1f2937;">
+              Hình ảnh phụ
+            </div>
+            <div style="font-size: 12px; color: #6b7280;">
+              Bật để đặt làm hình ảnh chính của sản phẩm
+            </div>
+          </div>
+        </div>
       </div>
       <div class="field-unit" style="display: flex; justify-content: flex-end; margin-top: 15px;">
         <button type="button" class="remove-nested-field btn btn-outline-danger btn-sm">🗑️ Remove Image</button>
@@ -456,7 +502,11 @@
   </script>
 
   <div class="form-actions" style="display: flex; justify-content: flex-end; margin-top: 30px;">
-    <%= form.submit "✨ Tạo Sản Phẩm Mới", class: "btn btn-primary btn-create-product" %>
+    <% if page.resource.persisted? %>
+      <%= form.submit "✨ Cập Nhật Sản Phẩm", class: "btn btn-primary btn-create-product" %>
+    <% else %>
+      <%= form.submit "✨ Tạo Sản Phẩm Mới", class: "btn btn-primary btn-create-product" %>
+    <% end %>
   </div>
 <% end %>
 
@@ -764,8 +814,259 @@
     bulkFiles = [];
   }
   
+  // Drag & Drop functionality
+  function initializeDragAndDrop() {
+    const container = document.getElementById('product-images-container');
+    if (!container) return;
+
+    let draggedElement = null;
+    let draggedIndex = -1;
+    let dragOffset = { x: 0, y: 0 };
+    let isDragging = false;
+    let originalSize = { width: 0, height: 0 };
+
+    // Use event delegation to handle drag events
+    container.addEventListener('mousedown', function(e) {
+      if (e.target.classList.contains('drag-handle')) {
+        handleMouseDown(e);
+      }
+    });
+
+    // Ensure all drag handles exist on page load
+    function ensureAllDragHandles() {
+      const items = container.querySelectorAll('.sortable-item');
+      items.forEach((item) => {
+        let dragHandle = item.querySelector('.drag-handle');
+        if (!dragHandle) {
+          dragHandle = document.createElement('div');
+          dragHandle.className = 'drag-handle';
+          dragHandle.innerHTML = '⋮⋮';
+          dragHandle.style.cssText = 'position: absolute; top: 10px; right: 10px; cursor: grab; color: #666; font-size: 18px; z-index: 10;';
+          item.appendChild(dragHandle);
+        }
+      });
+    }
+
+    // Initialize drag handles
+    ensureAllDragHandles();
+
+    // Function to update drag listeners for all items (for compatibility)
+    function updateDragListeners() {
+      // Event delegation handles this automatically
+    }
+
+    function handleMouseDown(e) {
+      e.preventDefault();
+      draggedElement = e.target.closest('.sortable-item');
+      if (!draggedElement) return;
+
+      draggedIndex = Array.from(container.children).indexOf(draggedElement);
+      
+      // Calculate offset from mouse to element
+      const rect = draggedElement.getBoundingClientRect();
+      dragOffset.x = e.clientX - rect.left;
+      dragOffset.y = e.clientY - rect.top;
+      
+      // Store original size
+      originalSize.width = rect.width;
+      originalSize.height = rect.height;
+      
+      isDragging = true;
+      draggedElement.classList.add('dragging');
+
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    function handleMouseMove(e) {
+      if (!draggedElement || !isDragging) return;
+
+      e.preventDefault();
+      
+      // Move the element to follow mouse cursor
+      const newX = e.clientX - dragOffset.x;
+      const newY = e.clientY - dragOffset.y;
+      
+      draggedElement.style.position = 'fixed';
+      draggedElement.style.left = newX + 'px';
+      draggedElement.style.top = newY + 'px';
+      draggedElement.style.zIndex = '1000';
+      draggedElement.style.pointerEvents = 'none';
+      draggedElement.style.width = originalSize.width + 'px';
+      draggedElement.style.height = originalSize.height + 'px';
+
+      const items = Array.from(container.children);
+      
+      // Find the item we're hovering over
+      let targetIndex = -1;
+      items.forEach((item, index) => {
+        if (item === draggedElement) return;
+        
+        const rect = item.getBoundingClientRect();
+        const itemCenter = rect.top + rect.height / 2;
+        
+        if (e.clientY < itemCenter) {
+          targetIndex = index;
+        }
+      });
+
+      // Update visual feedback
+      items.forEach((item, index) => {
+        item.classList.remove('drag-over');
+        if (index === targetIndex) {
+          item.classList.add('drag-over');
+        }
+      });
+    }
+
+    function handleMouseUp(e) {
+      if (!draggedElement || !isDragging) return;
+
+      e.preventDefault();
+      
+      // First, reset element position to get accurate measurements
+      draggedElement.style.position = '';
+      draggedElement.style.left = '';
+      draggedElement.style.top = '';
+      draggedElement.style.zIndex = '';
+      draggedElement.style.pointerEvents = '';
+      draggedElement.style.width = '';
+      draggedElement.style.height = '';
+      
+      // Force reflow to ensure element is back in normal flow
+      draggedElement.offsetHeight;
+      
+      // Now get fresh measurements
+      const items = Array.from(container.children);
+      
+      // Find the target position
+      let targetIndex = -1;
+      items.forEach((item, index) => {
+        if (item === draggedElement) return;
+        
+        const rect = item.getBoundingClientRect();
+        const itemCenter = rect.top + rect.height / 2;
+        
+        if (e.clientY < itemCenter) {
+          targetIndex = index;
+        }
+      });
+
+      // If no target found, move to end
+      if (targetIndex === -1) {
+        targetIndex = items.length - 1;
+      }
+
+      // Move the element
+      if (targetIndex !== draggedIndex) {
+        if (targetIndex > draggedIndex) {
+          container.insertBefore(draggedElement, items[targetIndex + 1]);
+        } else {
+          container.insertBefore(draggedElement, items[targetIndex]);
+        }
+        
+        // Update sort order values
+        updateSortOrders();
+      }
+
+      // Clean up
+      items.forEach(item => item.classList.remove('drag-over'));
+      draggedElement.classList.remove('dragging');
+      draggedElement = null;
+      draggedIndex = -1;
+      isDragging = false;
+
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    }
+
+    function updateSortOrders() {
+      const items = container.querySelectorAll('.sortable-item');
+      items.forEach((item, index) => {
+        const sortOrderField = item.querySelector('.sort-order-field');
+        if (sortOrderField) {
+          sortOrderField.value = index;
+        }
+        item.setAttribute('data-sort-order', index);
+        
+        // Ensure drag handle exists and is visible
+        let dragHandle = item.querySelector('.drag-handle');
+        if (!dragHandle) {
+          dragHandle = document.createElement('div');
+          dragHandle.className = 'drag-handle';
+          dragHandle.innerHTML = '⋮⋮';
+          dragHandle.style.cssText = 'position: absolute; top: 10px; right: 10px; cursor: grab; color: #666; font-size: 18px; z-index: 10;';
+          item.appendChild(dragHandle);
+        } else {
+          // Ensure drag handle is visible
+          dragHandle.style.display = 'block';
+          dragHandle.style.visibility = 'visible';
+          dragHandle.style.opacity = '1';
+        }
+      });
+    }
+
+    // Event delegation handles new items automatically
+    // No need for MutationObserver since we use event delegation
+  }
+
   // Initialize image preview functionality
   initializeImagePreview();
+
+  // Initialize drag & drop functionality
+  initializeDragAndDrop();
+
+  // Primary Image Toggle functionality
+  function initializePrimaryImageToggles() {
+    // Use event delegation for dynamically added elements
+    document.addEventListener('change', function(e) {
+      if (e.target && e.target.id && e.target.id.startsWith('image_is_primary_')) {
+        const toggle = e.target;
+        const labelId = 'image-primary-label-' + toggle.id.split('_').pop();
+        const label = document.getElementById(labelId);
+
+        if (label) {
+          // Uncheck all other primary toggles
+          const allToggles = document.querySelectorAll('input[id^="image_is_primary_"]');
+          allToggles.forEach(function(otherToggle) {
+            if (otherToggle !== toggle && otherToggle.checked) {
+              otherToggle.checked = false;
+              const otherLabelId = 'image-primary-label-' + otherToggle.id.split('_').pop();
+              const otherLabel = document.getElementById(otherLabelId);
+              if (otherLabel) {
+                otherLabel.textContent = 'Hình ảnh phụ';
+              }
+            }
+          });
+          
+          // Update current label
+          if (toggle.checked) {
+            label.textContent = 'Hình ảnh chính';
+          } else {
+            label.textContent = 'Hình ảnh phụ';
+          }
+        }
+      }
+    });
+
+    // Initialize existing toggles
+    const existingToggles = document.querySelectorAll('input[id^="image_is_primary_"]');
+    existingToggles.forEach(function(toggle) {
+      const labelId = 'image-primary-label-' + toggle.id.split('_').pop();
+      const label = document.getElementById(labelId);
+      
+      if (label) {
+        if (toggle.checked) {
+          label.textContent = 'Hình ảnh chính';
+        } else {
+          label.textContent = 'Hình ảnh phụ';
+        }
+      }
+    });
+  }
+
+  // Initialize primary image toggles
+  initializePrimaryImageToggles();
 </script>
 
 <style>
@@ -802,14 +1103,23 @@
   }
   
   .delete-current-image {
-    background: #dc3545;
-    color: white;
-    border: none;
-    cursor: pointer;
+    background: #dc3545 !important;
+    color: white !important;
+    border: none !important;
+    cursor: pointer !important;
+    border-radius: 50% !important;
+    width: 20px !important;
+    height: 20px !important;
+    padding: 0 !important;
+    font-size: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
   }
   
   .delete-current-image:hover {
-    background: #c82333;
+    background: #c82333 !important;
   }
   
   .preview-image {
@@ -833,6 +1143,18 @@
   .bulk-preview-item:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  
+  .remove-bulk-preview {
+    border-radius: 50% !important;
+    width: 20px !important;
+    height: 20px !important;
+    padding: 0 !important;
+    font-size: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
   }
   
   .remove-bulk-preview:hover {
@@ -948,6 +1270,25 @@
     transform: translateX(28px);
   }
 
+  /* Disabled toggle styling */
+  .toggle-label.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .toggle-input:disabled + .toggle-label {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .toggle-input:disabled + .toggle-label .toggle-knob {
+    background: #e5e7eb;
+  }
+
+  .toggle-input:disabled:checked + .toggle-label {
+    background: #9ca3af;
+  }
+
   /* Enhanced Button Styles */
   .btn {
     border-radius: 8px;
@@ -1027,7 +1368,7 @@
     border-color: #dc3545;
   }
 
-  /* Create Product Button Styling */
+  /* Create/Update Product Button Styling */
   .btn-create-product {
     background: linear-gradient(135deg, #007bff, #0056b3) !important;
     border: none !important;
@@ -1077,6 +1418,64 @@
     color: #333 !important;
     border-color: #5a6268 !important;
   }
+
+  /* Drag & Drop Styles */
+  .sortable-container {
+    min-height: 50px;
+  }
+
+  .sortable-item {
+    transition: all 0.3s ease;
+    background: white;
+  }
+
+  .sortable-item:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .sortable-item.dragging {
+    opacity: 0.8;
+    transform: rotate(3deg) scale(1.02);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    z-index: 1000;
+    transition: none;
+    cursor: grabbing;
+  }
+
+  .sortable-item.dragging .drag-handle {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Ensure drag handle is always visible */
+  .drag-handle {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    z-index: 10 !important;
+  }
+
+  .sortable-item.drag-over {
+    border: 2px dashed #007bff;
+    background-color: #f8f9fa;
+  }
+
+  .drag-handle {
+    user-select: none;
+    transition: color 0.2s ease;
+  }
+
+  .drag-handle:hover {
+    color: #007bff;
+  }
+
+  .sortable-item.dragging .drag-handle {
+    cursor: grabbing;
+  }
 </style>
 
 <script>
@@ -1085,12 +1484,19 @@
     const label = document.getElementById('active-label');
     function syncLabel(){
       if (!input || !label) return;
-      label.textContent = input.checked ? 'Hiển thị sản phẩm trên website' : 'Ẩn sản phẩm khỏi website';
-      label.style.color = input.checked ? '#065f46' : '#6b7280';
+      // Default to false (unchecked) for new products
+      const isChecked = input.checked;
+      label.textContent = isChecked ? 'Hiển thị sản phẩm trên website' : 'Ẩn sản phẩm khỏi website';
+      label.style.color = isChecked ? '#065f46' : '#6b7280';
     }
     document.addEventListener('turbo:load', syncLabel);
     document.addEventListener('DOMContentLoaded', syncLabel);
     if (input) input.addEventListener('change', syncLabel);
+    
+    // Ensure default state is false for new products
+    if (input && !input.hasAttribute('value')) {
+      input.checked = false;
+    }
   })();
 </script>
 

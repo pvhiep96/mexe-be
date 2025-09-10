@@ -40,7 +40,7 @@
                 ['All Status', ''],
                 ['Active', 'active'],
                 ['Inactive', 'inactive'],
-                ['⭐ Featured', 'featured'],
+                ['🔧 Essential Accessories', 'essential_accessories'],
                 ['🆕 New', 'new'],
                 ['🔥 Hot', 'hot'],
                 ['📦 Preorder', 'preorder'],
@@ -142,8 +142,8 @@
                     <%= product.is_active? ? 'Active' : 'Inactive' %>
                   </span>
                   <div style="display: flex; flex-wrap: wrap; gap: 2px;">
-                    <% if product.is_featured? %>
-                      <span class="badge badge-warning">⭐ Featured</span>
+                    <% if product.is_essential_accessories? %>
+                      <span class="badge badge-warning">🔧 Essential Accessories</span>
                     <% end %>
                     <% if product.is_new? %>
                       <span class="badge badge-info">🆕 New</span>
