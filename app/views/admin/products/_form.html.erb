@@ -775,13 +775,31 @@
     
     if (!container || !template || bulkFiles.length === 0) return;
     
+    // First, clean up any empty fields
+    const emptyFields = container.querySelectorAll('.product-image-fields');
+    emptyFields.forEach(field => {
+      const fileInput = field.querySelector('.image-upload');
+      const hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
+      const hasCurrentImage = field.querySelector('.current-image-preview');
+      
+      // If field has no file and no current image, remove it
+      if (!hasFile && !hasCurrentImage) {
+        field.remove();
+      }
+    });
+    
+    // Get current number of existing image fields to calculate proper sort order
+    const existingFields = container.querySelectorAll('.product-image-fields');
+    let nextSortOrder = existingFields.length;
+    
     bulkFiles.forEach((file, index) => {
       const newIndex = Date.now() + index;
       let newField = template.innerHTML.replace(/NEW_RECORD/g, newIndex);
       
       const wrapper = document.createElement('div');
       wrapper.innerHTML = newField;
-      wrapper.className = 'nested-field-wrapper';
+      wrapper.className = 'nested-field-wrapper product-image-fields sortable-item';
+      wrapper.setAttribute('data-sort-order', nextSortOrder + index);
       
       container.appendChild(wrapper);
       
@@ -790,6 +808,12 @@
       const dataTransfer = new DataTransfer();
       dataTransfer.items.add(file);
       fileInput.files = dataTransfer.files;
+      
+      // Set correct sort order
+      const sortOrderField = wrapper.querySelector('.sort-order-field');
+      if (sortOrderField) {
+        sortOrderField.value = nextSortOrder + index;
+      }
       
       // Trigger preview for this field
       handleImagePreview(fileInput);
@@ -805,7 +829,17 @@
           removeImagePreview(e.target);
         });
       }
+      
+      // Add drag handle
+      const dragHandle = document.createElement('div');
+      dragHandle.className = 'drag-handle';
+      dragHandle.innerHTML = '⋮⋮';
+      dragHandle.style.cssText = 'position: absolute; top: 10px; right: 10px; cursor: grab; color: #666; font-size: 18px; z-index: 10;';
+      wrapper.appendChild(dragHandle);
     });
+    
+    // Update sort orders for all fields after adding new ones
+    updateSortOrders();
     
     // Clear bulk upload
     document.getElementById('bulk-image-upload').value = '';
@@ -976,33 +1010,60 @@
       draggedIndex = -1;
       isDragging = false;
 
+      // Ensure drag handles are visible after drag operation
+      setTimeout(() => {
+        ensureDragHandlesVisible();
+      }, 100);
+
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     }
 
     function updateSortOrders() {
       const items = container.querySelectorAll('.sortable-item');
+      let validIndex = 0;
+      
       items.forEach((item, index) => {
-        const sortOrderField = item.querySelector('.sort-order-field');
-        if (sortOrderField) {
-          sortOrderField.value = index;
-        }
-        item.setAttribute('data-sort-order', index);
+        const fileInput = item.querySelector('.image-upload');
+        const hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
+        const hasCurrentImage = item.querySelector('.current-image-preview');
         
-        // Ensure drag handle exists and is visible
-        let dragHandle = item.querySelector('.drag-handle');
-        if (!dragHandle) {
-          dragHandle = document.createElement('div');
-          dragHandle.className = 'drag-handle';
-          dragHandle.innerHTML = '⋮⋮';
-          dragHandle.style.cssText = 'position: absolute; top: 10px; right: 10px; cursor: grab; color: #666; font-size: 18px; z-index: 10;';
-          item.appendChild(dragHandle);
-        } else {
-          // Ensure drag handle is visible
-          dragHandle.style.display = 'block';
-          dragHandle.style.visibility = 'visible';
-          dragHandle.style.opacity = '1';
+        // Only update sort order for items that have images
+        if (hasFile || hasCurrentImage) {
+          const sortOrderField = item.querySelector('.sort-order-field');
+          if (sortOrderField) {
+            sortOrderField.value = validIndex;
+          }
+          item.setAttribute('data-sort-order', validIndex);
+          validIndex++;
         }
+      });
+      
+      // Ensure drag handles are properly managed after sort order update
+      ensureDragHandlesVisible();
+    }
+
+    // Function to ensure all drag handles are visible
+    function ensureDragHandlesVisible() {
+      const items = container.querySelectorAll('.sortable-item');
+      items.forEach((item) => {
+        // Remove ALL existing drag handles first to avoid duplicates
+        const existingHandles = item.querySelectorAll('.drag-handle');
+        existingHandles.forEach(handle => handle.remove());
+        
+        // Create a single new drag handle
+        const dragHandle = document.createElement('div');
+        dragHandle.className = 'drag-handle';
+        dragHandle.innerHTML = '⋮⋮';
+        dragHandle.style.cssText = 'position: absolute; top: 10px; right: 10px; cursor: grab; color: #666; font-size: 16px; z-index: 10; display: block; visibility: visible; opacity: 1; pointer-events: auto; font-weight: bold; letter-spacing: 2px;';
+        
+        // Ensure the item has relative positioning for absolute positioning to work
+        if (getComputedStyle(item).position === 'static') {
+          item.style.position = 'relative';
+        }
+        
+        // Append the drag handle to the item
+        item.appendChild(dragHandle);
       });
     }
 
@@ -1010,11 +1071,78 @@
     // No need for MutationObserver since we use event delegation
   }
 
+  // Clean up empty image fields on page load
+  function cleanupEmptyImageFields() {
+    const container = document.getElementById('product-images-container');
+    if (!container) return;
+    
+    const emptyFields = container.querySelectorAll('.product-image-fields');
+    emptyFields.forEach(field => {
+      const fileInput = field.querySelector('.image-upload');
+      const hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
+      const hasCurrentImage = field.querySelector('.current-image-preview');
+      
+      // If field has no file and no current image, remove it
+      if (!hasFile && !hasCurrentImage) {
+        field.remove();
+      }
+    });
+    
+    // Update sort orders after cleanup
+    updateSortOrders();
+  }
+
   // Initialize image preview functionality
   initializeImagePreview();
 
   // Initialize drag & drop functionality
   initializeDragAndDrop();
+  
+  // Clean up empty fields on page load
+  cleanupEmptyImageFields();
+  
+  // Function to clean up orphaned drag handles
+  function cleanupOrphanedDragHandles() {
+    const container = document.getElementById('product-images-container');
+    if (!container) return;
+    
+    // Find all drag handles that are not inside sortable items
+    const allDragHandles = document.querySelectorAll('.drag-handle');
+    allDragHandles.forEach(handle => {
+      const sortableItem = handle.closest('.sortable-item');
+      if (!sortableItem || !container.contains(sortableItem)) {
+        handle.remove();
+      }
+    });
+  }
+  
+  // Monitor DOM changes to ensure drag handles are always visible
+  function initializeDragHandleMonitor() {
+    const container = document.getElementById('product-images-container');
+    if (!container) return;
+    
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.type === 'childList' || mutation.type === 'attributes') {
+          // Small delay to ensure DOM is fully updated
+          setTimeout(() => {
+            cleanupOrphanedDragHandles();
+            ensureDragHandlesVisible();
+          }, 50);
+        }
+      });
+    });
+    
+    observer.observe(container, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class', 'style']
+    });
+  }
+  
+  // Initialize drag handle monitor
+  initializeDragHandleMonitor();
 
   // Primary Image Toggle functionality
   function initializePrimaryImageToggles() {
@@ -1427,6 +1555,7 @@
   .sortable-item {
     transition: all 0.3s ease;
     background: white;
+    position: relative;
   }
 
   .sortable-item:hover {
@@ -1456,7 +1585,24 @@
     position: absolute !important;
     top: 10px !important;
     right: 10px !important;
-    z-index: 10 !important;
+    z-index: 1000 !important;
+    pointer-events: auto !important;
+    cursor: grab !important;
+    background: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    user-select: none !important;
+    color: #666 !important;
+    font-size: 18px !important;
+    line-height: 1 !important;
+  }
+  
+  .drag-handle:hover {
+    color: #007bff !important;
+    transform: scale(1.1) !important;
+    background: none !important;
   }
 
   .sortable-item.drag-over {
