@@ -6,11 +6,10 @@ module Api
           success: true,
           data: {
             categories: get_categories,
-            best_sellers: get_best_sellers,
+            best_sellers: get_products_by_flag(:is_best_seller),
             early_order_products: get_early_order_products,
-            new_brands: get_new_brands,
-            featured_products: get_featured_products,
-            essential_accessories: get_essential_accessories
+            hot_special_offer: get_products_by_flag(:is_hot),
+            essential_accessories: get_products_by_flag(:is_essential_accessories)
           }
         }
       end
@@ -51,70 +50,9 @@ module Api
         end
       end
 
-      def get_best_sellers
-        products = Product.includes(:brand, :category, :product_images)
-                        .active
-                        .where('stock_quantity > 0')
-                        .order(view_count: :desc, created_at: :desc)
-                        .limit(8)
-
-        ActiveModel::Serializer::CollectionSerializer.new(products, serializer: ProductSerializer)
-      end
-
-      def get_featured_products
-        products = Product.includes(:brand, :category, :product_images)
-                        .active
-                        .where('stock_quantity > 0')
-                        .where('is_featured = ? OR is_new = ? OR is_hot = ? OR is_preorder = ?', true, true, true, true)
-                        .order(created_at: :desc)
-                        .limit(12)
-
-        ActiveModel::Serializer::CollectionSerializer.new(products, serializer: ProductSerializer)
-      end
-
-      def get_new_brands
-        brands = Brand.includes(:products)
-                     .active
-                     .order(created_at: :desc)
-                     .limit(6)
-
-        brands.map do |brand|
-          {
-            id: brand.id,
-            name: brand.name,
-            slug: brand.slug,
-            description: brand.description,
-            logo_url: brand.logo,
-            founded_year: brand.founded_year,
-            field: brand.field,
-            product_count: brand.products.active.count,
-            featured_products: brand.products.includes(:product_images)
-                                   .active
-                                   .where('is_featured = ? OR is_new = ? OR is_hot = ?', true, true, true)
-                                   .limit(3)
-                                   .map { |p| ProductSerializer.new(p).as_json }
-          }
-        end
-      end
-
-      def get_essential_accessories
-        # Lấy các sản phẩm phụ kiện cần thiết dựa trên category và đánh giá
-        essential_categories = Category.active.where(slug: ['camera-hanh-trinh', 'tham-san', 'den-led', 'bao-ve'])
-        
-        products = Product.includes(:brand, :category, :product_images)
-                        .active
-                        .where('stock_quantity > 0')
-                        .where(category: essential_categories)
-                        .order(view_count: :desc, created_at: :desc)
-                        .limit(8)
-
-        ActiveModel::Serializer::CollectionSerializer.new(products, serializer: ProductSerializer)
-      end
 
       def get_products_by_flag(flag_column)
-        products = Product.includes(:brand, :category, :product_images)
-                         .where(is_active: true)
-                         .where('stock_quantity > 0')
+        products = Product.active.includes(:brand, :category, :product_images)
                          .where(flag_column => true)
                          .order(created_at: :desc)
                          .limit(15)

@@ -102,7 +102,7 @@ products = Product.create([
     original_price: 3000000,
     discount_percent: 16.67,
     stock_quantity: 50,
-    is_featured: true,
+    is_essential_accessories: true,
     is_new: true,
     warranty_period: 24
   },
@@ -119,7 +119,7 @@ products = Product.create([
     original_price: 5000000,
     discount_percent: 10,
     stock_quantity: 30,
-    is_featured: true,
+    is_essential_accessories: true,
     warranty_period: 24
   },
   {
@@ -183,7 +183,7 @@ products = Product.create([
     original_price: 900000,
     discount_percent: 11.11,
     stock_quantity: 80,
-    is_featured: true,
+    is_essential_accessories: true,
     warranty_period: 12
   },
   {
@@ -231,7 +231,7 @@ products = Product.create([
     original_price: 1400000,
     discount_percent: 14.29,
     stock_quantity: 60,
-    is_featured: true,
+    is_essential_accessories: true,
     warranty_period: 12
   },
   {
@@ -830,7 +830,7 @@ puts "- #{ArticleImage.count} article images"
 # Set early order tab flags
 puts "Setting early order tab flags..."
 # Trending products (Dự án thịnh hành)
-Product.where(is_hot: true).or(Product.where(is_featured: true)).update_all(is_trending: true)
+Product.where(is_hot: true).or(Product.where(is_essential_accessories: true)).update_all(is_trending: true)
 
 # New products (Mới ra mắt) - already has is_new flag
 puts "New products: #{Product.where(is_new: true).count}"
@@ -842,11 +842,15 @@ Product.where(id: [1, 3, 5]).update_all(is_ending_soon: true) # Some specific pr
 # Arriving soon products (Sắp về hàng) - set some products as arriving soon
 Product.where(id: [2, 4, 6, 8]).update_all(is_arriving_soon: true) # Some specific products
 
+# Best seller products (Bán chạy nhất) - set some products as best sellers
+Product.where(id: [1, 2, 3, 4, 5, 6]).update_all(is_best_seller: true) # Some specific products
+
 puts "Early order tab flags set:"
 puts "- Trending: #{Product.where(is_trending: true).count}"
 puts "- New: #{Product.where(is_new: true).count}"
 puts "- Ending soon: #{Product.where(is_ending_soon: true).count}"
 puts "- Arriving soon: #{Product.where(is_arriving_soon: true).count}"
+puts "- Best seller: #{Product.where(is_best_seller: true).count}"
 
 puts "Admin users created:"
 puts "- Super Admin: admin@mexe.com / password123"

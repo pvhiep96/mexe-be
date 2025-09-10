@@ -24,7 +24,7 @@ class ProductDashboard < Administrate::BaseDashboard
     min_stock_alert: Field::Number,
     warranty_period: Field::String,
     is_active: Field::Boolean,
-    is_featured: Field::Boolean,
+    is_essential_accessories: Field::Boolean,
     is_new: Field::Boolean,
     is_hot: Field::Boolean,
     is_preorder: Field::Boolean,
@@ -82,7 +82,7 @@ class ProductDashboard < Administrate::BaseDashboard
     min_stock_alert
     warranty_period
     is_active
-    is_featured
+    is_essential_accessories
     is_new
     is_hot
     is_preorder
@@ -114,7 +114,7 @@ class ProductDashboard < Administrate::BaseDashboard
     min_stock_alert
     warranty_period
     is_active
-    is_featured
+    is_essential_accessories
     is_new
     is_hot
     is_preorder

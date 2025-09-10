@@ -25,7 +25,7 @@ vi:
     created_at: "Ngày tạo"
     updated_at: "Ngày cập nhật"
     is_active: "Kích hoạt"
-    is_featured: "Nổi bật"
+    is_essential_accessories: "Phụ kiện thiết yếu"
     is_new: "Mới"
     is_hot: "Hot"
     is_preorder: "Đặt trước"

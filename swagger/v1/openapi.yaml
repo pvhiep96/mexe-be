@@ -320,7 +320,7 @@ components:
           format: float
         is_active:
           type: boolean
-        is_featured:
+        is_essential_accessories:
           type: boolean
         is_new:
           type: boolean
@@ -370,7 +370,7 @@ components:
           type: integer
         is_active:
           type: boolean
-        is_featured:
+        is_essential_accessories:
           type: boolean
         is_new:
           type: boolean

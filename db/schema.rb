@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_09_06_162343) do
+ActiveRecord::Schema[7.2].define(version: 2025_09_10_025723) do
   create_table "active_admin_comments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
@@ -129,8 +129,20 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_06_162343) do
     t.text "meta_description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "image_url"
     t.index ["parent_id"], name: "index_categories_on_parent_id"
     t.index ["slug"], name: "index_categories_on_slug", unique: true
+  end
+
+  create_table "ckeditor_assets", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "data_file_name", null: false
+    t.string "data_content_type"
+    t.integer "data_file_size"
+    t.string "data_fingerprint"
+    t.string "type", limit: 30
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["type"], name: "index_ckeditor_assets_on_type"
   end
 
   create_table "client_notifications", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -232,6 +244,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_06_162343) do
     t.decimal "coupon_discount", precision: 10, scale: 2, default: "0.0"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "tracking_url"
+    t.datetime "shipped_at"
+    t.datetime "delivered_at"
     t.string "shipping_name"
     t.string "shipping_phone"
     t.string "shipping_city"
@@ -336,8 +351,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_06_162343) do
     t.string "dimensions"
     t.integer "stock_quantity", default: 0
     t.integer "min_stock_alert", default: 10
-    t.boolean "is_active", default: true
-    t.boolean "is_featured", default: false
+    t.boolean "is_active", default: false
+    t.boolean "is_essential_accessories", default: false
     t.boolean "is_new", default: false
     t.boolean "is_hot", default: false
     t.boolean "is_preorder", default: false
@@ -353,6 +368,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_06_162343) do
     t.boolean "is_ending_soon", default: false
     t.boolean "is_arriving_soon", default: false
     t.bigint "client_id"
+    t.boolean "is_best_seller", default: false
     t.index ["brand_id"], name: "index_products_on_brand_id"
     t.index ["category_id"], name: "index_products_on_category_id"
     t.index ["client_id"], name: "index_products_on_client_id"
