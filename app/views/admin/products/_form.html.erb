@@ -169,7 +169,6 @@
                 <label>Current Image:</label>
                 <div style="position: relative; display: inline-block;">
                   <img src="<%= image_form.object.image.url %>" alt="<%= image_form.object.alt_text %>" style="max-width: 200px; max-height: 150px; border: 1px solid #ddd; border-radius: 4px;">
-                  <button type="button" class="delete-current-image btn btn-danger btn-xs" style="position: absolute; top: -5px; right: -5px; width: 20px; height: 20px; border-radius: 50%; padding: 0; font-size: 12px;">×</button>
                 </div>
               </div>
             <% end %>
@@ -182,9 +181,7 @@
             <!-- New Image Preview -->
             <div class="field-unit">
               <div id="image_preview_<%= image_form.object.object_id %>" class="image-preview" style="margin-top: 10px; display: none;">
-                <label>Preview:</label><br>
                 <img class="preview-image" style="max-width: 200px; max-height: 150px; border: 1px solid #ddd; border-radius: 4px;">
-                <button type="button" class="remove-preview btn btn-outline-danger btn-xs" style="margin-left: 10px;">🗑️ Remove</button>
               </div>
             </div>
             
@@ -230,9 +227,12 @@
       <label>Product Descriptions</label>
     </div>
     <div class="field-unit__field">
-      <div id="product-descriptions-container">
+      <div id="product-descriptions-container" class="sortable-container">
         <%= form.fields_for :product_descriptions do |desc_form| %>
-          <div class="nested-field-wrapper product-description-fields" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0;">
+          <div class="nested-field-wrapper product-description-fields sortable-item" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; position: relative; cursor: move;" data-sort-order="<%= desc_form.object.sort_order || 0 %>">
+            <!-- Drag Handle -->
+            <div class="drag-handle" style="position: absolute; top: 10px; right: 10px; cursor: grab; color: #666; font-size: 18px; z-index: 10;">⋮⋮</div>
+            
             <div class="field-unit">
               <label>Title</label>
               <%= desc_form.text_field :title, class: "text-field" %>
@@ -248,7 +248,7 @@
              </div>
             <div class="field-unit">
               <label>Sort Order</label>
-              <%= desc_form.number_field :sort_order, value: desc_form.object.sort_order || 0, class: "text-field" %>
+              <%= desc_form.number_field :sort_order, value: desc_form.object.sort_order || 0, class: "text-field sort-order-field" %>
             </div>
             <div class="field-unit" style="display: flex; justify-content: flex-end; margin-top: 15px;">
               <%= desc_form.hidden_field :_destroy %>
@@ -270,9 +270,12 @@
       <label>Product Specifications</label>
     </div>
     <div class="field-unit__field">
-      <div id="product-specifications-container">
+      <div id="product-specifications-container" class="sortable-container">
         <%= form.fields_for :product_specifications do |spec_form| %>
-          <div class="nested-field-wrapper product-specification-fields" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0;">
+          <div class="nested-field-wrapper product-specification-fields sortable-item" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; position: relative; cursor: move;" data-sort-order="<%= spec_form.object.sort_order || 0 %>">
+            <!-- Drag Handle -->
+            <div class="drag-handle" style="position: absolute; top: 10px; right: 10px; cursor: grab; color: #666; font-size: 18px; z-index: 10;">⋮⋮</div>
+            
             <div class="field-unit">
               <label>Name</label>
               <%= spec_form.text_field :spec_name, class: "text-field" %>
@@ -287,7 +290,7 @@
             </div>
             <div class="field-unit">
               <label>Sort Order</label>
-              <%= spec_form.number_field :sort_order, value: spec_form.object.sort_order || 0, class: "text-field" %>
+              <%= spec_form.number_field :sort_order, value: spec_form.object.sort_order || 0, class: "text-field sort-order-field" %>
             </div>
             <div class="field-unit" style="display: flex; justify-content: flex-end; margin-top: 15px;">
               <%= spec_form.hidden_field :_destroy %>
@@ -313,9 +316,12 @@
         📹 <strong>Hỗ trợ:</strong> YouTube và Vimeo URLs. Ví dụ: https://www.youtube.com/watch?v=ABC123 hoặc https://youtu.be/ABC123
       </div>
 
-      <div id="product-videos-container">
+      <div id="product-videos-container" class="sortable-container">
         <%= form.fields_for :product_videos do |video_form| %>
-          <div class="nested-field-wrapper product-video-fields" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0;">
+          <div class="nested-field-wrapper product-video-fields sortable-item" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; position: relative; cursor: move;" data-sort-order="<%= video_form.object.sort_order || 0 %>">
+            <!-- Drag Handle -->
+            <div class="drag-handle" style="position: absolute; top: 10px; right: 10px; cursor: grab; color: #666; font-size: 18px; z-index: 10;">⋮⋮</div>
+            
             <div class="field-unit">
               <label>Video URL</label>
               <%= video_form.url_field :url, class: "text-field", placeholder: "https://www.youtube.com/watch?v=..." %>
@@ -330,7 +336,7 @@
             </div>
             <div class="field-unit">
               <label>Sort Order</label>
-              <%= video_form.number_field :sort_order, value: video_form.object.sort_order || 0, class: "text-field" %>
+              <%= video_form.number_field :sort_order, value: video_form.object.sort_order || 0, class: "text-field sort-order-field" %>
             </div>
             <div class="field-unit">
               <div style="display: flex; align-items: center; gap: 12px;">
@@ -378,9 +384,7 @@
       <!-- New Image Preview -->
       <div class="field-unit">
         <div id="image_preview_NEW_RECORD" class="image-preview" style="margin-top: 10px; display: none;">
-          <label>Preview:</label><br>
           <img class="preview-image" style="max-width: 200px; max-height: 150px; border: 1px solid #ddd; border-radius: 4px;">
-          <button type="button" class="remove-preview btn btn-outline-danger btn-xs" style="margin-left: 10px;">🗑️ Remove</button>
         </div>
       </div>
 
@@ -413,7 +417,10 @@
   </script>
 
   <script type="text/template" id="product-description-template">
-    <div class="nested-field-wrapper product-description-fields" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0;">
+    <div class="nested-field-wrapper product-description-fields sortable-item" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; position: relative; cursor: move;" data-sort-order="0">
+      <!-- Drag Handle -->
+      <div class="drag-handle" style="position: absolute; top: 10px; right: 10px; cursor: grab; color: #666; font-size: 18px; z-index: 10;">⋮⋮</div>
+      
       <div class="field-unit">
         <label>Title</label>
         <input type="text" name="product[product_descriptions_attributes][NEW_RECORD][title]" class="text-field">
@@ -427,7 +434,7 @@
       </div>
       <div class="field-unit">
         <label>Sort Order</label>
-        <input type="number" name="product[product_descriptions_attributes][NEW_RECORD][sort_order]" value="0" class="text-field">
+        <input type="number" name="product[product_descriptions_attributes][NEW_RECORD][sort_order]" value="0" class="text-field sort-order-field">
       </div>
       <div class="field-unit" style="display: flex; justify-content: flex-end; margin-top: 15px;">
         <button type="button" class="remove-nested-field btn btn-outline-danger btn-sm">🗑️ Remove Description</button>
@@ -436,7 +443,10 @@
   </script>
 
   <script type="text/template" id="product-specification-template">
-    <div class="nested-field-wrapper product-specification-fields" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0;">
+    <div class="nested-field-wrapper product-specification-fields sortable-item" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; position: relative; cursor: move;" data-sort-order="0">
+      <!-- Drag Handle -->
+      <div class="drag-handle" style="position: absolute; top: 10px; right: 10px; cursor: grab; color: #666; font-size: 18px; z-index: 10;">⋮⋮</div>
+      
       <div class="field-unit">
         <label>Name</label>
         <input type="text" name="product[product_specifications_attributes][NEW_RECORD][spec_name]" class="text-field">
@@ -451,7 +461,7 @@
       </div>
       <div class="field-unit">
         <label>Sort Order</label>
-        <input type="number" name="product[product_specifications_attributes][NEW_RECORD][position]" value="0" class="text-field">
+        <input type="number" name="product[product_specifications_attributes][NEW_RECORD][sort_order]" value="0" class="text-field sort-order-field">
       </div>
       <div class="field-unit" style="display: flex; justify-content: flex-end; margin-top: 15px;">
         <button type="button" class="remove-nested-field btn btn-outline-danger btn-sm">🗑️ Remove Specification</button>
@@ -460,7 +470,10 @@
   </script>
 
   <script type="text/template" id="product-video-template">
-    <div class="nested-field-wrapper product-video-fields" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0;">
+    <div class="nested-field-wrapper product-video-fields sortable-item" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; position: relative; cursor: move;" data-sort-order="0">
+      <!-- Drag Handle -->
+      <div class="drag-handle" style="position: absolute; top: 10px; right: 10px; cursor: grab; color: #666; font-size: 18px; z-index: 10;">⋮⋮</div>
+      
       <div class="field-unit">
         <label>Video URL</label>
         <input type="url" name="product[product_videos_attributes][NEW_RECORD][url]" class="text-field" placeholder="https://www.youtube.com/watch?v=...">
@@ -475,7 +488,7 @@
       </div>
       <div class="field-unit">
         <label>Sort Order</label>
-        <input type="number" name="product[product_videos_attributes][NEW_RECORD][sort_order]" value="0" class="text-field">
+        <input type="number" name="product[product_videos_attributes][NEW_RECORD][sort_order]" value="0" class="text-field sort-order-field">
       </div>
       <div class="field-unit">
         <div style="display: flex; align-items: center; gap: 12px;">
@@ -606,13 +619,7 @@
     
     // Handle remove preview buttons
     document.addEventListener('click', function(e) {
-      if (e.target.classList.contains('remove-preview')) {
-        removeImagePreview(e.target);
-      }
       
-      if (e.target.classList.contains('delete-current-image')) {
-        deleteCurrentImage(e.target);
-      }
       
       if (e.target.classList.contains('remove-bulk-preview')) {
         removeBulkPreview(e.target);
@@ -620,6 +627,25 @@
       
       if (e.target.id === 'add-bulk-images') {
         addBulkImagesToForm();
+      }
+      
+      // Handle Add buttons for different sections
+      if (e.target.id === 'add-product-description') {
+        e.preventDefault();
+        e.stopPropagation();
+        addProductDescription();
+      }
+      
+      if (e.target.id === 'add-product-specification') {
+        e.preventDefault();
+        e.stopPropagation();
+        addProductSpecification();
+      }
+      
+      if (e.target.id === 'add-product-video') {
+        e.preventDefault();
+        e.stopPropagation();
+        addProductVideo();
       }
     });
   }
@@ -657,27 +683,7 @@
     reader.readAsDataURL(file);
   }
   
-  function removeImagePreview(button) {
-    const previewContainer = button.closest('.image-preview');
-    const fieldWrapper = button.closest('.nested-field-wrapper');
-    const fileInput = fieldWrapper.querySelector('.image-upload');
-    
-    previewContainer.style.display = 'none';
-    fileInput.value = '';
-  }
   
-  function deleteCurrentImage(button) {
-    if (confirm('Bạn có chắc chắn muốn xóa ảnh hiện tại?')) {
-      const currentImagePreview = button.closest('.current-image-preview');
-      const fieldWrapper = button.closest('.nested-field-wrapper');
-      const destroyInput = fieldWrapper.querySelector('input[name*="[_destroy]"]');
-      
-      currentImagePreview.style.display = 'none';
-      if (destroyInput) {
-        destroyInput.value = '1';
-      }
-    }
-  }
   
   // Bulk image upload functions
   let bulkFiles = [];
@@ -823,12 +829,6 @@
         handleImagePreview(e.target);
       });
       
-      const removePreviewBtn = wrapper.querySelector('.remove-preview');
-      if (removePreviewBtn) {
-        removePreviewBtn.addEventListener('click', function(e) {
-          removeImagePreview(e.target);
-        });
-      }
       
       // Add drag handle
       const dragHandle = document.createElement('div');
@@ -848,10 +848,167 @@
     bulkFiles = [];
   }
   
+  // Add Product Description
+  function addProductDescription() {
+    const container = document.getElementById('product-descriptions-container');
+    const template = document.getElementById('product-description-template');
+    
+    if (!container || !template) return;
+    
+    // Prevent duplicate calls
+    if (container.dataset.adding === 'true') return;
+    container.dataset.adding = 'true';
+    
+    // Get next sort order
+    const existingItems = container.querySelectorAll('.sortable-item');
+    const nextSortOrder = existingItems.length;
+    
+    // Clone template
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = template.innerHTML;
+    const newItem = wrapper.firstElementChild;
+    
+    // Update sort order
+    const sortOrderField = newItem.querySelector('.sort-order-field');
+    if (sortOrderField) {
+      sortOrderField.value = nextSortOrder;
+    }
+    newItem.setAttribute('data-sort-order', nextSortOrder);
+    
+    // Add to container
+    container.appendChild(newItem);
+    
+    // Update sort orders for all items
+    updateSortOrdersForContainer(container);
+    
+    // Reset flag
+    setTimeout(() => {
+      container.dataset.adding = 'false';
+    }, 100);
+  }
+  
+  // Add Product Specification
+  function addProductSpecification() {
+    const container = document.getElementById('product-specifications-container');
+    const template = document.getElementById('product-specification-template');
+    
+    if (!container || !template) return;
+    
+    // Prevent duplicate calls
+    if (container.dataset.adding === 'true') return;
+    container.dataset.adding = 'true';
+    
+    // Get next sort order
+    const existingItems = container.querySelectorAll('.sortable-item');
+    const nextSortOrder = existingItems.length;
+    
+    // Clone template
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = template.innerHTML;
+    const newItem = wrapper.firstElementChild;
+    
+    // Update sort order
+    const sortOrderField = newItem.querySelector('.sort-order-field');
+    if (sortOrderField) {
+      sortOrderField.value = nextSortOrder;
+    }
+    newItem.setAttribute('data-sort-order', nextSortOrder);
+    
+    // Add to container
+    container.appendChild(newItem);
+    
+    // Update sort orders for all items
+    updateSortOrdersForContainer(container);
+    
+    // Reset flag
+    setTimeout(() => {
+      container.dataset.adding = 'false';
+    }, 100);
+  }
+  
+  // Add Product Video
+  function addProductVideo() {
+    const container = document.getElementById('product-videos-container');
+    const template = document.getElementById('product-video-template');
+    
+    if (!container || !template) return;
+    
+    // Prevent duplicate calls
+    if (container.dataset.adding === 'true') return;
+    container.dataset.adding = 'true';
+    
+    // Get next sort order
+    const existingItems = container.querySelectorAll('.sortable-item');
+    const nextSortOrder = existingItems.length;
+    
+    // Clone template
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = template.innerHTML;
+    const newItem = wrapper.firstElementChild;
+    
+    // Update sort order
+    const sortOrderField = newItem.querySelector('.sort-order-field');
+    if (sortOrderField) {
+      sortOrderField.value = nextSortOrder;
+    }
+    newItem.setAttribute('data-sort-order', nextSortOrder);
+    
+    // Add to container
+    container.appendChild(newItem);
+    
+    // Update sort orders for all items
+    updateSortOrdersForContainer(container);
+    
+    // Reset flag
+    setTimeout(() => {
+      container.dataset.adding = 'false';
+    }, 100);
+  }
+  
+  // Update sort orders for a specific container
+  function updateSortOrdersForContainer(container) {
+    const items = container.querySelectorAll('.sortable-item');
+    let validIndex = 0;
+    
+    items.forEach((item, index) => {
+      // For images, check if they have files or current images
+      const fileInput = item.querySelector('.image-upload');
+      const hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
+      const hasCurrentImage = item.querySelector('.current-image-preview');
+      
+      // For other sections, always update sort order
+      const isImageSection = container.id === 'product-images-container';
+      const shouldUpdate = isImageSection ? (hasFile || hasCurrentImage) : true;
+      
+      if (shouldUpdate) {
+        const sortOrderField = item.querySelector('.sort-order-field');
+        if (sortOrderField) {
+          sortOrderField.value = validIndex;
+        }
+        item.setAttribute('data-sort-order', validIndex);
+        validIndex++;
+      }
+    });
+  }
+  
   // Drag & Drop functionality
   function initializeDragAndDrop() {
-    const container = document.getElementById('product-images-container');
-    if (!container) return;
+    const containers = [
+      'product-images-container',
+      'product-descriptions-container', 
+      'product-specifications-container',
+      'product-videos-container'
+    ];
+    
+    containers.forEach(containerId => {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      
+      initializeContainerDragAndDrop(container);
+    });
+  }
+  
+  function initializeContainerDragAndDrop(container) {
 
     let draggedElement = null;
     let draggedIndex = -1;
@@ -932,25 +1089,37 @@
       const items = Array.from(container.children);
       
       // Find the item we're hovering over
-      let targetIndex = -1;
-      items.forEach((item, index) => {
-        if (item === draggedElement) return;
+      const mouseY = e.clientY;
+      let hoveredItem = null;
+      
+      // Clear all drag-over classes first
+      items.forEach(item => item.classList.remove('drag-over'));
+      
+      // Sort items by position to handle overlapping correctly
+      const sortedItems = items
+        .filter(item => item !== draggedElement)
+        .map(item => ({
+          element: item,
+          rect: item.getBoundingClientRect()
+        }))
+        .sort((a, b) => a.rect.top - b.rect.top);
+      
+      // Find the closest item
+      for (let i = 0; i < sortedItems.length; i++) {
+        const item = sortedItems[i];
+        const itemCenter = item.rect.top + item.rect.height / 2;
         
-        const rect = item.getBoundingClientRect();
-        const itemCenter = rect.top + rect.height / 2;
-        
-        if (e.clientY < itemCenter) {
-          targetIndex = index;
+        if (mouseY < itemCenter) {
+          hoveredItem = item.element;
+          break;
         }
-      });
+      }
+      
+      // Add visual feedback
+      if (hoveredItem) {
+        hoveredItem.classList.add('drag-over');
+      }
 
-      // Update visual feedback
-      items.forEach((item, index) => {
-        item.classList.remove('drag-over');
-        if (index === targetIndex) {
-          item.classList.add('drag-over');
-        }
-      });
     }
 
     function handleMouseUp(e) {
@@ -973,19 +1142,42 @@
       // Now get fresh measurements
       const items = Array.from(container.children);
       
-      // Find the target position
+      // Find the target position based on mouse position
       let targetIndex = -1;
-      items.forEach((item, index) => {
-        if (item === draggedElement) return;
-        
+      const mouseY = e.clientY;
+      
+      // Get all items except the dragged one
+      const otherItems = items.filter(item => item !== draggedElement);
+      
+      // Find the item that the mouse is closest to
+      let closestItem = null;
+      let minDistance = Infinity;
+      
+      otherItems.forEach(item => {
         const rect = item.getBoundingClientRect();
         const itemCenter = rect.top + rect.height / 2;
+        const distance = Math.abs(mouseY - itemCenter);
         
-        if (e.clientY < itemCenter) {
-          targetIndex = index;
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestItem = item;
         }
       });
-
+      
+      if (closestItem) {
+        // Find the original index of the closest item
+        targetIndex = Array.from(container.children).indexOf(closestItem);
+        
+        // If mouse is above the center of the closest item, insert before it
+        // If mouse is below the center, insert after it
+        const rect = closestItem.getBoundingClientRect();
+        const itemCenter = rect.top + rect.height / 2;
+        
+        if (mouseY > itemCenter) {
+          targetIndex += 1; // Insert after the closest item
+        }
+      }
+      
       // If no target found, move to end
       if (targetIndex === -1) {
         targetIndex = items.length - 1;
@@ -993,10 +1185,25 @@
 
       // Move the element
       if (targetIndex !== draggedIndex) {
+        // Remove the dragged element from its current position
+        container.removeChild(draggedElement);
+        
+        // Get the updated items array (without the dragged element)
+        const updatedItems = Array.from(container.children);
+        
+        // Adjust target index after removal
+        let adjustedTargetIndex = targetIndex;
         if (targetIndex > draggedIndex) {
-          container.insertBefore(draggedElement, items[targetIndex + 1]);
+          adjustedTargetIndex = targetIndex - 1; // Items after dragged element shift up
+        }
+        
+        if (adjustedTargetIndex >= updatedItems.length) {
+          // Moving to the end
+          container.appendChild(draggedElement);
         } else {
-          container.insertBefore(draggedElement, items[targetIndex]);
+          // Insert at the adjusted target position
+          const targetElement = updatedItems[adjustedTargetIndex];
+          container.insertBefore(draggedElement, targetElement);
         }
         
         // Update sort order values
@@ -1024,12 +1231,16 @@
       let validIndex = 0;
       
       items.forEach((item, index) => {
+        // For images, check if they have files or current images
         const fileInput = item.querySelector('.image-upload');
         const hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
         const hasCurrentImage = item.querySelector('.current-image-preview');
         
-        // Only update sort order for items that have images
-        if (hasFile || hasCurrentImage) {
+        // For other sections, always update sort order
+        const isImageSection = container.id === 'product-images-container';
+        const shouldUpdate = isImageSection ? (hasFile || hasCurrentImage) : true;
+        
+        if (shouldUpdate) {
           const sortOrderField = item.querySelector('.sort-order-field');
           if (sortOrderField) {
             sortOrderField.value = validIndex;
@@ -1055,7 +1266,7 @@
         const dragHandle = document.createElement('div');
         dragHandle.className = 'drag-handle';
         dragHandle.innerHTML = '⋮⋮';
-        dragHandle.style.cssText = 'position: absolute; top: 10px; right: 10px; cursor: grab; color: #666; font-size: 16px; z-index: 10; display: block; visibility: visible; opacity: 1; pointer-events: auto; font-weight: bold; letter-spacing: 2px;';
+        dragHandle.style.cssText = 'position: absolute; top: 10px; right: 10px; cursor: grab; color: #666; font-size: 18px; z-index: 10;';
         
         // Ensure the item has relative positioning for absolute positioning to work
         if (getComputedStyle(item).position === 'static') {
@@ -1230,25 +1441,6 @@
     border: 1px solid #e9ecef;
   }
   
-  .delete-current-image {
-    background: #dc3545 !important;
-    color: white !important;
-    border: none !important;
-    cursor: pointer !important;
-    border-radius: 50% !important;
-    width: 20px !important;
-    height: 20px !important;
-    padding: 0 !important;
-    font-size: 12px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    line-height: 1 !important;
-  }
-  
-  .delete-current-image:hover {
-    background: #c82333 !important;
-  }
   
   .preview-image {
     display: block;
@@ -1613,6 +1805,9 @@
   .drag-handle {
     user-select: none;
     transition: color 0.2s ease;
+    font-family: monospace;
+    font-weight: bold;
+    letter-spacing: 1px;
   }
 
   .drag-handle:hover {
