@@ -33,11 +33,11 @@ module Api
         }, status: :internal_server_error
       end
 
-      def show
-        product = Product.includes(:brand, :category, :images, :variants, :specifications, :descriptions)
-                         .find_by(id: params[:id]) || 
-                  Product.includes(:brand, :category, :images, :variants, :specifications, :descriptions)
-                         .find_by(slug: params[:id])
+                  def show
+                    product = Product.includes(:brand, :category, :images, :variants, :specifications, :descriptions, :videos)
+                                     .find_by(id: params[:id]) ||
+                             Product.includes(:brand, :category, :images, :variants, :specifications, :descriptions, :videos)
+                                     .find_by(slug: params[:id])
         
         if product
           render json: ProductDetailSerializer.new(product).as_json

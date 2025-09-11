@@ -12,4 +12,5 @@ class ProductDetailSerializer < ActiveModel::Serializer
   has_many :variants, serializer: ProductVariantSerializer
   has_many :specifications, serializer: ProductSpecificationSerializer
   has_many :descriptions, serializer: ProductDescriptionSerializer
+  has_many :videos, serializer: ProductVideoSerializer
 end
