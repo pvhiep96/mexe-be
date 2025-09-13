@@ -6,7 +6,7 @@ class ImageUploader < CarrierWave::Uploader::Base
   
   # Override the directory where uploaded files will be stored.
   def store_dir
-    "uploads/#{model.class.to_s.underscore}/#{mounted_as}/#{model.id || 'tmp'}"
+    "uploads/#{model.class.to_s.underscore}/#{mounted_as}/#{model.id || "tmp_#{Time.now.to_i}"}"
   end
 
   # Process files as they are uploaded:

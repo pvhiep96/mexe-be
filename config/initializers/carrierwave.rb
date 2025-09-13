@@ -2,6 +2,10 @@ CarrierWave.configure do |config|
   config.permissions = 0666
   config.directory_permissions = 0777
   
+  # Ensure temp directory is accessible
+  config.root = Rails.root.join('public')
+  config.cache_dir = Rails.root.join('tmp/uploads')
+  
   if Rails.env.production?
     # Production settings
     config.fog_credentials = {

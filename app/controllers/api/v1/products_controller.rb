@@ -6,9 +6,36 @@ module Api
         per_page = (params[:per_page] || 20).to_i
 
         products = Product.active.includes(:brand, :category, :images, :variants, :specifications)
-                          .order(created_at: :desc)
-                          .page(page)
-                          .per(per_page)
+                          .search_by_query(params[:search])
+                          .filter_by_category(params[:category_id])
+                          .filter_by_brand(params[:brand_id])
+                          
+        # Apply additional filters
+        products = products.where(is_new: true) if params[:is_new] == 'true'
+        products = products.where(is_hot: true) if params[:is_hot] == 'true'
+        products = products.where(is_featured: true) if params[:is_featured] == 'true'
+        
+        # Apply sorting
+        products = case params[:sort]
+                  when 'price_asc'
+                    products.order(:price)
+                  when 'price_desc'
+                    products.order(price: :desc)
+                  when 'name_asc'
+                    products.order(:name)
+                  when 'name_desc'
+                    products.order(name: :desc)
+                  when 'newest'
+                    products.order(created_at: :desc)
+                  when 'oldest'
+                    products.order(created_at: :asc)
+                  else
+                    # If search query exists, keep search ordering, otherwise default ordering
+                    params[:search].present? ? products : products.order(created_at: :desc)
+                  end
+        
+        # Apply pagination
+        products = products.page(page).per(per_page)
 
         products_data = products.map do |product|
           ProductSerializer.new(product).as_json

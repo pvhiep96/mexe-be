@@ -38,6 +38,16 @@ class Product < ApplicationRecord
   scope :preorder, -> { where(is_preorder: true) }
   scope :filter_by_category, ->(category_id) { where(category_id: category_id) if category_id.present? }
   scope :filter_by_brand, ->(brand_id) { where(brand_id: brand_id) if brand_id.present? }
+  scope :search_by_query, ->(query) {
+    return all if query.blank?
+    
+    search_term = "%#{sanitize_sql_like(query)}%"
+    joins("LEFT JOIN brands ON products.brand_id = brands.id")
+      .where(
+        "products.name LIKE ? OR products.description LIKE ? OR products.short_description LIKE ? OR brands.name LIKE ?",
+        search_term, search_term, search_term, search_term
+      )
+  }
 
   def self.ransackable_attributes(auth_object = nil)
     %w[id name slug sku description short_description brand_id category_id price original_price discount_percent cost_price weight dimensions stock_quantity min_stock_alert is_active is_essential_accessories is_new is_hot is_preorder preorder_quantity preorder_end_date warranty_period meta_title meta_description view_count created_at updated_at]

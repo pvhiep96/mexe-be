@@ -53,6 +53,9 @@ Rails.application.routes.draw do
       resources :products, only: [:index, :show]
       resources :orders, only: [:index, :show, :create]
       
+      # Search routes
+      get 'search/products', to: 'search#products'
+      
       # Order tracking
       get 'orders/my_orders', to: 'order_tracking#my_orders'
       get 'orders/:id/track', to: 'order_tracking#show'

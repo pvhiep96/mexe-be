@@ -107,7 +107,7 @@ module Admin
         :is_essential_accessories, :is_best_seller, :is_new, :is_hot, :is_preorder, :is_trending, :is_ending_soon, :is_arriving_soon,
         product_images_attributes: [:id, :image, :alt_text, :sort_order, :is_primary, :_destroy],
         product_descriptions_attributes: [:id, :title, :content, :sort_order, :_destroy],
-        product_specifications_attributes: [:id, :spec_name, :spec_value, :unit, :position, :_destroy],
+        product_specifications_attributes: [:id, :spec_name, :spec_value, :unit, :sort_order, :_destroy],
         product_videos_attributes: [:id, :url, :title, :description, :sort_order, :is_active, :_destroy]
       ]
 
