@@ -221,12 +221,14 @@
           <% end %>
         </li>
         
-        <li>
-          <a href="#">
-            <span class="nav-icon">👥</span>
-            Users
-          </a>
-        </li>
+        <% if current_admin_user&.super_admin? %>
+          <li>
+            <%= link_to admin_admin_users_path, class: "#{current_page?(admin_admin_users_path) || request.path.start_with?('/admin/admin_users') ? 'active' : ''}" do %>
+              <span class="nav-icon">👥</span>
+              Users
+            <% end %>
+          </li>
+        <% end %>
         
         <li>
           <%= link_to admin_orders_path, class: "#{current_page?(admin_orders_path) || request.path.start_with?('/admin/orders') ? 'active' : ''}" do %>

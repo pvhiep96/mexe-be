@@ -88,13 +88,15 @@ class Product < ApplicationRecord
     # Get current admin user from Thread.current (set by controller)
     current_admin = Thread.current[:current_admin_user]
 
-    if current_admin.present? && !current_admin.super_admin?
+    # Only validate if is_active is being set to true by a non-super-admin
+    if current_admin.present? && !current_admin.super_admin? && is_active == true && is_active_was != true
       errors.add(:is_active, "Chỉ Super Admin mới có quyền thay đổi trạng thái hiển thị sản phẩm")
     end
   end
 
   def created_by_client?
-    client_id.present?
+    current_admin = Thread.current[:current_admin_user]
+    current_admin&.client? && client_id.present?
   end
 
   def should_create_edit_approval?
@@ -111,14 +113,14 @@ class Product < ApplicationRecord
   end
 
   def create_approval_request
-    product_approvals.create!(
+    product_approvals.create(
       status: :pending,
       approval_type: :creation
     )
   end
 
   def create_edit_approval_request
-    product_approvals.create!(
+    product_approvals.create(
       status: :pending,
       approval_type: :edit
     )

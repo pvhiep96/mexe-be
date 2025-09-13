@@ -2,13 +2,13 @@ class ProductApproval < ApplicationRecord
   belongs_to :product
   belongs_to :admin_user
 
-  enum status: {
+  enum :status, {
     pending: 0,
     approved: 1,
     rejected: 2
   }
 
-  enum approval_type: {
+  enum :approval_type, {
     creation: 'creation',
     edit: 'edit'
   }
