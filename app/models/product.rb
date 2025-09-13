@@ -11,6 +11,7 @@ class Product < ApplicationRecord
   has_many :wishlists, dependent: :destroy
   has_many :wished_by_users, through: :wishlists, source: :user
   has_many :product_reviews, dependent: :destroy
+  has_many :product_approvals, dependent: :destroy
   has_many :images, class_name: 'ProductImage'
   has_many :descriptions, class_name: 'ProductDescription'
   has_many :videos, class_name: 'ProductVideo'
@@ -30,6 +31,11 @@ class Product < ApplicationRecord
 
   # Custom validation for is_active field
   validate :can_update_is_active?, if: :is_active_changed?
+  
+  # Product approval workflow
+  before_save :set_client_if_needed
+  after_create :create_approval_request, if: :created_by_client?
+  after_update :create_edit_approval_request, if: :should_create_edit_approval?
 
   scope :active, -> { where(is_active: true) }
   scope :essential_accessories, -> { where(is_essential_accessories: true) }
@@ -49,13 +55,6 @@ class Product < ApplicationRecord
       )
   }
 
-  def self.ransackable_attributes(auth_object = nil)
-    %w[id name slug sku description short_description brand_id category_id price original_price discount_percent cost_price weight dimensions stock_quantity min_stock_alert is_active is_essential_accessories is_new is_hot is_preorder preorder_quantity preorder_end_date warranty_period meta_title meta_description view_count created_at updated_at]
-  end
-
-  def self.ransackable_associations(auth_object = nil)
-    %w[brand category product_images product_specifications product_videos product_variants order_items wishlists product_reviews]
-  end
 
   # Get primary image or first image
   def primary_image
@@ -68,6 +67,21 @@ class Product < ApplicationRecord
     primary_image.image_url
   end
 
+  # Check if product has pending approval
+  def has_pending_approval?
+    product_approvals.pending.exists?
+  end
+
+  # Get latest approval status
+  def latest_approval
+    product_approvals.order(created_at: :desc).first
+  end
+
+  # Check if product needs approval
+  def needs_approval?
+    !is_active? && created_by_client?
+  end
+
   private
 
   def can_update_is_active?
@@ -76,6 +90,46 @@ class Product < ApplicationRecord
 
     if current_admin.present? && !current_admin.super_admin?
       errors.add(:is_active, "Chỉ Super Admin mới có quyền thay đổi trạng thái hiển thị sản phẩm")
+    end
+  end
+
+  def created_by_client?
+    client_id.present?
+  end
+
+  def should_create_edit_approval?
+    # Only create edit approval if product was updated by a different user than the client
+    # and the client exists and product has significant changes
+    current_admin = Thread.current[:current_admin_user]
+    return false unless client_id.present?
+    return false unless current_admin&.client?
+    return false if current_admin.id == client_id
+    
+    # Check if important fields were changed
+    important_fields = %w[name description price stock_quantity brand_id category_id]
+    (changed & important_fields).any?
+  end
+
+  def create_approval_request
+    product_approvals.create!(
+      status: :pending,
+      approval_type: :creation
+    )
+  end
+
+  def create_edit_approval_request
+    product_approvals.create!(
+      status: :pending,
+      approval_type: :edit
+    )
+  end
+
+  def set_client_if_needed
+    current_admin = Thread.current[:current_admin_user]
+    if current_admin&.client? && client_id.blank?
+      self.client_id = current_admin.id
+      # Ensure client-created products are inactive by default
+      self.is_active = false
     end
   end
 end

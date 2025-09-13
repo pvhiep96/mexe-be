@@ -32,6 +32,8 @@ gem "jwt"
 # Pagination
 gem "kaminari"
 
+# Search and filtering - removed ransack
+
 # Administrate for admin interface
 gem "administrate"
 gem "devise"

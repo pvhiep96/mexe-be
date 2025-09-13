@@ -1,0 +1,332 @@
+<div class="admin-users-index">
+  <div class="header" style="margin-bottom: 30px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <h1>👥 Quản lý tài khoản</h1>
+        <p style="color: #666; margin: 0;">Quản lý tài khoản Super Admin và NPP</p>
+      </div>
+      <div>
+        <%= link_to "➕ Tạo tài khoản mới", new_admin_admin_user_path, class: "btn btn-primary" %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter and Search -->
+  <div class="card" style="margin-bottom: 30px;">
+    <h3>Bộ lọc và tìm kiếm</h3>
+    <%= form_with url: admin_admin_users_path, method: :get, local: true, class: "filter-form" do |form| %>
+      <div class="form-row">
+        <div class="form-group">
+          <%= form.label :role, "Loại tài khoản" %>
+          <%= form.select :role, 
+              options_for_select([
+                ['Tất cả', ''],
+                ['Super Admin', 'super_admin'],
+                ['NPP (Client)', 'client']
+              ], params[:role]), 
+              {}, { class: "form-control" } %>
+        </div>
+        <div class="form-group">
+          <%= form.label :search, "Tìm kiếm theo email" %>
+          <%= form.text_field :search, 
+              value: params[:search], 
+              placeholder: "Nhập email để tìm kiếm...", 
+              class: "form-control" %>
+        </div>
+        <div class="form-group">
+          <%= form.submit "Tìm kiếm", class: "btn btn-secondary" %>
+          <%= link_to "Xóa bộ lọc", admin_admin_users_path, class: "btn btn-outline" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Users Table -->
+  <div class="card">
+    <h3>Danh sách tài khoản</h3>
+    <% if @admin_users.any? %>
+      <div class="table-responsive">
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Loại tài khoản</th>
+              <th>Tên công ty</th>
+              <th>Điện thoại</th>
+              <th>Sản phẩm</th>
+              <th>Đơn hàng</th>
+              <th>Ngày tạo</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @admin_users.each do |user| %>
+              <tr>
+                <td>
+                  <div class="user-email">
+                    <strong><%= user.email %></strong>
+                    <% if user == current_admin_user %>
+                      <span class="badge badge-current">Hiện tại</span>
+                    <% end %>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge badge-<%= user.super_admin? ? 'primary' : 'info' %>">
+                    <%= user.super_admin? ? 'Super Admin' : 'NPP' %>
+                  </span>
+                </td>
+                <td><%= user.client_name || '-' %></td>
+                <td><%= user.client_phone || '-' %></td>
+                <td>
+                  <span class="stat-number"><%= user.products.count %></span>
+                </td>
+                <td>
+                  <span class="stat-number"><%= user.orders_as_client.count %></span>
+                </td>
+                <td><%= user.created_at.strftime("%d/%m/%Y") %></td>
+                <td>
+                  <div class="action-buttons">
+                    <%= link_to "👁️", admin_admin_user_path(user), class: "btn btn-sm btn-outline", title: "Xem chi tiết" %>
+                    <%= link_to "✏️", edit_admin_admin_user_path(user), class: "btn btn-sm btn-outline", title: "Chỉnh sửa" %>
+                    <% if user != current_admin_user %>
+                      <%= link_to "🗑️", admin_admin_user_path(user), 
+                          method: :delete, 
+                          class: "btn btn-sm btn-danger", 
+                          title: "Xóa tài khoản",
+                          data: { 
+                            confirm: "Bạn có chắc chắn muốn xóa tài khoản #{user.email}?",
+                            turbo_method: :delete
+                          } %>
+                    <% end %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination-wrapper">
+        <%= paginate @admin_users %>
+      </div>
+    <% else %>
+      <div class="empty-state">
+        <div class="empty-icon">👥</div>
+        <h3>Chưa có tài khoản nào</h3>
+        <p>Tạo tài khoản đầu tiên để bắt đầu quản lý hệ thống.</p>
+        <%= link_to "Tạo tài khoản mới", new_admin_admin_user_path, class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<style>
+  .admin-users-index {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+  }
+
+  .card h3 {
+    margin-bottom: 20px;
+    color: #333;
+    border-bottom: 2px solid #f8f9fa;
+    padding-bottom: 10px;
+  }
+
+  .btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s ease;
+  }
+
+  .btn-primary {
+    background: #007bff;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: #0056b3;
+  }
+
+  .btn-secondary {
+    background: #6c757d;
+    color: white;
+  }
+
+  .btn-secondary:hover {
+    background: #545b62;
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: #007bff;
+    border: 1px solid #007bff;
+  }
+
+  .btn-outline:hover {
+    background: #007bff;
+    color: white;
+  }
+
+  .btn-danger {
+    background: #dc3545;
+    color: white;
+  }
+
+  .btn-danger:hover {
+    background: #c82333;
+  }
+
+  .btn-sm {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+
+  .filter-form {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 20px;
+    align-items: end;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .form-group label {
+    font-weight: bold;
+    color: #333;
+  }
+
+  .form-control {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  .users-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+
+  .users-table th,
+  .users-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .users-table th {
+    background: #f8f9fa;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .users-table tr:hover {
+    background: #f8f9fa;
+  }
+
+  .user-email {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  .badge-primary {
+    background: #007bff;
+    color: white;
+  }
+
+  .badge-info {
+    background: #17a2b8;
+    color: white;
+  }
+
+  .badge-current {
+    background: #28a745;
+    color: white;
+  }
+
+  .stat-number {
+    font-weight: bold;
+    color: #007bff;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 5px;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+  }
+
+  .empty-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+  }
+
+  .empty-state h3 {
+    margin-bottom: 10px;
+    color: #333;
+  }
+
+  .pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  @media (max-width: 768px) {
+    .form-row {
+      flex-direction: column;
+    }
+    
+    .users-table {
+      font-size: 12px;
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+    }
+  }
+</style>

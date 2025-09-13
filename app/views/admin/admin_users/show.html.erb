@@ -1,0 +1,367 @@
+<div class="admin-user-show">
+  <div class="header" style="margin-bottom: 30px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <h1>👤 Chi tiết tài khoản</h1>
+        <p style="color: #666; margin: 0;"><%= @admin_user.email %></p>
+      </div>
+      <div>
+        <%= link_to "✏️ Chỉnh sửa", edit_admin_admin_user_path(@admin_user), class: "btn btn-primary" %>
+        <%= link_to "← Quay lại", admin_admin_users_path, class: "btn btn-secondary" %>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px;">
+    <!-- User Information -->
+    <div class="card">
+      <h3>Thông tin tài khoản</h3>
+      <div class="user-info">
+        <div class="info-item">
+          <strong>Email:</strong>
+          <span><%= @admin_user.email %></span>
+        </div>
+        
+        <div class="info-item">
+          <strong>Loại tài khoản:</strong>
+          <span class="badge badge-<%= @admin_user.super_admin? ? 'primary' : 'info' %>">
+            <%= @admin_user.super_admin? ? 'Super Admin' : 'NPP (Client)' %>
+          </span>
+        </div>
+        
+        <% if @admin_user.client? %>
+          <div class="info-item">
+            <strong>Tên công ty:</strong>
+            <span><%= @admin_user.client_name || 'Chưa cập nhật' %></span>
+          </div>
+          
+          <div class="info-item">
+            <strong>Điện thoại:</strong>
+            <span><%= @admin_user.client_phone || 'Chưa cập nhật' %></span>
+          </div>
+          
+          <% if @admin_user.client_address.present? %>
+            <div class="info-item">
+              <strong>Địa chỉ:</strong>
+              <span><%= @admin_user.client_address %></span>
+            </div>
+          <% end %>
+        <% end %>
+        
+        <div class="info-item">
+          <strong>Ngày tạo:</strong>
+          <span><%= @admin_user.created_at.strftime("%d/%m/%Y %H:%M") %></span>
+        </div>
+        
+        <div class="info-item">
+          <strong>Cập nhật lần cuối:</strong>
+          <span><%= @admin_user.updated_at.strftime("%d/%m/%Y %H:%M") %></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="card">
+      <h3>Thống kê hoạt động</h3>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-icon">📦</div>
+          <div class="stat-content">
+            <h4><%= @products_count %></h4>
+            <p>Sản phẩm</p>
+          </div>
+        </div>
+        
+        <div class="stat-item">
+          <div class="stat-icon">📋</div>
+          <div class="stat-content">
+            <h4><%= @orders_count %></h4>
+            <p>Đơn hàng</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Products -->
+  <% if @recent_products.any? %>
+    <div class="card" style="margin-top: 20px;">
+      <h3>Sản phẩm gần đây</h3>
+      <div class="products-list">
+        <% @recent_products.each do |product| %>
+          <div class="product-item">
+            <div class="product-info">
+              <h4><%= link_to product.name, admin_product_path(product) %></h4>
+              <p><%= product.short_description&.truncate(100) %></p>
+              <div class="product-meta">
+                <span class="status-badge status-<%= product.is_active? ? 'active' : 'inactive' %>">
+                  <%= product.is_active? ? 'Hoạt động' : 'Chờ duyệt' %>
+                </span>
+                <span class="price"><%= number_to_currency(product.price, unit: '₫', precision: 0) %></span>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Actions -->
+  <div class="card" style="margin-top: 20px;">
+    <h3>Thao tác</h3>
+    <div class="action-buttons">
+      <%= link_to "✏️ Chỉnh sửa thông tin", edit_admin_admin_user_path(@admin_user), class: "btn btn-primary" %>
+      
+      <% if @admin_user != current_admin_user %>
+        <%= link_to "🔑 Đặt lại mật khẩu", reset_password_admin_admin_user_path(@admin_user), 
+            method: :patch,
+            class: "btn btn-warning",
+            data: { 
+              confirm: "Bạn có chắc chắn muốn đặt lại mật khẩu cho #{@admin_user.email}?"
+            } %>
+        
+        <%= link_to "🗑️ Xóa tài khoản", admin_admin_user_path(@admin_user), 
+            method: :delete, 
+            class: "btn btn-danger",
+            data: { 
+              confirm: "Bạn có chắc chắn muốn xóa tài khoản #{@admin_user.email}? Hành động này không thể hoàn tác!",
+              turbo_method: :delete
+            } %>
+      <% else %>
+        <span class="text-muted">Không thể xóa tài khoản hiện tại</span>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<style>
+  .admin-user-show {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+
+  .card h3 {
+    margin-bottom: 20px;
+    color: #333;
+    border-bottom: 2px solid #f8f9fa;
+    padding-bottom: 10px;
+  }
+
+  .user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 4px solid #007bff;
+  }
+
+  .info-item strong {
+    color: #333;
+    min-width: 120px;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  .badge-primary {
+    background: #007bff;
+    color: white;
+  }
+
+  .badge-info {
+    background: #17a2b8;
+    color: white;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+  }
+
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+  }
+
+  .stat-icon {
+    font-size: 2rem;
+    opacity: 0.7;
+  }
+
+  .stat-content h4 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .stat-content p {
+    margin: 5px 0 0 0;
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .products-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .product-item {
+    padding: 15px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    background: #f8f9fa;
+  }
+
+  .product-info h4 {
+    margin: 0 0 8px 0;
+    color: #333;
+  }
+
+  .product-info h4 a {
+    text-decoration: none;
+    color: #007bff;
+  }
+
+  .product-info h4 a:hover {
+    text-decoration: underline;
+  }
+
+  .product-info p {
+    margin: 0 0 10px 0;
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .product-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+  }
+
+  .status-active {
+    background: #d4edda;
+    color: #155724;
+  }
+
+  .status-inactive {
+    background: #f8d7da;
+    color: #721c24;
+  }
+
+  .price {
+    font-weight: bold;
+    color: #28a745;
+  }
+
+  .btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s ease;
+    margin-right: 10px;
+    margin-bottom: 10px;
+  }
+
+  .btn-primary {
+    background: #007bff;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: #0056b3;
+  }
+
+  .btn-secondary {
+    background: #6c757d;
+    color: white;
+  }
+
+  .btn-secondary:hover {
+    background: #545b62;
+  }
+
+  .btn-warning {
+    background: #ffc107;
+    color: #212529;
+  }
+
+  .btn-warning:hover {
+    background: #e0a800;
+  }
+
+  .btn-danger {
+    background: #dc3545;
+    color: white;
+  }
+
+  .btn-danger:hover {
+    background: #c82333;
+  }
+
+  .action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .text-muted {
+    color: #6c757d;
+    font-style: italic;
+  }
+
+  @media (max-width: 768px) {
+    .info-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 5px;
+    }
+    
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+    }
+  }
+</style>

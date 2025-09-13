@@ -4,6 +4,11 @@ module Admin
 
     def index
       @products = Product.includes(:brand, :category, :product_images)
+      
+      # Filter products based on user role
+      unless current_admin_user&.super_admin?
+        @products = @products.where(client_id: current_admin_user.id)
+      end
 
       # Search functionality
       if params[:search].present?

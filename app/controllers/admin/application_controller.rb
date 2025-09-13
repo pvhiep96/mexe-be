@@ -34,7 +34,62 @@ module Admin
                         current_admin_user.products.order(created_at: :desc).limit(5)
     end
 
+    protected
+
+    def authorize_resource(resource)
+      case resource
+      when Class
+        authorize_resource_class(resource)
+      when Product
+        authorize_product(resource)
+      else
+        # Default authorization for other resources
+        return true if current_admin_user&.super_admin?
+      end
+    end
+
     private
+
+    def authorize_resource_class(resource_class)
+      case resource_class.name
+      when 'Product'
+        return true if current_admin_user&.can_manage_products?
+        raise_authorization_error("Bạn không có quyền quản lý sản phẩm")
+      when 'Order'
+        return true if current_admin_user&.can_manage_orders?
+        raise_authorization_error("Bạn không có quyền quản lý đơn hàng")
+      when 'AdminUser'
+        return true if current_admin_user&.can_manage_admin_users?
+        raise_authorization_error("Chỉ Super Admin mới có quyền quản lý tài khoản")
+      when 'ProductApproval'
+        return true if current_admin_user&.can_approve_products?
+        raise_authorization_error("Chỉ Super Admin mới có quyền duyệt sản phẩm")
+      else
+        return true if current_admin_user&.super_admin?
+        raise_authorization_error("Bạn không có quyền truy cập tính năng này")
+      end
+    end
+
+    def authorize_product(product)
+      if current_admin_user&.super_admin?
+        return true
+      elsif current_admin_user&.client?
+        # Client can only access their own products
+        if product.persisted? && product.client_id != current_admin_user.id
+          raise_authorization_error("Bạn chỉ có thể truy cập sản phẩm của mình")
+        end
+        # Set client_id for new products
+        product.client_id = current_admin_user.id if product.new_record?
+        return true
+      else
+        raise_authorization_error("Bạn không có quyền truy cập sản phẩm")
+      end
+    end
+
+    def raise_authorization_error(message)
+      redirect_to admin_root_path, alert: message
+    end
+
 
     # Override this value to specify the number of elements to display at a time
     # on index pages. Defaults to 20.

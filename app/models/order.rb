@@ -50,6 +50,8 @@ class Order < ApplicationRecord
     processing_delivered: 2
   }, _prefix: :processing
 
+  scope :processing_not_processed, -> { where(status_processed: :not_processed) }
+
   SHIPPING_PROVIDERS = [
     ['Giao Hàng Nhanh', 'ghn'],
     ['Giao Hàng Tiết Kiệm', 'ghtk'], 

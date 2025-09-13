@@ -24,6 +24,27 @@ Rails.application.routes.draw do
         patch :mark_all_as_read
       end
     end
+    
+    # Super Admin only routes
+    resources :product_approvals, only: [:index, :show] do
+      member do
+        patch :approve
+        patch :reject
+      end
+    end
+    
+    resources :admin_users do
+      member do
+        patch :grant_access
+        patch :revoke_access
+        patch :reset_password
+      end
+    end
+    
+    # Analytics routes
+    get 'analytics', to: 'analytics#index'
+    get 'analytics/client', to: 'analytics#client_analytics', as: :client_analytics
+    get 'analytics/npp/:npp_id', to: 'analytics#npp_detail', as: :npp_analytics
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

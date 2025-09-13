@@ -3,6 +3,7 @@ module Admin
     before_action :set_order, only: [:show, :update_shipping]
 
     def index
+      authorize_resource(Order)
       @orders = filtered_orders.includes(:user, :user_order_info, :products, :order_items)
                               .order(created_at: :desc)
                               .page(params[:page])

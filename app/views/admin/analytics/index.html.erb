@@ -1,0 +1,419 @@
+<div class="analytics-dashboard">
+  <div class="header" style="margin-bottom: 30px;">
+    <h1>📊 Báo cáo doanh thu tổng quan</h1>
+    <p style="color: #666; margin: 0;">Thống kê doanh thu và hiệu suất kinh doanh</p>
+  </div>
+
+  <!-- Date Range Filter -->
+  <div class="card" style="margin-bottom: 30px;">
+    <h3>Chọn khoảng thời gian</h3>
+    <%= form_with url: admin_analytics_path, method: :get, local: true, class: "date-filter-form" do |form| %>
+      <div class="form-row">
+        <div class="form-group">
+          <%= form.label :start_date, "Từ ngày" %>
+          <%= form.date_field :start_date, value: @start_date, class: "form-control" %>
+        </div>
+        <div class="form-group">
+          <%= form.label :end_date, "Đến ngày" %>
+          <%= form.date_field :end_date, value: @end_date, class: "form-control" %>
+        </div>
+        <div class="form-group">
+          <%= form.submit "Cập nhật", class: "btn btn-primary" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Revenue Overview -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px;">
+    <div class="stat-card revenue-card">
+      <div class="stat-icon">💰</div>
+      <div class="stat-content">
+        <h3><%= number_to_currency(@total_revenue, unit: '₫', precision: 0) %></h3>
+        <p>Tổng doanh thu</p>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon">📦</div>
+      <div class="stat-content">
+        <h3><%= @top_selling_products.count %></h3>
+        <p>Sản phẩm bán chạy</p>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon">📋</div>
+      <div class="stat-content">
+        <h3><%= @recent_orders.count %></h3>
+        <p>Đơn hàng gần đây</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- NPP Revenue Breakdown -->
+  <div class="card" style="margin-bottom: 30px;">
+    <h3>Doanh thu theo NPP</h3>
+    <% if @npp_revenue_breakdown.any? %>
+      <div class="npp-breakdown">
+        <% @npp_revenue_breakdown.each do |item| %>
+          <div class="npp-item">
+            <div class="npp-info">
+              <h4><%= item[:npp].client_name %></h4>
+              <p><%= item[:npp].email %></p>
+            </div>
+            <div class="npp-stats">
+              <div class="revenue-amount">
+                <%= number_to_currency(item[:revenue], unit: '₫', precision: 0) %>
+              </div>
+              <div class="revenue-percentage">
+                <%= item[:percentage] %>%
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p>Chưa có dữ liệu doanh thu từ NPP.</p>
+    <% end %>
+  </div>
+
+  <!-- Monthly Revenue Chart -->
+  <div class="card" style="margin-bottom: 30px;">
+    <h3>Doanh thu theo tháng</h3>
+    <% if @monthly_revenue.any? %>
+      <div class="monthly-chart">
+        <% @monthly_revenue.each do |month, revenue| %>
+          <div class="month-item">
+            <div class="month-name"><%= month %></div>
+            <div class="month-bar">
+              <div class="bar-fill" style="width: <%= (@monthly_revenue.values.max > 0 ? (revenue.to_f / @monthly_revenue.values.max * 100) : 0) %>%"></div>
+            </div>
+            <div class="month-revenue"><%= number_to_currency(revenue, unit: '₫', precision: 0) %></div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p>Chưa có dữ liệu doanh thu theo tháng.</p>
+    <% end %>
+  </div>
+
+  <!-- Top Selling Products -->
+  <div class="card" style="margin-bottom: 30px;">
+    <h3>Sản phẩm bán chạy</h3>
+    <% if @top_selling_products.any? %>
+      <div class="product-list">
+        <% @top_selling_products.each_with_index do |item, index| %>
+          <div class="product-item">
+            <div class="product-rank">#<%= index + 1 %></div>
+            <div class="product-info">
+              <h4><%= link_to item[:product].name, admin_product_path(item[:product]) %></h4>
+              <p><%= item[:product].short_description&.truncate(100) %></p>
+            </div>
+            <div class="product-stats">
+              <div class="quantity-sold"><%= item[:quantity] %> sản phẩm</div>
+              <div class="product-price"><%= number_to_currency(item[:product].price, unit: '₫', precision: 0) %></div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p>Chưa có dữ liệu sản phẩm bán chạy.</p>
+    <% end %>
+  </div>
+
+  <!-- Recent Orders -->
+  <div class="card">
+    <h3>Đơn hàng gần đây</h3>
+    <% if @recent_orders.any? %>
+      <div class="order-list">
+        <% @recent_orders.each do |order| %>
+          <div class="order-item">
+            <div class="order-info">
+              <h4><%= link_to "Đơn hàng ##{order.order_number}", admin_order_path(order) %></h4>
+              <p><%= order.user_order_info&.buyer_name || order.guest_name || 'Khách hàng' %></p>
+              <p><%= order.created_at.strftime("%d/%m/%Y %H:%M") %></p>
+            </div>
+            <div class="order-stats">
+              <div class="order-status status-<%= order.status %>">
+                <%= order.status.humanize %>
+              </div>
+              <div class="order-amount">
+                <%= number_to_currency(order.total_amount, unit: '₫', precision: 0) %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p>Chưa có đơn hàng nào.</p>
+    <% end %>
+  </div>
+</div>
+
+<style>
+  .analytics-dashboard {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .date-filter-form {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 20px;
+    align-items: end;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .form-group label {
+    font-weight: bold;
+    color: #333;
+  }
+
+  .form-control {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+
+  .btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .btn-primary {
+    background: #007bff;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: #0056b3;
+  }
+
+  .stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .revenue-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }
+
+  .stat-icon {
+    font-size: 2.5rem;
+    opacity: 0.7;
+  }
+
+  .stat-content h3 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: bold;
+  }
+
+  .stat-content p {
+    margin: 5px 0 0 0;
+    opacity: 0.8;
+    font-size: 0.9rem;
+  }
+
+  .card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+
+  .card h3 {
+    margin-bottom: 20px;
+    color: #333;
+    border-bottom: 2px solid #f8f9fa;
+    padding-bottom: 10px;
+  }
+
+  .npp-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .npp-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #007bff;
+  }
+
+  .npp-info h4 {
+    margin: 0 0 5px 0;
+    color: #333;
+  }
+
+  .npp-info p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .npp-stats {
+    text-align: right;
+  }
+
+  .revenue-amount {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #28a745;
+  }
+
+  .revenue-percentage {
+    font-size: 0.9rem;
+    color: #666;
+  }
+
+  .monthly-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .month-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .month-name {
+    min-width: 120px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .month-bar {
+    flex: 1;
+    height: 20px;
+    background: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #28a745, #20c997);
+    transition: width 0.3s ease;
+  }
+
+  .month-revenue {
+    min-width: 120px;
+    text-align: right;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .product-list, .order-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .product-item, .order-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+  }
+
+  .product-rank {
+    background: #007bff;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+  }
+
+  .product-info, .order-info {
+    flex: 1;
+  }
+
+  .product-info h4, .order-info h4 {
+    margin: 0 0 5px 0;
+    color: #333;
+  }
+
+  .product-info h4 a, .order-info h4 a {
+    text-decoration: none;
+    color: #007bff;
+  }
+
+  .product-info h4 a:hover, .order-info h4 a:hover {
+    text-decoration: underline;
+  }
+
+  .product-info p, .order-info p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .product-stats, .order-stats {
+    text-align: right;
+  }
+
+  .quantity-sold, .order-amount {
+    font-weight: bold;
+    color: #28a745;
+  }
+
+  .order-status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  .status-delivered {
+    background: #d4edda;
+    color: #155724;
+  }
+
+  .status-pending {
+    background: #fff3cd;
+    color: #856404;
+  }
+
+  .status-processing {
+    background: #cce5ff;
+    color: #004085;
+  }
+</style>
