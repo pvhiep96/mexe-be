@@ -2,7 +2,7 @@ class ImageUploader < CarrierWave::Uploader::Base
   include CarrierWave::MiniMagick
 
   # Choose what kind of storage to use for this uploader:
-  storage :file
+  storage ENV['USE_CLOUD_STORAGE'] == 'true' ? :fog : :file
 
   # Override the directory where uploaded files will be stored.
   def store_dir
