@@ -29,8 +29,8 @@ class Product < ApplicationRecord
   validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :stock_quantity, numericality: { greater_than_or_equal_to: 0 }
 
-  # Custom validation for is_active field
-  validate :can_update_is_active?, if: :is_active_changed?
+  # Custom validation for Status & Flags fields - only Super Admin can edit
+  validate :can_update_status_flags?, if: :status_flags_changed?
   
   # Product approval workflow
   before_save :set_client_if_needed
@@ -84,13 +84,28 @@ class Product < ApplicationRecord
 
   private
 
-  def can_update_is_active?
+  def status_flags_changed?
+    # Check if any Status & Flags fields have changed
+    status_flags_fields.any? { |field| send("#{field}_changed?") }
+  end
+
+  def status_flags_fields
+    %w[is_active is_essential_accessories is_best_seller is_new is_hot is_preorder is_trending is_ending_soon is_arriving_soon]
+  end
+
+  def can_update_status_flags?
     # Get current admin user from Thread.current (set by controller)
     current_admin = Thread.current[:current_admin_user]
 
-    # Only validate if is_active is being set to true by a non-super-admin
-    if current_admin.present? && !current_admin.super_admin? && is_active == true && is_active_was != true
-      errors.add(:is_active, "Chỉ Super Admin mới có quyền thay đổi trạng thái hiển thị sản phẩm")
+    # Only Super Admin can edit Status & Flags
+    if current_admin.present? && !current_admin.super_admin?
+      changed_status_flags = status_flags_fields.select { |field| send("#{field}_changed?") }
+      if changed_status_flags.any?
+        errors.add(:base, "Chỉ Super Admin mới có quyền chỉnh sửa Status & Flags của sản phẩm")
+        changed_status_flags.each do |field|
+          errors.add(field, "Chỉ Super Admin mới có quyền chỉnh sửa trường này")
+        end
+      end
     end
   end
 

@@ -109,16 +109,18 @@ module Admin
 
     def resource_params
       permitted_attrs = dashboard.permitted_attributes(action_name) + [
-        :is_essential_accessories, :is_best_seller, :is_new, :is_hot, :is_preorder, :is_trending, :is_ending_soon, :is_arriving_soon,
         product_images_attributes: [:id, :image, :alt_text, :sort_order, :is_primary, :_destroy],
         product_descriptions_attributes: [:id, :title, :content, :sort_order, :_destroy],
         product_specifications_attributes: [:id, :spec_name, :spec_value, :unit, :sort_order, :_destroy],
         product_videos_attributes: [:id, :url, :title, :description, :sort_order, :is_active, :_destroy]
       ]
 
-      # Only allow is_active for super_admin
+      # Only allow Status & Flags for super_admin
       if current_admin_user&.super_admin?
-        permitted_attrs << :is_active
+        permitted_attrs += [
+          :is_active, :is_essential_accessories, :is_best_seller, :is_new, :is_hot, 
+          :is_preorder, :is_trending, :is_ending_soon, :is_arriving_soon
+        ]
       end
 
       params.require(resource_class.model_name.param_key).permit(permitted_attrs)

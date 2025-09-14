@@ -98,46 +98,86 @@
       <label style="font-weight: bold;">🏷️ Product Status Flags</label>
     </div>
     <div class="field-unit__field" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 4px; background: #f8f9fa;">
-        <div style="display: flex; align-items: center; gap: 8px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <% if current_admin_user&.super_admin? %>
           <%= form.check_box :is_essential_accessories %>
-          <%= form.label :is_essential_accessories, "🔧 Essential Accessories (Phụ kiện thiết yếu)", class: "status-flag-label" %>
-        </div>
-        
-        <div style="display: flex; align-items: center; gap: 8px;">
+        <% else %>
+          <%= form.check_box :is_essential_accessories, { disabled: true } %>
+        <% end %>
+        <%= form.label :is_essential_accessories, "🔧 Essential Accessories (Phụ kiện thiết yếu)", class: "status-flag-label #{'disabled' unless current_admin_user&.super_admin?}" %>
+      </div>
+      
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <% if current_admin_user&.super_admin? %>
           <%= form.check_box :is_best_seller %>
-          <%= form.label :is_best_seller, "🏆 Best Seller (Bán chạy nhất)", class: "status-flag-label" %>
-        </div>
-      
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <%= form.check_box :is_new %>
-        <%= form.label :is_new, "🆕 New (Mới)", class: "status-flag-label" %>
+        <% else %>
+          <%= form.check_box :is_best_seller, { disabled: true } %>
+        <% end %>
+        <%= form.label :is_best_seller, "🏆 Best Seller (Bán chạy nhất)", class: "status-flag-label #{'disabled' unless current_admin_user&.super_admin?}" %>
       </div>
       
       <div style="display: flex; align-items: center; gap: 8px;">
-        <%= form.check_box :is_hot %>
-        <%= form.label :is_hot, "🔥 Hot (Thương Hiệu Mới - Ưu Đãi Đặc Biệt Nóng)", class: "status-flag-label" %>
+        <% if current_admin_user&.super_admin? %>
+          <%= form.check_box :is_new %>
+        <% else %>
+          <%= form.check_box :is_new, { disabled: true } %>
+        <% end %>
+        <%= form.label :is_new, "🆕 New (Mới)", class: "status-flag-label #{'disabled' unless current_admin_user&.super_admin?}" %>
       </div>
       
       <div style="display: flex; align-items: center; gap: 8px;">
-        <%= form.check_box :is_preorder %>
-        <%= form.label :is_preorder, "📦 Preorder (Đặt trước)", class: "status-flag-label" %>
+        <% if current_admin_user&.super_admin? %>
+          <%= form.check_box :is_hot %>
+        <% else %>
+          <%= form.check_box :is_hot, { disabled: true } %>
+        <% end %>
+        <%= form.label :is_hot, "🔥 Hot (Thương Hiệu Mới - Ưu Đãi Đặc Biệt Nóng)", class: "status-flag-label #{'disabled' unless current_admin_user&.super_admin?}" %>
       </div>
       
       <div style="display: flex; align-items: center; gap: 8px;">
-        <%= form.check_box :is_trending %>
-        <%= form.label :is_trending, "📈 Trending (Xu hướng)", class: "status-flag-label" %>
+        <% if current_admin_user&.super_admin? %>
+          <%= form.check_box :is_preorder %>
+        <% else %>
+          <%= form.check_box :is_preorder, { disabled: true } %>
+        <% end %>
+        <%= form.label :is_preorder, "📦 Preorder (Đặt trước)", class: "status-flag-label #{'disabled' unless current_admin_user&.super_admin?}" %>
       </div>
       
       <div style="display: flex; align-items: center; gap: 8px;">
-        <%= form.check_box :is_ending_soon %>
-        <%= form.label :is_ending_soon, "⏰ Ending Soon (Sắp kết thúc)", class: "status-flag-label" %>
+        <% if current_admin_user&.super_admin? %>
+          <%= form.check_box :is_trending %>
+        <% else %>
+          <%= form.check_box :is_trending, { disabled: true } %>
+        <% end %>
+        <%= form.label :is_trending, "📈 Trending (Xu hướng)", class: "status-flag-label #{'disabled' unless current_admin_user&.super_admin?}" %>
       </div>
       
       <div style="display: flex; align-items: center; gap: 8px;">
-        <%= form.check_box :is_arriving_soon %>
-        <%= form.label :is_arriving_soon, "🚚 Arriving Soon (Sắp về hàng)", class: "status-flag-label" %>
+        <% if current_admin_user&.super_admin? %>
+          <%= form.check_box :is_ending_soon %>
+        <% else %>
+          <%= form.check_box :is_ending_soon, { disabled: true } %>
+        <% end %>
+        <%= form.label :is_ending_soon, "⏰ Ending Soon (Sắp kết thúc)", class: "status-flag-label #{'disabled' unless current_admin_user&.super_admin?}" %>
+      </div>
+      
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <% if current_admin_user&.super_admin? %>
+          <%= form.check_box :is_arriving_soon %>
+        <% else %>
+          <%= form.check_box :is_arriving_soon, { disabled: true } %>
+        <% end %>
+        <%= form.label :is_arriving_soon, "🚚 Arriving Soon (Sắp về hàng)", class: "status-flag-label #{'disabled' unless current_admin_user&.super_admin?}" %>
       </div>
     </div>
+    
+    <% unless current_admin_user&.super_admin? %>
+      <div style="margin-top: 10px; padding: 10px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px;">
+        <div style="color: #856404; font-size: 14px;">
+          <strong>ℹ️ Thông báo:</strong> Chỉ Super Admin mới có quyền chỉnh sửa Status & Flags của sản phẩm.
+        </div>
+      </div>
+    <% end %>
   </div>
 
   <!-- Product Images Section -->
@@ -555,6 +595,7 @@
         CKEDITOR.replace(textarea.id, {
           height: 400,
           width: '100%',
+          maxWidth: '100%',
           language: 'vi',
           toolbar: [
             { name: 'document', items: [ 'Source', '-', 'Preview', '-', 'Templates' ] },
@@ -719,11 +760,11 @@
       reader.onload = function(e) {
         const previewDiv = document.createElement('div');
         previewDiv.className = 'bulk-preview-item';
-        previewDiv.style.cssText = 'position: relative; border: 1px solid #ddd; border-radius: 4px; overflow: hidden;';
+        previewDiv.style.cssText = 'position: relative; border: 1px solid #ddd; border-radius: 4px; overflow: hidden; max-width: 100%;';
         previewDiv.dataset.fileIndex = index;
         
         previewDiv.innerHTML = `
-          <img src="${e.target.result}" style="width: 100%; height: 120px; object-fit: cover;">
+          <img src="${e.target.result}" style="max-width: 100%; height: 120px; object-fit: cover;">
           <div style="padding: 5px; font-size: 11px; background: #f8f9fa;">
             <div style="font-weight: bold; margin-bottom: 2px;">${file.name}</div>
             <div>${(file.size / 1024).toFixed(1)} KB</div>
@@ -1484,8 +1525,10 @@
   
   #bulk-image-upload {
     width: 100%;
+    max-width: 100%;
     padding: 10px;
     border: 1px solid #ddd;
+    overflow-x: hidden;
     border-radius: 4px;
     cursor: pointer;
   }
@@ -1816,6 +1859,86 @@
 
   .sortable-item.dragging .drag-handle {
     cursor: grabbing;
+  }
+
+  /* Disabled Status & Flags styling */
+  .status-flag-label.disabled {
+    color: #6c757d !important;
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  input[type="checkbox"]:disabled + .status-flag-label.disabled {
+    color: #6c757d !important;
+    opacity: 0.6;
+  }
+  
+  input[type="checkbox"]:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  /* Disabled checkbox container */
+  .field-unit__field div:has(input[type="checkbox"]:disabled) {
+    opacity: 0.7;
+  }
+
+  /* Fix overflow issues */
+  .field-unit {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .field-unit__field {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* CKEditor container */
+  .cke_editor {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Image preview containers */
+  .image-preview {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .preview-image {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Bulk upload preview */
+  .bulk-preview-item {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .bulk-preview-item img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Form containers */
+  .nested-form {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Grid layouts */
+  .field-unit__field[style*="grid"] {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .field-unit__field[style*="grid-template-columns"] {
+      grid-template-columns: 1fr !important;
+    }
   }
 </style>
 
