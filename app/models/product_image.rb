@@ -13,4 +13,4 @@ class ProductImage < ApplicationRecord
   def image_url
     image.url if image.present?
   end
-end 
+end

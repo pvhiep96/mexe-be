@@ -41,6 +41,7 @@ gem "devise"
 # Image upload and processing
 gem "carrierwave"
 gem "mini_magick"
+gem "fog-aws"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ mswin mswin64 mingw x64_mingw jruby ]
@@ -55,6 +56,8 @@ gem 'active_model_serializers', '~> 0.10.14'# For JSON serialization
 
 # CORS support for API
 gem "rack-cors"
+
+gem "aws-sdk-s3"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
