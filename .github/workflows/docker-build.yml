@@ -1,0 +1,43 @@
+name: Docker Build & Push
+
+# on:
+#   push:
+#     branches:
+#       - main   # or your branch
+on:
+  workflow_dispatch: # Allows manual triggering from GitHub UI
+    # inputs:
+    #   environment:
+    #     description: 'Environment to deploy'
+    #     required: true
+    #     default: 'dev'
+    #     type: choice
+    #     options:
+    #       - dev
+    #       - prod
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout code
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      # 2. Set up Docker
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # 3. Log in to Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: quytv020494@gmail.com
+          password: 31121994aA
+
+      # 4. Run your script.sh
+      - name: Run Docker script
+        run: |
+          chmod +x ./build.sh
+          ./build.sh b.${GITHUB_RUN_NUMBER}   # pass tag as argument
