@@ -1,7 +1,7 @@
 module Api
   module V1
     class OrdersController < ::Api::ApplicationController
-      before_action :authenticate_user!, only: [:index, :show]
+      before_action :authenticate_user!, only: [:index]
 
       def index
         # Remove binding.pry
@@ -104,6 +104,9 @@ module Api
           # Always create user_order_info record to store buyer information from shipping form
           create_user_order_info(order)
           
+          # Send order confirmation email
+          send_order_confirmation_email(order)
+          
           render json: OrderSerializer.new(order).to_json, status: :created
         else
           Rails.logger.error("Order creation failed: #{order.errors.full_messages.join(', ')}")
@@ -186,6 +189,21 @@ module Api
         end
       rescue StandardError => e
         Rails.logger.error("Failed to create user_order_info: #{e.message}")
+      end
+
+      def send_order_confirmation_email(order)
+        # Reload order with associations to ensure data is fresh
+        order.reload
+
+        recipient_email = order.user_order_info&.buyer_email || order.guest_email
+        if recipient_email.present?
+          Rails.logger.info("Sending order confirmation email to #{recipient_email} for order #{order.order_number}")
+          OrderConfirmationMailer.confirmation(order).deliver_now
+        else
+          Rails.logger.warn("No email address found for order #{order.order_number} - skipping email")
+        end
+      rescue StandardError => e
+        Rails.logger.error("Failed to send order confirmation email for order #{order.order_number}: #{e.message}")
       end
     end
   end

@@ -1,0 +1,41 @@
+MEXE STORE - XÁC NHẬN ĐỚN HÀNG
+
+Xin chào <%= @user_order_info&.buyer_name || @order.guest_name %>!
+
+Cảm ơn bạn đã đặt hàng tại Mexe Store. Đơn hàng của bạn đã được tiếp nhận và đang được xử lý.
+
+=== THÔNG TIN ĐỚN HÀNG ===
+Mã đơn hàng: #<%= @order.order_number %>
+Ngày đặt: <%= @order.created_at.strftime("%d/%m/%Y %H:%M") %>
+Trạng thái: <%= @order.status.humanize %>
+Phương thức thanh toán: <%= @order.payment_method == 'cod' ? 'Thanh toán khi nhận hàng (COD)' : @order.payment_method %>
+
+=== SẢN PHẨM ĐÃ ĐẶT ===
+<% @order_items.each do |item| %>
+- <%= item.product_name %>
+  Số lượng: <%= item.quantity %> x <%= number_to_currency(item.unit_price, unit: "đ", format: "%n %u") %>
+  Thành tiền: <%= number_to_currency(item.total_price, unit: "đ", format: "%n %u") %>
+
+<% end %>
+Tổng cộng: <%= number_to_currency(@order.total_amount, unit: "đ", format: "%n %u") %>
+
+<% if @order.shipping_name.present? %>
+=== THÔNG TIN GIAO HÀNG ===
+Người nhận: <%= @order.shipping_name %>
+<% if @order.shipping_phone.present? %>Số điện thoại: <%= @order.shipping_phone %><% end %>
+<% if @order.delivery_address.present? %>Địa chỉ: <%= @order.delivery_address %><% end %>
+
+<% end %>
+<% if @order.payment_method == 'cod' %>
+=== THANH TOÁN COD ===
+Bạn sẽ thanh toán bằng tiền mặt khi nhận hàng.
+Vui lòng chuẩn bị đủ số tiền <%= number_to_currency(@order.total_amount, unit: "đ", format: "%n %u") %> để thanh toán cho shipper.
+
+<% end %>
+Chúng tôi sẽ liên hệ với bạn sớm nhất để xác nhận đơn hàng và thông báo thời gian giao hàng.
+
+Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua email này.
+
+Cảm ơn bạn đã tin tưởng Mexe Store!
+
+© 2025 Mexe Store. All rights reserved.

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xác nhận đơn hàng - Mexe Store</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: #4f46e5; color: white; padding: 20px; text-align: center; }
+    .content { padding: 20px; background: #f9f9f9; }
+    .order-info { background: white; padding: 15px; margin: 10px 0; border-radius: 5px; }
+    .item { border-bottom: 1px solid #eee; padding: 10px 0; }
+    .total { font-weight: bold; font-size: 18px; color: #4f46e5; }
+    .footer { text-align: center; padding: 20px; color: #666; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Mexe Store</h1>
+      <p>Cảm ơn bạn đã đặt hàng!</p>
+    </div>
+    
+    <div class="content">
+      <h2>Xin chào <%= @user_order_info&.buyer_name || @order.guest_name %>!</h2>
+      <p>Cảm ơn bạn đã đặt hàng tại Mexe Store. Đơn hàng của bạn đã được tiếp nhận và đang được xử lý.</p>
+      
+      <div class="order-info">
+        <h3>Thông tin đơn hàng</h3>
+        <p><strong>Mã đơn hàng:</strong> #<%= @order.order_number %></p>
+        <p><strong>Ngày đặt:</strong> <%= @order.created_at.strftime("%d/%m/%Y %H:%M") %></p>
+        <p><strong>Trạng thái:</strong> <%= @order.status.humanize %></p>
+        <p><strong>Phương thức thanh toán:</strong> 
+          <%= @order.payment_method == 'cod' ? 'Thanh toán khi nhận hàng (COD)' : @order.payment_method %>
+        </p>
+      </div>
+
+      <div class="order-info">
+        <h3>Sản phẩm đã đặt</h3>
+        <% @order_items.each do |item| %>
+          <div class="item">
+            <p><strong><%= item.product_name %></strong></p>
+            <p>Số lượng: <%= item.quantity %> x <%= number_to_currency(item.unit_price, unit: "đ", format: "%n %u") %></p>
+            <p>Thành tiền: <%= number_to_currency(item.total_price, unit: "đ", format: "%n %u") %></p>
+          </div>
+        <% end %>
+        <div class="total">
+          <p>Tổng cộng: <%= number_to_currency(@order.total_amount, unit: "đ", format: "%n %u") %></p>
+        </div>
+      </div>
+
+      <% if @order.shipping_name.present? %>
+        <div class="order-info">
+          <h3>Thông tin giao hàng</h3>
+          <p><strong>Người nhận:</strong> <%= @order.shipping_name %></p>
+          <% if @order.shipping_phone.present? %>
+            <p><strong>Số điện thoại:</strong> <%= @order.shipping_phone %></p>
+          <% end %>
+          <% if @order.delivery_address.present? %>
+            <p><strong>Địa chỉ:</strong> <%= @order.delivery_address %></p>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if @order.payment_method == 'cod' %>
+        <div class="order-info" style="background: #fef3cd; border: 1px solid #faebcc;">
+          <h3>Thông tin thanh toán COD</h3>
+          <p>Bạn sẽ thanh toán bằng tiền mặt khi nhận hàng. Vui lòng chuẩn bị đủ số tiền <%= number_to_currency(@order.total_amount, unit: "đ", format: "%n %u") %> để thanh toán cho shipper.</p>
+        </div>
+      <% end %>
+
+      <p>Chúng tôi sẽ liên hệ với bạn sớm nhất để xác nhận đơn hàng và thông báo thời gian giao hàng.</p>
+      <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua email này hoặc số điện thoại hỗ trợ.</p>
+    </div>
+    
+    <div class="footer">
+      <p>Cảm ơn bạn đã tin tướng Mexe Store!</p>
+      <p>© 2025 Mexe Store. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>
