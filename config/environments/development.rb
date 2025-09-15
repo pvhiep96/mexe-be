@@ -48,9 +48,9 @@ Rails.application.configure do
   config.action_mailer.smtp_settings = {
     address: 'smtp.gmail.com',
     port: 587,
-    domain: 'gmail.com',
-    user_name: 'EMAIL',
-    password: 'PASSWORD',
+    domain: '47.129.168.239',
+    user_name: ENV['GMAIL_USERNAME'], # Use environment variable for security
+    password: ENV['GMAIL_PASSWORD'], # Use environment variable for security
     authentication: :plain,
     enable_starttls_auto: true
   }
@@ -96,13 +96,13 @@ Rails.application.configure do
   config.hosts << "localhost"
   config.hosts << "127.0.0.1"
   config.hosts << "0.0.0.0"
-  
+
   # Allow all subdomains of trycloudflare.com for development
   config.hosts << ".trycloudflare.com"
-  
+
   # Disable force SSL check for development
   config.force_ssl = false
-  
+
   # Allow all hosts in development
   config.hosts.clear
 end
