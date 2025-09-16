@@ -96,12 +96,29 @@ Rails.application.configure do
   config.active_record.attributes_for_inspect = [ :id ]
 
   # config.hosts << "tough-coffee-bought-d.trycloudflare.com"
-  config.hosts.clear
+  # config.hosts.clear
   # Enable DNS rebinding protection and other `Host` header attacks.
-  # config.hosts = [
-  #   "example.com",     # Allow requests from example.com
-  #   /.*\.example\.com/ # Allow requests from subdomains like `www.example.com`
-  # ]
+  config.hosts = [
+    "47.129.168.239",     # Allow requests from production IP
+    "localhost",           # Allow localhost for development
+    "127.0.0.1"           # Allow localhost IP
+  ]
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+
+  # CORS Configuration for Production
+  config.middleware.insert_before 0, Rack::Cors do
+    allow do
+      origins 'http://47.129.168.239', 'https://47.129.168.239',
+              'http://47.129.168.239:80', 'http://47.129.168.239:3000',
+              'https://47.129.168.239:80', 'https://47.129.168.239:3000'
+
+      resource '*',
+        headers: :any,
+        methods: [:get, :post, :put, :patch, :delete, :options, :head],
+        credentials: true,
+        expose: ['access-token', 'expiry', 'token-type', 'Authorization'],
+        max_age: 600
+    end
+  end
 end
