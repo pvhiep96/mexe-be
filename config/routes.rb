@@ -45,6 +45,17 @@ Rails.application.routes.draw do
     get 'analytics', to: 'analytics#index'
     get 'analytics/client', to: 'analytics#client_analytics', as: :client_analytics
     get 'analytics/npp/:npp_id', to: 'analytics#npp_detail', as: :npp_analytics
+    
+    # Revenue Reports routes
+    resources :revenue_reports, only: [:index, :show] do
+      collection do
+        get :summary
+        get :trends
+        get :top_clients
+        get :client_dashboard
+        post :generate
+      end
+    end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
@@ -66,6 +77,11 @@ Rails.application.routes.draw do
       post 'auth/change_password', to: 'auth#change_password'
       get 'auth/profile', to: 'auth#profile'
       put 'auth/update_profile', to: 'auth#update_profile'
+      
+      # Admin Auth routes
+      post 'admin_auth/login', to: 'admin_auth#login'
+      get 'admin_auth/profile', to: 'admin_auth#profile'
+      post 'admin_auth/logout', to: 'admin_auth#logout'
       
       # Home routes
       get 'home', to: 'home#index'
@@ -90,6 +106,16 @@ Rails.application.routes.draw do
       get 'users/orders', to: 'orders#index'
       get 'users/favorites', to: 'users#favorites'
       get 'users/addresses', to: 'users#addresses'
+      
+      # Revenue Reports API routes (Admin only)
+      resources :revenue_reports, only: [:index, :show] do
+        collection do
+          get :summary
+          get :trends
+          get :top_clients
+          post :generate
+        end
+      end
       
       # Debug routes (only in development)
       if Rails.env.development?

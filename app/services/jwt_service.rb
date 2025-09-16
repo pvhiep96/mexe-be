@@ -34,10 +34,24 @@ class JwtService
     decoded&.first&.dig('user_id')
   end
 
+  def self.extract_admin_user_id(token)
+    decoded = decode(token)
+    decoded&.first&.dig('admin_user_id')
+  end
+
   def self.generate_user_token(user)
     payload = {
       user_id: user.id,
       email: user.email
+    }
+    encode(payload)
+  end
+
+  def self.generate_admin_user_token(admin_user)
+    payload = {
+      admin_user_id: admin_user.id,
+      email: admin_user.email,
+      role: admin_user.role
     }
     encode(payload)
   end

@@ -1,0 +1,481 @@
+<% content_for :title, "Báo cáo Doanh thu của tôi" %>
+
+<div class="client-revenue-dashboard">
+  <div class="dashboard-header">
+    <h1>Báo cáo Doanh thu & Lợi nhuận</h1>
+    <p class="dashboard-subtitle">Xem báo cáo doanh thu và lợi nhuận của bạn</p>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="quick-stats">
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-chart-line"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Doanh thu hôm nay</h3>
+        <div class="stat-value">
+          <%= number_to_currency(@today_revenue || 0, unit: "₫", precision: 0) %>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-coins"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Lợi nhuận hôm nay</h3>
+        <div class="stat-value">
+          <%= number_to_currency(@today_profit || 0, unit: "₫", precision: 0) %>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-shopping-cart"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Đơn hàng hôm nay</h3>
+        <div class="stat-value">
+          <%= @today_orders || 0 %>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-percentage"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Tỷ lệ lợi nhuận</h3>
+        <div class="stat-value">
+          <%= number_to_percentage(@today_profit_margin || 0, precision: 1) %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Period Selection -->
+  <div class="period-selection">
+    <h3>Chọn kỳ báo cáo</h3>
+    <div class="period-tabs">
+      <%= link_to "Hàng ngày", admin_revenue_reports_path(period: 'daily'), 
+          class: "period-tab #{'active' if @period == 'daily'}" %>
+      <%= link_to "Hàng tháng", admin_revenue_reports_path(period: 'monthly'), 
+          class: "period-tab #{'active' if @period == 'monthly'}" %>
+      <%= link_to "Hàng năm", admin_revenue_reports_path(period: 'yearly'), 
+          class: "period-tab #{'active' if @period == 'yearly'}" %>
+    </div>
+  </div>
+
+  <!-- Revenue Chart -->
+  <div class="chart-section">
+    <h3>Biểu đồ Doanh thu</h3>
+    <div class="chart-container">
+      <canvas id="revenueChart" width="400" height="200"></canvas>
+    </div>
+  </div>
+
+  <!-- Recent Reports Table -->
+  <div class="reports-section">
+    <h3>Báo cáo gần đây</h3>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Ngày</th>
+            <th>Doanh thu</th>
+            <th>Lợi nhuận</th>
+            <th>Đơn hàng</th>
+            <th>Sản phẩm bán</th>
+            <th>Tỷ lệ lợi nhuận</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if @recent_reports.any? %>
+            <% @recent_reports.each do |report| %>
+              <tr>
+                <td>
+                  <%= case @period
+                  when 'daily'
+                    report.report_date.strftime('%d/%m/%Y')
+                  when 'monthly'
+                    report.report_date.strftime('%m/%Y')
+                  when 'yearly'
+                    report.report_date.strftime('%Y')
+                  end %>
+                </td>
+                <td class="text-end">
+                  <%= number_to_currency(report.total_revenue, unit: "₫", precision: 0) %>
+                </td>
+                <td class="text-end">
+                  <%= number_to_currency(report.total_profit, unit: "₫", precision: 0) %>
+                </td>
+                <td class="text-center">
+                  <%= report.order_count %>
+                </td>
+                <td class="text-center">
+                  <%= report.product_count %>
+                </td>
+                <td class="text-center">
+                  <span class="profit-margin <%= report.profit_margin > 20 ? 'high' : report.profit_margin > 10 ? 'medium' : 'low' %>">
+                    <%= number_to_percentage(report.profit_margin, precision: 1) %>
+                  </span>
+                </td>
+              </tr>
+            <% end %>
+          <% else %>
+            <tr>
+              <td colspan="6" class="text-center text-muted">
+                Chưa có dữ liệu báo cáo
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Performance Summary -->
+  <div class="performance-summary">
+    <h3>Tổng quan hiệu suất</h3>
+    <div class="summary-grid">
+      <div class="summary-item">
+        <div class="summary-label">Doanh thu trung bình/ngày</div>
+        <div class="summary-value">
+          <%= number_to_currency(@avg_daily_revenue || 0, unit: "₫", precision: 0) %>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">Lợi nhuận trung bình/ngày</div>
+        <div class="summary-value">
+          <%= number_to_currency(@avg_daily_profit || 0, unit: "₫", precision: 0) %>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">Đơn hàng trung bình/ngày</div>
+        <div class="summary-value">
+          <%= (@avg_daily_orders || 0).round(1) %>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">Tỷ lệ lợi nhuận trung bình</div>
+        <div class="summary-value">
+          <%= number_to_percentage(@avg_profit_margin || 0, precision: 1) %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="action-buttons">
+    <%= link_to "Xem báo cáo chi tiết", admin_revenue_reports_path, class: "btn btn-primary" %>
+    <%= link_to "Xuất báo cáo", admin_revenue_reports_path(format: :pdf), class: "btn btn-success" %>
+    <%= link_to "Tạo báo cáo mới", generate_admin_revenue_reports_path(period: 'daily'), method: :post, class: "btn btn-info" %>
+  </div>
+</div>
+
+<style>
+.client-revenue-dashboard {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.dashboard-header h1 {
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.dashboard-subtitle {
+  color: #6c757d;
+  font-size: 16px;
+}
+
+.quick-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border-left: 5px solid #007bff;
+}
+
+.stat-icon {
+  font-size: 2.5rem;
+  color: #007bff;
+  opacity: 0.8;
+}
+
+.stat-content h3 {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  color: #6c757d;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.period-selection {
+  background: white;
+  border-radius: 8px;
+  padding: 25px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
+
+.period-selection h3 {
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.period-tabs {
+  display: flex;
+  gap: 10px;
+}
+
+.period-tab {
+  padding: 10px 20px;
+  border: 2px solid #dee2e6;
+  border-radius: 6px;
+  text-decoration: none;
+  color: #495057;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.period-tab:hover {
+  background-color: #f8f9fa;
+  border-color: #007bff;
+  color: #007bff;
+}
+
+.period-tab.active {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: white;
+}
+
+.chart-section {
+  background: white;
+  border-radius: 8px;
+  padding: 25px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
+
+.chart-section h3 {
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.chart-container {
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.reports-section {
+  background: white;
+  border-radius: 8px;
+  padding: 25px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
+
+.reports-section h3 {
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+  border-top: none;
+}
+
+.profit-margin.high {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.profit-margin.medium {
+  color: #ffc107;
+  font-weight: bold;
+}
+
+.profit-margin.low {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.performance-summary {
+  background: white;
+  border-radius: 8px;
+  padding: 25px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
+
+.performance-summary h3 {
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.summary-item {
+  text-align: center;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.summary-label {
+  font-size: 12px;
+  color: #6c757d;
+  margin-bottom: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.summary-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .quick-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .period-tabs {
+    flex-direction: column;
+  }
+  
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+</style>
+
+<script>
+// Simple chart implementation (you can replace with Chart.js or other library)
+document.addEventListener('DOMContentLoaded', function() {
+  const canvas = document.getElementById('revenueChart');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    
+    // Sample data - replace with actual data from your controller
+    const data = {
+      labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+      datasets: [{
+        label: 'Doanh thu (₫)',
+        data: [1200000, 1900000, 3000000, 5000000, 2000000, 3000000, 4500000],
+        borderColor: '#007bff',
+        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+        tension: 0.4
+      }]
+    };
+    
+    // Simple line chart drawing
+    drawLineChart(ctx, data);
+  }
+});
+
+function drawLineChart(ctx, data) {
+  const canvas = ctx.canvas;
+  const width = canvas.width;
+  const height = canvas.height;
+  const padding = 40;
+  
+  // Clear canvas
+  ctx.clearRect(0, 0, width, height);
+  
+  // Draw axes
+  ctx.strokeStyle = '#dee2e6';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(padding, padding);
+  ctx.lineTo(padding, height - padding);
+  ctx.lineTo(width - padding, height - padding);
+  ctx.stroke();
+  
+  // Draw data line
+  ctx.strokeStyle = '#007bff';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  
+  const maxValue = Math.max(...data.datasets[0].data);
+  const stepX = (width - 2 * padding) / (data.labels.length - 1);
+  
+  data.datasets[0].data.forEach((value, index) => {
+    const x = padding + index * stepX;
+    const y = height - padding - (value / maxValue) * (height - 2 * padding);
+    
+    if (index === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
+  });
+  
+  ctx.stroke();
+  
+  // Draw data points
+  ctx.fillStyle = '#007bff';
+  data.datasets[0].data.forEach((value, index) => {
+    const x = padding + index * stepX;
+    const y = height - padding - (value / maxValue) * (height - 2 * padding);
+    
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, 2 * Math.PI);
+    ctx.fill();
+  });
+}
+</script>
+

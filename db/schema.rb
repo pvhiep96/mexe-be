@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_09_13_011802) do
+ActiveRecord::Schema[7.2].define(version: 2025_09_14_055503) do
   create_table "active_admin_comments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
@@ -376,6 +376,23 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_13_011802) do
     t.index ["slug"], name: "index_products_on_slug", unique: true
   end
 
+  create_table "revenue_reports", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "client_id", null: false
+    t.date "report_date", null: false
+    t.string "report_type", null: false
+    t.decimal "total_revenue", precision: 15, scale: 2, default: "0.0"
+    t.decimal "total_profit", precision: 15, scale: 2, default: "0.0"
+    t.integer "order_count", default: 0
+    t.integer "product_count", default: 0
+    t.decimal "average_order_value", precision: 15, scale: 2, default: "0.0"
+    t.decimal "profit_margin", precision: 5, scale: 2, default: "0.0"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["client_id", "report_date", "report_type"], name: "index_revenue_reports_on_client_date_type", unique: true
+    t.index ["report_date"], name: "index_revenue_reports_on_report_date"
+    t.index ["report_type"], name: "index_revenue_reports_on_report_type"
+  end
+
   create_table "settings", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "setting_key", null: false
     t.text "setting_value"
@@ -496,6 +513,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_13_011802) do
   add_foreign_key "products", "admin_users", column: "client_id"
   add_foreign_key "products", "brands"
   add_foreign_key "products", "categories"
+  add_foreign_key "revenue_reports", "admin_users", column: "client_id"
   add_foreign_key "user_addresses", "users"
   add_foreign_key "user_order_infos", "orders"
   add_foreign_key "wishlists", "products"

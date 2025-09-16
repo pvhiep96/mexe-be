@@ -16,6 +16,7 @@ class AdminUser < ApplicationRecord
   has_many :orders_as_client, through: :order_items_as_client, source: :order
   has_many :client_notifications, dependent: :destroy
   has_many :product_approvals, dependent: :destroy
+  has_many :revenue_reports, foreign_key: :client_id, dependent: :destroy
 
   # Validations
   validates :client_name, presence: true, if: :client?
