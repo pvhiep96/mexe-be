@@ -12,7 +12,8 @@ services:
       - RAILS_MASTER_KEY="QdpQKkPGrP4+0c2xl1wBo5zG/jq68iG5jsZPCisf1IQ="
     depends_on:
       - db
-    command: ./bin/rails server -b 0.0.0.0
+    entrypoint: ["/rails/bin/docker-entrypoint"]
+    command: ["rails", "server", "-b", "0.0.0.0"]
     stdin_open: true
     tty: true
 

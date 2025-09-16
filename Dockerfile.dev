@@ -31,10 +31,8 @@ RUN bundle install
 # Copy the rest of the application
 COPY . .
 
-# Add a script to be executed every time the container starts
-COPY entrypoint.sh /usr/bin/
-# RUN chmod +x /usr/bin/entrypoint.sh
-# ENTRYPOINT ["entrypoint.sh"]
+# Ensure docker-entrypoint script is executable
+RUN chmod +x /rails/bin/docker-entrypoint
 
 # Configure the main process to run when running the image
 EXPOSE 3000

@@ -25,6 +25,10 @@ This directory contains Docker configurations for running the Rails application 
 
 3. **Start the development environment:**
    ```bash
+   # Option 1: Use the convenient script (recommended)
+   ./docker-dev.sh
+   
+   # Option 2: Manual command
    docker-compose up --build
    ```
 
@@ -154,6 +158,18 @@ mexe-be/
 - `rails_storage`: Rails Active Storage files
 - `rails_logs`: Rails application logs
 - `node_modules`: Node.js modules (development only)
+
+## Automatic Bundle Install
+
+The Docker setup now automatically handles `bundle install` when needed. The `entrypoint.sh` script will:
+
+1. Check if all gems are installed (`bundle check`)
+2. Run `bundle install` if any gems are missing
+3. Create the database if it doesn't exist
+4. Run database migrations
+5. Start the Rails server
+
+This means you no longer need to manually run `bundle install` when starting the containers.
 
 ## Troubleshooting
 

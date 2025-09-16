@@ -9,7 +9,8 @@ services:
       - .:/rails
       # - bundle_cache:/usr/local/bundle
       - node_modules:/rails/node_modules
-    command: ./bin/rails server -b 0.0.0.0
+    entrypoint: ["/rails/bin/docker-entrypoint"]
+    command: ["rails", "server", "-b", "0.0.0.0"]
     stdin_open: true
     tty: true
 
