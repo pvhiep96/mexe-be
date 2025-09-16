@@ -74,6 +74,14 @@ resource "aws_security_group" "instance" {
   }
 
   ingress {
+    description = "HTTP-admin"
+    from_port   = 81
+    to_port     = 81
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
     description = "HTTPS"
     from_port   = 443
     to_port     = 443
@@ -135,4 +143,23 @@ resource "aws_instance" "app" {
   tags = {
     Name = "${var.project}-app"
   }
+}
+
+resource "aws_s3_bucket" "rails_storage" {
+  bucket = "${var.project}-assets"
+  # acl    = "private"
+
+  tags = {
+    Name        = "Rails6ActiveStorage"
+    Environment = "production"
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "block" {
+  bucket = aws_s3_bucket.rails_storage.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
