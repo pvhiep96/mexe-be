@@ -1,0 +1,32 @@
+MEXE STORE
+==========
+
+Xin chào <%= @name %>,
+
+Cảm ơn bạn đã quan tâm đến sản phẩm của chúng tôi!
+
+THÔNG TIN SAN PHẨM:
+<% if @product_name.present? %>
+- Tên sản phẩm: <%= @product_name %>
+<% if @product_url.present? %>
+- Link sản phẩm: <%= @product_url %>
+<% end %>
+<% end %>
+
+THÔNG TIN LIÊN HỆ CỦA BẠN:
+- Họ tên: <%= @name %>
+- Email: <%= @email %>
+- Số điện thoại: <%= @phone %>
+- Địa chỉ: <%= @address %>
+
+Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất để tư vấn chi tiết về sản phẩm.
+
+Nếu bạn có bất kỳ câu hỏi nào khác, vui lòng liên hệ với chúng tôi qua:
+- Email: mexestore2025@gmail.com
+- Facebook Messenger
+- Zalo
+
+---
+Email này được gửi tự động từ hệ thống Mexe Store
+Vui lòng không trả lời email này
+© 2025 Mexe Store. All rights reserved.

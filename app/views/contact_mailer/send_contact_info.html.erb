@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        margin: 0;
+        padding: 20px;
+        background-color: #f4f4f4;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      }
+      .header {
+        text-align: center;
+        border-bottom: 2px solid #e74c3c;
+        padding-bottom: 20px;
+        margin-bottom: 30px;
+      }
+      .logo {
+        font-size: 28px;
+        font-weight: bold;
+        color: #e74c3c;
+      }
+      .content {
+        margin-bottom: 30px;
+      }
+      .product-info {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+      }
+      .contact-info {
+        background-color: #e8f4fd;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+      }
+      .footer {
+        text-align: center;
+        border-top: 1px solid #ddd;
+        padding-top: 20px;
+        margin-top: 30px;
+        color: #666;
+        font-size: 12px;
+      }
+      .btn {
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: #e74c3c;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        margin: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="logo">MEXE STORE</div>
+        <p>Cảm ơn bạn đã quan tâm đến sản phẩm của chúng tôi!</p>
+      </div>
+
+      <div class="content">
+        <p>Xin chào <strong><%= @name %></strong>,</p>
+
+        <p>Chúng tôi đã nhận được yêu cầu thông tin sản phẩm từ bạn. Dưới đây là thông tin chi tiết:</p>
+
+        <% if @product_name.present? %>
+        <div class="product-info">
+          <h3>📦 Thông tin sản phẩm</h3>
+          <p><strong>Tên sản phẩm:</strong> <%= @product_name %></p>
+          <% if @product_url.present? %>
+            <p><strong>Link sản phẩm:</strong> <a href="<%= @product_url %>" target="_blank"><%= @product_url %></a></p>
+          <% end %>
+        </div>
+        <% end %>
+
+        <div class="contact-info">
+          <h3>📞 Thông tin liên hệ của bạn</h3>
+          <p><strong>Họ tên:</strong> <%= @name %></p>
+          <p><strong>Email:</strong> <%= @email %></p>
+          <p><strong>Số điện thoại:</strong> <%= @phone %></p>
+          <p><strong>Địa chỉ:</strong> <%= @address %></p>
+        </div>
+
+        <p>Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất để tư vấn chi tiết về sản phẩm.</p>
+
+        <p>Nếu bạn có bất kỳ câu hỏi nào khác, vui lòng liên hệ với chúng tôi qua:</p>
+        <ul>
+          <li>📧 Email: mexestore2025@gmail.com</li>
+          <li>📱 Facebook Messenger</li>
+          <li>💬 Zalo</li>
+        </ul>
+      </div>
+
+      <div class="footer">
+        <p>Email này được gửi tự động từ hệ thống Mexe Store</p>
+        <p>Vui lòng không trả lời email này</p>
+        <p>&copy; 2025 Mexe Store. All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+</html>

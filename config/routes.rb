@@ -116,7 +116,10 @@ Rails.application.routes.draw do
           post :generate
         end
       end
-      
+
+      # Contact routes
+      post 'contacts', to: 'contacts#create'
+
       # Debug routes (only in development)
       if Rails.env.development?
         get 'debug/auth_test', to: 'debug#auth_test'
