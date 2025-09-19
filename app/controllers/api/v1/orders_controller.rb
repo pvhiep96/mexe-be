@@ -10,7 +10,7 @@ module Api
                             .where(params[:status] ? { status: params[:status] } : {})
                             .order(created_at: :desc)
                             .page(params[:page]).per(params[:per_page] || 20)
-        
+
         render json: orders.map { |order| OrderSerializer.new(order).as_json }
       end
 
@@ -26,18 +26,18 @@ module Api
         # Debug logging
         Rails.logger.info "Orders params: #{params.inspect}"
         Rails.logger.info "Orders key: #{params[:orders].inspect}"
-        
+
         # Check if orders params exist
         unless params[:orders]
           Rails.logger.error "Orders params missing: #{params.inspect}"
           render json: { error: 'Orders parameters are required' }, status: :bad_request
           return
         end
-        
+
         order_number = params[:orders][:order_number] || generate_order_number
 
         order = Order.find_or_initialize_by(order_number: order_number)
-        
+
         # Set user ID (use current_user if authenticated, otherwise allow guest orders)
         if current_user
           order.user_id = current_user.id
@@ -47,25 +47,25 @@ module Api
           order.guest_email = order_params[:guest_email]
           order.guest_phone = order_params[:guest_phone]
         end
-        
+
         # Check for existing order
         if order.persisted? && order.delivered?
           render json: { error: 'You have a recent pending order' }, status: :unprocessable_entity
           return
         end
-        
+
         # Set order attributes (exclude nested parameters)
         basic_params = order_params.except(:order_items, :shipping_info, :buyer_info)
         Rails.logger.info "Order basic params: #{basic_params.inspect}"
         order.assign_attributes(basic_params)
-        
+
         # Set shipping information
         Rails.logger.info "Shipping info: #{order_params[:shipping_info].inspect}"
-        
+
         if order_params[:shipping_info].present?
           shipping_info = order_params[:shipping_info]
           order.shipping_name = shipping_info[:shipping_name]
-          order.shipping_phone = shipping_info[:shipping_phone] 
+          order.shipping_phone = shipping_info[:shipping_phone]
           order.shipping_city = shipping_info[:shipping_city]
           order.shipping_district = shipping_info[:shipping_district]
           order.shipping_ward = shipping_info[:shipping_ward]
@@ -74,10 +74,10 @@ module Api
         else
           Rails.logger.warn "No shipping info found in params"
         end
-        
+
         # Manually build order items
         Rails.logger.info "Order items: #{order_params[:order_items].inspect}"
-        
+
         if order_params[:order_items].present?
           order_params[:order_items].each do |item_params|
             Rails.logger.info "Processing item: #{item_params.inspect}"
@@ -95,18 +95,18 @@ module Api
         else
           Rails.logger.warn "No order items found in params"
         end
-        
+
         order.valid?
         if order.save
           order.calculate_totals
           order.save
-          
+
           # Always create user_order_info record to store buyer information from shipping form
           create_user_order_info(order)
-          
+
           # Send order confirmation email
           send_order_confirmation_email(order)
-          
+
           render json: OrderSerializer.new(order).to_json, status: :created
         else
           Rails.logger.error("Order creation failed: #{order.errors.full_messages.join(', ')}")
@@ -117,6 +117,46 @@ module Api
       rescue StandardError => e
         puts e.message;
         render json: { error: "Failed to create order: #{e.message}" }, status: :unprocessable_entity
+      end
+
+#       {
+#   vnp_Amount: '250000000',
+#   vnp_BankCode: 'NCB',
+#   vnp_BankTranNo: 'VNP15154657',
+#   vnp_CardType: 'ATM',
+#   vnp_OrderInfo: 'ORD-20250829-64E480A6',
+#   vnp_PayDate: '20250829220319',
+#   vnp_ResponseCode: '00',
+#   vnp_TmnCode: '5YQD1DBZ',
+#   vnp_TransactionNo: '15154657',
+#   vnp_TransactionStatus: '00',
+#   vnp_TxnRef: 'ORDER_1756479704666_1xe00tg4i',
+#   vnp_SecureHash: 'd65c40e85507e085147e1432da8e5466a768dc51e3f7346a00abab58a10aa67435f9ab9794fa168f6641281ec7e0acbeb66e0782e8f81fb03430e16fddd1a884'
+# }
+
+      def completed
+        order = Order.find_by(order_number: params[:vnp_OrderInfo])
+        if(order.nil?)
+          render json: { error: 'Order not found' }, status: :not_found
+          return
+        end
+
+        if(order.payment_status == 'paid')
+          render json: { message: 'Order already paid' }, status: :ok
+          return
+        end
+
+        if(order.payment_status == 'pending')
+          order.payment_status = 'paid'
+          order.status = 'processing'
+          if order.save
+            send_order_confirmation_email(order)
+            render json: { message: 'Order already paid' }, status: :ok
+          else
+            render json: { error: 'Failed to update order status' }, status: :unprocessable_entity
+          end
+        end
+
       end
 
       private
@@ -145,10 +185,10 @@ module Api
         address_parts = [
           shipping_info[:delivery_address],
           shipping_info[:shipping_ward],
-          shipping_info[:shipping_district], 
+          shipping_info[:shipping_district],
           shipping_info[:shipping_city]
         ].compact.reject(&:blank?)
-        
+
         address_parts.join(', ')
       end
 
@@ -156,7 +196,7 @@ module Api
         # Use shipping_info from checkout form as primary source
         shipping_info = order_params[:shipping_info]
         buyer_info = order_params[:buyer_info]
-        
+
         # Determine buyer information from shipping form or user data
         if current_user
           # For logged in users, use shipping form data or fallback to user profile

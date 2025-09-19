@@ -24,7 +24,7 @@ Rails.application.routes.draw do
         patch :mark_all_as_read
       end
     end
-    
+
     # Super Admin only routes
     resources :product_approvals, only: [:index, :show] do
       member do
@@ -32,7 +32,7 @@ Rails.application.routes.draw do
         patch :reject
       end
     end
-    
+
     resources :admin_users do
       member do
         patch :grant_access
@@ -40,12 +40,12 @@ Rails.application.routes.draw do
         patch :reset_password
       end
     end
-    
+
     # Analytics routes
     get 'analytics', to: 'analytics#index'
     get 'analytics/client', to: 'analytics#client_analytics', as: :client_analytics
     get 'analytics/npp/:npp_id', to: 'analytics#npp_detail', as: :npp_analytics
-    
+
     # Revenue Reports routes
     resources :revenue_reports, only: [:index, :show] do
       collection do
@@ -77,22 +77,23 @@ Rails.application.routes.draw do
       post 'auth/change_password', to: 'auth#change_password'
       get 'auth/profile', to: 'auth#profile'
       put 'auth/update_profile', to: 'auth#update_profile'
-      
+
       # Admin Auth routes
       post 'admin_auth/login', to: 'admin_auth#login'
       get 'admin_auth/profile', to: 'admin_auth#profile'
       post 'admin_auth/logout', to: 'admin_auth#logout'
-      
+
       # Home routes
       get 'home', to: 'home#index'
-      
+
       # Resource routes
       resources :products, only: [:index, :show]
       resources :orders, only: [:index, :show, :create]
-      
+      post 'orders/completed', to: 'orders#completed'
+
       # Search routes
       get 'search/products', to: 'search#products'
-      
+
       # Order tracking
       get 'orders/my_orders', to: 'order_tracking#my_orders'
       get 'orders/:id/track', to: 'order_tracking#show'
@@ -100,13 +101,13 @@ Rails.application.routes.draw do
       resources :categories, only: [:index, :show]
       resources :stores, only: [:index]
       resources :brands, only: [:index, :show]
-      
+
       # User routes
       get 'users/me', to: 'users#show'
       get 'users/orders', to: 'orders#index'
       get 'users/favorites', to: 'users#favorites'
       get 'users/addresses', to: 'users#addresses'
-      
+
       # Revenue Reports API routes (Admin only)
       resources :revenue_reports, only: [:index, :show] do
         collection do
