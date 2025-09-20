@@ -72,6 +72,29 @@ module Api
           render json: { error: 'Product not found' }, status: :not_found
         end
       end
+
+      # Test endpoint to verify payment options data
+      def payment_options_test
+        products_with_options = Product.where(
+          'full_payment_transfer = ? OR partial_advance_payment = ?',
+          true, true
+        ).limit(5)
+
+        test_data = products_with_options.map do |product|
+          {
+            id: product.id,
+            name: product.name,
+            has_payment_options: product.has_payment_options?,
+            primary_payment_option: product.primary_payment_option
+          }.merge(product.payment_options_attributes)
+        end
+
+        render json: {
+          message: 'Payment options test data',
+          products_count: products_with_options.count,
+          products: test_data
+        }
+      end
     end
   end
 end

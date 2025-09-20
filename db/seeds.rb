@@ -8,10 +8,8 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
-puts "Seeding database..."
 
 # Create settings
-puts "Creating settings..."
 [
   { setting_key: 'site_name', setting_value: 'Mexe - Phụ Kiện Ô Tô & Workspace', setting_type: 'string', description: 'Tên website' },
   { setting_key: 'site_description', setting_value: 'Chuyên cung cấp phụ kiện ô tô chất lượng cao và workspace hiệu quả', setting_type: 'string', description: 'Mô tả website' },
@@ -26,11 +24,9 @@ puts "Creating settings..."
 end
 
 # Create categories
-puts "Creating categories..."
 # Create parent categories first
 auto_category = Category.create(name: 'Phụ Kiện Ô Tô', slug: 'phu-kien-o-to', description: 'Các phụ kiện cần thiết cho ô tô')
 
-puts "Auto category ID: #{auto_category.id}" if auto_category.persisted?
 
 # Create subcategories  
 if auto_category.persisted?
@@ -45,7 +41,6 @@ if auto_category.persisted?
 end
 
 # Create brands
-puts "Creating brands..."
 brands = Brand.create([
   { name: 'Honda Genuine Parts', slug: 'honda-genuine-parts', description: 'Phụ kiện chính hãng Honda', founded_year: 1948, field: 'Automotive Parts', story: 'Honda Genuine Parts cung cấp phụ kiện chính hãng chất lượng cao', sort_order: 1 },
   { name: 'Toyota Genuine Parts', slug: 'toyota-genuine-parts', description: 'Phụ kiện chính hãng Toyota', founded_year: 1937, field: 'Automotive Parts', story: 'Toyota Genuine Parts đảm bảo chất lượng và độ bền', sort_order: 2 },
@@ -58,7 +53,6 @@ brands = Brand.create([
 ])
 
 # Create admin users first (needed for client_id assignment)
-puts "Creating admin users..."
 
 # Super Admin
 super_admin = AdminUser.find_or_create_by(email: 'admin@mexe.com') do |admin|
@@ -87,7 +81,6 @@ client2 = AdminUser.find_or_create_by(email: 'client2@mexe.com') do |admin|
 end
 
 # Create products with client_id assignment
-puts "Creating products..."
 products = Product.create([
   {
     name: 'Camera Hành Trình 4K AUTOLIGHT AL-2024',
@@ -253,7 +246,6 @@ products = Product.create([
 ])
 
 # Create product specifications
-puts "Creating product specifications..."
 ProductSpecification.create([
   # Camera AUTOLIGHT AL-2024
   { product_id: 1, spec_name: 'Độ phân giải', spec_value: '4K (3840x2160)', sort_order: 1 },
@@ -309,13 +301,10 @@ ProductSpecification.create([
 ])
 
 # Create product images (Note: Using sample URLs, in production these would be actual uploaded files)
-puts "Creating product images..."
-puts "Note: ProductImages will be created without actual files - you can upload real images through the admin interface"
 # For now, we'll skip creating ProductImages in seeds since CarrierWave requires actual files
 # You can upload images through the admin interface after running seeds
 
 # Create product descriptions
-puts "Creating product descriptions..."
 ProductDescription.create([
   # Camera AUTOLIGHT AL-2024 descriptions
   {
@@ -496,7 +485,6 @@ ProductDescription.create([
 ])
 
 # Create product videos
-puts "Creating product videos..."
 ProductVideo.create([
   # Camera AUTOLIGHT videos
   {
@@ -608,7 +596,6 @@ ProductVideo.create([
 ])
 
 # Create product variants
-puts "Creating product variants..."
 ProductVariant.create([
   # Camera AUTOLIGHT variants
   { product_id: 1, variant_name: 'Màu sắc', variant_value: 'Đen', price_adjustment: 0, stock_quantity: 30 },
@@ -656,7 +643,6 @@ ProductVariant.create([
 ])
 
 # Create shipping zones
-puts "Creating shipping zones..."
 ShippingZone.create([
   { name: 'Hà Nội', cities: ['Hà Nội'], shipping_fee: 20000, free_shipping_threshold: 500000, estimated_days: '1-2 ngày' },
   { name: 'TP. Hồ Chí Minh', cities: ['TP. Hồ Chí Minh'], shipping_fee: 20000, free_shipping_threshold: 500000, estimated_days: '1-2 ngày' },
@@ -665,7 +651,6 @@ ShippingZone.create([
 ])
 
 # Create stores
-puts "Creating stores..."
 Store.create([
   {
     name: 'Mexe Store Hà Nội',
@@ -694,7 +679,6 @@ Store.create([
 ])
 
 # Create coupons
-puts "Creating coupons..."
 Coupon.create([
   {
     code: 'WELCOME10',
@@ -724,7 +708,6 @@ Coupon.create([
 ])
 
 # Create articles
-puts "Creating articles..."
 articles = Article.create([
   {
     title: 'Top 10 phụ kiện ô tô cần thiết cho xe mới',
@@ -794,7 +777,6 @@ articles = Article.create([
 ])
 
 # Create article images
-puts "Creating article images..."
 ArticleImage.create([
   { article_id: 1, image_url: '/images/articles/top-10-phu-kien-1.jpg', alt_text: 'Camera hành trình', caption: 'Camera hành trình bảo vệ quyền lợi', sort_order: 1 },
   { article_id: 1, image_url: '/images/articles/top-10-phu-kien-2.jpg', alt_text: 'Thảm sàn ô tô', caption: 'Thảm sàn bảo vệ sàn xe', sort_order: 2 },
@@ -808,32 +790,14 @@ ArticleImage.create([
   { article_id: 5, image_url: '/images/articles/am-thanh-2.jpg', alt_text: 'Amply xe hơi', caption: 'Amply xe hơi công suất cao', sort_order: 2 }
 ])
 
-puts "Database seeding completed successfully!"
-puts "Created:"
-puts "- #{Setting.count} settings"
-puts "- #{Category.count} categories"
-puts "- #{Brand.count} brands"
-puts "- #{Product.count} products"
-puts "- #{ProductSpecification.count} product specifications"
-puts "- #{ProductDescription.count} product descriptions"
-puts "- #{ProductVideo.count} product videos"
-puts "- #{ProductImage.count} product images"
-puts "- #{ProductVariant.count} product variants"
-puts "- #{ShippingZone.count} shipping zones"
-puts "- #{Store.count} stores"
-puts "- #{Coupon.count} coupons"
-puts "- #{Article.count} articles"
-puts "- #{ArticleImage.count} article images"
 
 # Admin users already created above for client_id assignment
 
 # Set early order tab flags
-puts "Setting early order tab flags..."
 # Trending products (Dự án thịnh hành)
 Product.where(is_hot: true).or(Product.where(is_essential_accessories: true)).update_all(is_trending: true)
 
 # New products (Mới ra mắt) - already has is_new flag
-puts "New products: #{Product.where(is_new: true).count}"
 
 # Ending soon products (Sắp kết thúc) - set some products as ending soon
 Product.where(is_preorder: true).update_all(is_ending_soon: true)
@@ -845,20 +809,9 @@ Product.where(id: [2, 4, 6, 8]).update_all(is_arriving_soon: true) # Some specif
 # Best seller products (Bán chạy nhất) - set some products as best sellers
 Product.where(id: [1, 2, 3, 4, 5, 6]).update_all(is_best_seller: true) # Some specific products
 
-puts "Early order tab flags set:"
-puts "- Trending: #{Product.where(is_trending: true).count}"
-puts "- New: #{Product.where(is_new: true).count}"
-puts "- Ending soon: #{Product.where(is_ending_soon: true).count}"
-puts "- Arriving soon: #{Product.where(is_arriving_soon: true).count}"
-puts "- Best seller: #{Product.where(is_best_seller: true).count}"
 
-puts "Admin users created:"
-puts "- Super Admin: admin@mexe.com / password123"
-puts "- Client 1: client1@mexe.com / password123 (#{client1.client_name})"
-puts "- Client 2: client2@mexe.com / password123 (#{client2.client_name})"
 
 # Create users for testing
-puts "Creating test users..."
 user1 = User.find_or_create_by(email: 'user1@test.com') do |user|
   user.full_name = 'Nguyễn Văn A'
   user.phone = '0912345678'
@@ -878,7 +831,6 @@ user2 = User.find_or_create_by(email: 'user2@test.com') do |user|
 end
 
 # Create sample orders
-puts "Creating sample orders..."
 orders = []
 
 # Order 1 - Logged in user
@@ -937,7 +889,6 @@ end
 orders = [order1, order2, order3]
 
 # Create order items for each order
-puts "Creating order items..."
 
 # Order 1 items (products from both clients)
 if Product.exists?(1) && Product.exists?(3)
@@ -995,13 +946,11 @@ orders.each do |order|
 end
 
 # Manually trigger client notifications after order items are created
-puts "Creating client notifications..."
 orders.each do |order|
   order.send(:notify_clients_about_new_order)
 end
 
 # Create user_order_info records
-puts "Creating user order info records..."
 UserOrderInfo.find_or_create_by(order: order1) do |info|
   info.buyer_name = 'Nguyễn Văn A'
   info.buyer_email = 'user1@test.com'
@@ -1031,18 +980,5 @@ end
 
 # Client notifications are now created automatically via callback
 
-puts "\nSample data created successfully!"
-puts "Created:"
-puts "- #{User.count} test users"
-puts "- #{Order.count} sample orders"
-puts "- #{OrderItem.count} order items"
-puts "- #{UserOrderInfo.count} user order info records"
-puts "- #{ClientNotification.count} client notifications"
 
-puts "\nTest Users:"
-puts "- user1@test.com / password123 (Nguyễn Văn A)"
-puts "- user2@test.com / password123 (Trần Thị B)"
 
-puts "\nClient Notifications Summary:"
-puts "- Client 1 (AUTOLIGHT): #{ClientNotification.where(admin_user: client1).count} notifications (#{ClientNotification.where(admin_user: client1, is_read: false).count} unread)"
-puts "- Client 2 (Honda Parts): #{ClientNotification.where(admin_user: client2).count} notifications (#{ClientNotification.where(admin_user: client2, is_read: false).count} unread)"

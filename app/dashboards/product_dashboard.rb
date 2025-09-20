@@ -19,7 +19,6 @@ class ProductDashboard < Administrate::BaseDashboard
     price: Field::String.with_options(searchable: false),
     original_price: Field::String.with_options(searchable: false),
     discount_percent: Field::Number,
-    cost_price: Field::String.with_options(searchable: false),
     stock_quantity: Field::Number,
     min_stock_alert: Field::Number,
     warranty_period: Field::String,
@@ -33,6 +32,12 @@ class ProductDashboard < Administrate::BaseDashboard
     meta_title: Field::String,
     meta_description: Field::Text,
     view_count: Field::Number,
+    # Payment options
+    full_payment_transfer: Field::Boolean,
+    full_payment_discount_percentage: Field::Number,
+    partial_advance_payment: Field::Boolean,
+    advance_payment_percentage: Field::Number,
+    advance_payment_discount_percentage: Field::Number,
     product_images: NestedHasManyField.with_options(
       nested_edit_attributes: [:image, :alt_text, :sort_order, :is_primary],
       nested_show_attributes: [:image, :alt_text, :sort_order, :is_primary]
@@ -75,9 +80,7 @@ class ProductDashboard < Administrate::BaseDashboard
     description
     short_description
     price
-    original_price
     discount_percent
-    cost_price
     stock_quantity
     min_stock_alert
     warranty_period
@@ -91,6 +94,11 @@ class ProductDashboard < Administrate::BaseDashboard
     meta_title
     meta_description
     view_count
+    full_payment_transfer
+    full_payment_discount_percentage
+    partial_advance_payment
+    advance_payment_percentage
+    advance_payment_discount_percentage
     created_at
     updated_at
   ].freeze
@@ -107,9 +115,7 @@ class ProductDashboard < Administrate::BaseDashboard
     description
     short_description
     price
-    original_price
     discount_percent
-    cost_price
     stock_quantity
     min_stock_alert
     warranty_period
@@ -122,6 +128,11 @@ class ProductDashboard < Administrate::BaseDashboard
     preorder_end_date
     meta_title
     meta_description
+    full_payment_transfer
+    full_payment_discount_percentage
+    partial_advance_payment
+    advance_payment_percentage
+    advance_payment_discount_percentage
   ].freeze
 
   # COLLECTION_FILTERS

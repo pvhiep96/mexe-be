@@ -23,13 +23,8 @@ module Api
       end
 
       def create
-        # Debug logging
-        Rails.logger.info "Orders params: #{params.inspect}"
-        Rails.logger.info "Orders key: #{params[:orders].inspect}"
-
         # Check if orders params exist
         unless params[:orders]
-          Rails.logger.error "Orders params missing: #{params.inspect}"
           render json: { error: 'Orders parameters are required' }, status: :bad_request
           return
         end
@@ -56,12 +51,16 @@ module Api
 
         # Set order attributes (exclude nested parameters)
         basic_params = order_params.except(:order_items, :shipping_info, :buyer_info)
-        Rails.logger.info "Order basic params: #{basic_params.inspect}"
         order.assign_attributes(basic_params)
 
-        # Set shipping information
-        Rails.logger.info "Shipping info: #{order_params[:shipping_info].inspect}"
+        # Set payment options with default values
+        order.full_payment_transfer = order_params[:full_payment_transfer] || false
+        order.full_payment_discount_percentage = order_params[:full_payment_discount_percentage] || 0.0
+        order.partial_advance_payment = order_params[:partial_advance_payment] || false
+        order.advance_payment_percentage = order_params[:advance_payment_percentage] || 0.0
+        order.advance_payment_discount_percentage = order_params[:advance_payment_discount_percentage] || 0.0
 
+        # Set shipping information
         if order_params[:shipping_info].present?
           shipping_info = order_params[:shipping_info]
           order.shipping_name = shipping_info[:shipping_name]
@@ -71,16 +70,11 @@ module Api
           order.shipping_ward = shipping_info[:shipping_ward]
           order.shipping_postal_code = shipping_info[:shipping_postal_code]
           order.delivery_address = shipping_info[:delivery_address] || build_full_address(shipping_info)
-        else
-          Rails.logger.warn "No shipping info found in params"
         end
 
         # Manually build order items
-        Rails.logger.info "Order items: #{order_params[:order_items].inspect}"
-
         if order_params[:order_items].present?
           order_params[:order_items].each do |item_params|
-            Rails.logger.info "Processing item: #{item_params.inspect}"
             product = Product.find(item_params[:product_id])
             order.order_items.build(
               product_id: product.id,
@@ -92,8 +86,6 @@ module Api
               # variant_info: item_params[:variant_id] ? ProductVariant.where(product_id: product.id, variant_value: item_params[:variant_id]).as_json : nil
             )
           end
-        else
-          Rails.logger.warn "No order items found in params"
         end
 
         order.valid?
@@ -109,13 +101,11 @@ module Api
 
           render json: OrderSerializer.new(order).to_json, status: :created
         else
-          Rails.logger.error("Order creation failed: #{order.errors.full_messages.join(', ')}")
           render json: { errors: order.errors.full_messages }, status: :unprocessable_entity
         end
       rescue ActiveRecord::RecordNotFound
         render json: { error: 'Product or variant not found' }, status: :unprocessable_entity
       rescue StandardError => e
-        puts e.message;
         render json: { error: "Failed to create order: #{e.message}" }, status: :unprocessable_entity
       end
 
@@ -165,6 +155,9 @@ module Api
         params.require(:orders).permit(
           :payment_method, :delivery_type, :delivery_address, :store_location,
           :coupon_code, :guest_email, :guest_phone, :guest_name, :notes,
+          # Payment options
+          :full_payment_transfer, :full_payment_discount_percentage,
+          :partial_advance_payment, :advance_payment_percentage, :advance_payment_discount_percentage,
           shipping_info: [
             :shipping_name, :shipping_phone, :shipping_city, :shipping_district,
             :shipping_ward, :shipping_postal_code, :delivery_address
@@ -222,13 +215,10 @@ module Api
 
         # Only create if we have essential information
         if final_buyer_info[:buyer_name].present? && final_buyer_info[:buyer_email].present?
-          Rails.logger.info("Creating UserOrderInfo with data: #{final_buyer_info.inspect}")
           order.create_user_order_info!(final_buyer_info)
-        else
-          Rails.logger.warn("Skipping UserOrderInfo creation - missing essential buyer information")
         end
       rescue StandardError => e
-        Rails.logger.error("Failed to create user_order_info: #{e.message}")
+        # Silent fail for user_order_info creation
       end
 
       def send_order_confirmation_email(order)
@@ -237,13 +227,10 @@ module Api
 
         recipient_email = order.user_order_info&.buyer_email || order.guest_email
         if recipient_email.present?
-          Rails.logger.info("Sending order confirmation email to #{recipient_email} for order #{order.order_number}")
           OrderConfirmationMailer.confirmation(order).deliver_now
-        else
-          Rails.logger.warn("No email address found for order #{order.order_number} - skipping email")
         end
       rescue StandardError => e
-        Rails.logger.error("Failed to send order confirmation email for order #{order.order_number}: #{e.message}")
+        # Silent fail for email sending
       end
     end
   end

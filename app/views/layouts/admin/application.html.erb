@@ -305,13 +305,10 @@
     // Wait for both CKEDITOR and DOM to be ready
     var initializeCKEditorWhenReady = function() {
       if (typeof CKEDITOR !== 'undefined' && document.readyState === 'complete') {
-        console.log('CKEDITOR is ready, initializing...');
         setTimeout(function() {
           var textareas = document.querySelectorAll('textarea.ckeditor');
-          console.log('Found textareas:', textareas.length);
           textareas.forEach(function(textarea) {
             if (!CKEDITOR.instances[textarea.id]) {
-              console.log('Initializing CKEditor for:', textarea.id);
               CKEDITOR.replace(textarea.id, {
                 height: 400,
                 language: 'vi',

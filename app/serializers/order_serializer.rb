@@ -6,7 +6,10 @@ class OrderSerializer < ActiveModel::Serializer
              :notes, :coupon_code, :coupon_discount, :guest_email, :guest_phone,
              :guest_name, :shipping_name, :shipping_phone, :shipping_city,
              :shipping_district, :shipping_ward, :shipping_postal_code, :created_at, :updated_at,
-             :buyer_info
+             :buyer_info, :payment_summary,
+             # Payment options
+             :full_payment_transfer, :full_payment_discount_percentage,
+             :partial_advance_payment, :advance_payment_percentage, :advance_payment_discount_percentage
 
   # Add shipping_address as an alias for delivery_address
   def shipping_address

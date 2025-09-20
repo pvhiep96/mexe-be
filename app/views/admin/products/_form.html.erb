@@ -44,12 +44,7 @@
     <%= form.text_area :description, rows: 5, class: "text-field" %>
   </div>
   
-  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; margin-bottom: 20px;">
-    <div class="field-unit">
-      <%= form.label :original_price %>
-      <%= form.number_field :original_price, step: 0.01, class: "text-field" %>
-    </div>
-    
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 20px;">
     <div class="field-unit">
       <%= form.label :price %>
       <%= form.number_field :price, step: 0.01, class: "text-field" %>
@@ -66,6 +61,109 @@
     </div>
   </div>
   
+  <!-- Payment Options Section -->
+  <div class="field-unit">
+    <div class="field-unit__label">
+      <label style="font-weight: bold;">💳 Payment Options (Tùy chọn thanh toán)</label>
+    </div>
+    <div class="field-unit__field" style="padding: 20px; border: 1px solid #ddd; border-radius: 4px; background: #f8f9fa;">
+
+      <!-- Full Payment Transfer Option -->
+      <div style="margin-bottom: 25px; padding: 15px; border: 1px solid #d1ecf1; border-radius: 6px; background: #d4edda;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+          <div class="toggle">
+            <%= form.check_box :full_payment_transfer, { class: "toggle-input", id: "product_full_payment_transfer" } %>
+            <label for="product_full_payment_transfer" class="toggle-label">
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+          <div>
+            <div style="font-weight: 700; color: #155724;">
+              💰 Chuyển khoản toàn bộ
+            </div>
+            <div style="font-size: 12px; color: #6c757d;">
+              Khách hàng chuyển khoản 100% số tiền trước khi nhận hàng
+            </div>
+          </div>
+        </div>
+
+        <div id="full-payment-discount-section" style="margin-left: 24px; display: none;">
+          <div class="field-unit" style="max-width: 300px;">
+            <%= form.label :full_payment_discount_percentage, "% Giảm giá (không bắt buộc)", style: "font-weight: 600; color: #155724; margin-bottom: 8px;" %>
+            <%= form.number_field :full_payment_discount_percentage,
+                placeholder: "VD: 5 (nghĩa là giảm 5%)",
+                step: 0.01,
+                min: 0,
+                max: 100,
+                class: "text-field",
+                style: "border-color: #c3e6cb;" %>
+            <small style="color: #6c757d; font-size: 11px;">Nhập số từ 0-100. VD: 5 = giảm 5%</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Partial Advance Payment Option -->
+      <div style="margin-bottom: 15px; padding: 15px; border: 1px solid #bee5eb; border-radius: 6px; background: #d1ecf1;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+          <div class="toggle">
+            <%= form.check_box :partial_advance_payment, { class: "toggle-input", id: "product_partial_advance_payment" } %>
+            <label for="product_partial_advance_payment" class="toggle-label">
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+          <div>
+            <div style="font-weight: 700; color: #0c5460;">
+              📊 Chuyển trước một phần
+            </div>
+            <div style="font-size: 12px; color: #6c757d;">
+              Khách hàng trả một phần trước, phần còn lại khi nhận hàng
+            </div>
+          </div>
+        </div>
+
+        <div id="partial-payment-fields" style="margin-left: 24px; display: none;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="field-unit">
+              <%= form.label :advance_payment_percentage, "% Phải trả trước (*)", style: "font-weight: 600; color: #0c5460; margin-bottom: 8px;" %>
+              <%= form.number_field :advance_payment_percentage,
+                  placeholder: "VD: 30 (nghĩa là trả trước 30%)",
+                  step: 0.01,
+                  min: 1,
+                  max: 99,
+                  class: "text-field",
+                  style: "border-color: #b6e3ea;",
+                  required: false %>
+              <small style="color: #6c757d; font-size: 11px;">Bắt buộc nhập số từ 1-99</small>
+            </div>
+
+            <div class="field-unit">
+              <%= form.label :advance_payment_discount_percentage, "% Được giảm giá khi trả trước", style: "font-weight: 600; color: #0c5460; margin-bottom: 8px;" %>
+              <%= form.number_field :advance_payment_discount_percentage,
+                  placeholder: "VD: 3 (nghĩa là giảm 3%)",
+                  step: 0.01,
+                  min: 0,
+                  max: 100,
+                  class: "text-field",
+                  style: "border-color: #b6e3ea;" %>
+              <small style="color: #6c757d; font-size: 11px;">Không bắt buộc. VD: 3 = giảm 3%</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 15px; padding: 12px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px;">
+        <div style="color: #856404; font-size: 14px;">
+          <strong>ℹ️ Hướng dẫn:</strong>
+          <ul style="margin: 8px 0 0 20px; padding: 0;">
+            <li>Có thể chọn cả 2 tùy chọn thanh toán cùng lúc</li>
+            <li><strong>Chuyển khoản toàn bộ:</strong> Khách trả 100% trước, có thể được giảm giá</li>
+            <li><strong>Chuyển trước một phần:</strong> Khách trả % nhất định trước, còn lại COD, có thể được giảm giá</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="field-unit" style="margin-bottom: 20px;">
     <div style="display: flex; align-items: center; gap: 12px;">
       <div class="toggle">
@@ -91,7 +189,7 @@
       </div>
     </div>
   </div>
-  
+
   <!-- Product Status Flags Section -->
   <div class="field-unit">
     <div class="field-unit__label">
@@ -2000,4 +2098,44 @@
   // Initialize video toggles on page load and when new videos are added
   document.addEventListener('DOMContentLoaded', initializeVideoToggles);
   document.addEventListener('turbo:load', initializeVideoToggles);
+
+  // Payment options toggle functionality
+  function initializePaymentOptionToggles() {
+    const fullPaymentToggle = document.getElementById('product_full_payment_transfer');
+    const partialPaymentToggle = document.getElementById('product_partial_advance_payment');
+    const fullDiscountSection = document.getElementById('full-payment-discount-section');
+    const partialFieldsSection = document.getElementById('partial-payment-fields');
+    const advancePercentageField = document.querySelector('input[name="product[advance_payment_percentage]"]');
+
+    if (!fullPaymentToggle || !partialPaymentToggle) return;
+
+    function updatePaymentOptions() {
+      // Handle full payment toggle
+      if (fullPaymentToggle.checked) {
+        if (fullDiscountSection) fullDiscountSection.style.display = 'block';
+      } else {
+        if (fullDiscountSection) fullDiscountSection.style.display = 'none';
+      }
+
+      // Handle partial payment toggle
+      if (partialPaymentToggle.checked) {
+        if (partialFieldsSection) partialFieldsSection.style.display = 'block';
+        if (advancePercentageField) advancePercentageField.setAttribute('required', 'required');
+      } else {
+        if (partialFieldsSection) partialFieldsSection.style.display = 'none';
+        if (advancePercentageField) advancePercentageField.removeAttribute('required');
+      }
+    }
+
+    // Add event listeners
+    fullPaymentToggle.addEventListener('change', updatePaymentOptions);
+    partialPaymentToggle.addEventListener('change', updatePaymentOptions);
+
+    // Initialize on page load
+    updatePaymentOptions();
+  }
+
+  // Initialize payment option toggles
+  document.addEventListener('DOMContentLoaded', initializePaymentOptionToggles);
+  document.addEventListener('turbo:load', initializePaymentOptionToggles);
 </script>

@@ -1,4 +1,6 @@
 class Product < ApplicationRecord
+  include PaymentOptionsSerializable
+
   belongs_to :brand, optional: true
   belongs_to :category, optional: true
   belongs_to :client, class_name: 'AdminUser', optional: true
@@ -28,6 +30,17 @@ class Product < ApplicationRecord
   validates :slug, presence: true, uniqueness: true
   validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :stock_quantity, numericality: { greater_than_or_equal_to: 0 }
+
+  # Payment option validations
+  validates :advance_payment_percentage,
+    numericality: { greater_than: 0, less_than_or_equal_to: 100 },
+    if: :partial_advance_payment?
+  validates :full_payment_discount_percentage,
+    numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 },
+    allow_blank: true
+  validates :advance_payment_discount_percentage,
+    numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 },
+    allow_blank: true
 
   # Custom validation for Status & Flags fields - only Super Admin can edit
   validate :can_update_status_flags?, if: :status_flags_changed?
@@ -80,6 +93,35 @@ class Product < ApplicationRecord
   # Check if product needs approval
   def needs_approval?
     !is_active? && created_by_client?
+  end
+
+  # Payment option helper methods
+  def partial_advance_payment?
+    partial_advance_payment == true
+  end
+
+  def full_payment_transfer?
+    full_payment_transfer == true
+  end
+
+  # Calculate actual price after discount for full payment
+  def full_payment_price
+    return price unless full_payment_transfer? && full_payment_discount_percentage.present?
+    price * (1 - full_payment_discount_percentage / 100.0)
+  end
+
+  # Calculate advance payment amount
+  def advance_payment_amount
+    return 0 unless partial_advance_payment? && advance_payment_percentage.present?
+    price * (advance_payment_percentage / 100.0)
+  end
+
+  # Calculate remaining payment amount after advance
+  def remaining_payment_amount
+    return price unless partial_advance_payment? && advance_payment_percentage.present?
+    advance_amount = advance_payment_amount
+    discount = advance_payment_discount_percentage.present? ? (advance_amount * advance_payment_discount_percentage / 100.0) : 0
+    (price - advance_amount) + discount
   end
 
   private

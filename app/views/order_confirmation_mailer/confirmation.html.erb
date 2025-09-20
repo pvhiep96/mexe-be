@@ -38,15 +38,36 @@
 
       <div class="order-info">
         <h3>Sản phẩm đã đặt</h3>
-        <% @order_items.each do |item| %>
+        <% @payment_details.each do |detail| %>
           <div class="item">
-            <p><strong><%= item.product_name %></strong></p>
-            <p>Số lượng: <%= item.quantity %> x <%= number_to_currency(item.unit_price, unit: "đ", format: "%n %u") %></p>
-            <p>Thành tiền: <%= number_to_currency(item.total_price, unit: "đ", format: "%n %u") %></p>
+            <p><strong><%= detail[:product_name] %></strong></p>
+            <p>Số lượng: <%= detail[:quantity] %> x <%= number_to_currency(detail[:original_price], unit: "đ", format: "%n %u") %></p>
+
+            <% if detail[:payment_type] == :full_payment %>
+              <% if detail[:discount_percentage].present? && detail[:discount_percentage] > 0 %>
+                <p style="color: #dc3545;">Giảm giá chuyển khoản toàn bộ: <%= detail[:discount_percentage] %>%</p>
+                <p>Giá sau giảm: <%= detail[:quantity] %> x <%= number_to_currency(detail[:discounted_price], unit: "đ", format: "%n %u") %></p>
+              <% end %>
+            <% elsif detail[:payment_type] == :partial_advance %>
+              <p style="color: #0d6efd;">Cần trả trước: <%= detail[:advance_percentage] %>% = <%= number_to_currency(detail[:advance_amount], unit: "đ", format: "%n %u") %></p>
+              <p>Còn lại: <%= number_to_currency(detail[:remaining_amount], unit: "đ", format: "%n %u") %></p>
+              <% if detail[:advance_discount_percentage].present? && detail[:advance_discount_percentage] > 0 %>
+                <p style="color: #dc3545;">Giảm giá khi trả trước: <%= detail[:advance_discount_percentage] %>%</p>
+              <% end %>
+            <% end %>
+
+            <p><strong>Thành tiền: <%= number_to_currency(detail[:item_total], unit: "đ", format: "%n %u") %></strong></p>
           </div>
         <% end %>
-        <div class="total">
-          <p>Tổng cộng: <%= number_to_currency(@order.total_amount, unit: "đ", format: "%n %u") %></p>
+
+        <div style="border-top: 2px solid #eee; padding-top: 15px; margin-top: 15px;">
+          <p>Giá trị đơn hàng: <%= number_to_currency(@original_amount, unit: "đ", format: "%n %u") %></p>
+          <% if @discount_amount > 0 %>
+            <p style="color: #dc3545;">Giảm giá: -<%= number_to_currency(@discount_amount, unit: "đ", format: "%n %u") %></p>
+          <% end %>
+          <div class="total">
+            <p>Tổng đơn: <%= number_to_currency(@total_amount, unit: "đ", format: "%n %u") %></p>
+          </div>
         </div>
       </div>
 

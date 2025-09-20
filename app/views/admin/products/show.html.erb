@@ -62,6 +62,112 @@
       </div>
     </div>
 
+    <!-- Payment Options -->
+    <div class="section" style="margin-bottom: 30px;">
+      <h3>💳 Payment Options</h3>
+      <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #dee2e6;">
+        <% if @product.full_payment_transfer? || @product.partial_advance_payment? %>
+
+          <!-- Full Payment Transfer -->
+          <% if @product.full_payment_transfer? %>
+            <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #c3e6cb; border-radius: 6px; background: #d4edda;">
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                <span style="font-size: 18px;">💰</span>
+                <div>
+                  <div style="font-weight: 700; color: #155724; font-size: 16px;">
+                    Chuyển khoản toàn bộ
+                  </div>
+                  <div style="font-size: 13px; color: #6c757d;">
+                    Khách hàng chuyển khoản 100% số tiền trước khi nhận hàng
+                  </div>
+                </div>
+              </div>
+
+              <% if @product.full_payment_discount_percentage.present? && @product.full_payment_discount_percentage > 0 %>
+                <div style="margin-left: 28px;">
+                  <div style="color: #155724; font-weight: 600;">
+                    🎉 Giảm giá: <span style="font-size: 18px;"><%= @product.full_payment_discount_percentage %>%</span>
+                  </div>
+                  <div style="color: #6c757d; font-size: 13px; margin-top: 5px;">
+                    <strong>Giá gốc:</strong> <%= number_to_currency(@product.price, unit: "₫", precision: 0) if @product.price %><br>
+                    <strong>Giá sau giảm:</strong>
+                    <span style="color: #28a745; font-weight: bold;">
+                      <%= number_to_currency(@product.full_payment_price, unit: "₫", precision: 0) if @product.price %>
+                    </span><br>
+                    <strong>Tiết kiệm:</strong>
+                    <span style="color: #dc3545; font-weight: bold;">
+                      <%= number_to_currency(@product.price - @product.full_payment_price, unit: "₫", precision: 0) if @product.price %>
+                    </span>
+                  </div>
+                </div>
+              <% else %>
+                <div style="margin-left: 28px; color: #6c757d; font-size: 13px;">
+                  Không có giảm giá đặc biệt
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+
+          <!-- Partial Advance Payment -->
+          <% if @product.partial_advance_payment? %>
+            <div style="margin-bottom: 15px; padding: 15px; border: 1px solid #b6e3ea; border-radius: 6px; background: #d1ecf1;">
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                <span style="font-size: 18px;">📊</span>
+                <div>
+                  <div style="font-weight: 700; color: #0c5460; font-size: 16px;">
+                    Chuyển trước một phần
+                  </div>
+                  <div style="font-size: 13px; color: #6c757d;">
+                    Khách hàng trả một phần trước, phần còn lại khi nhận hàng
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-left: 28px;">
+                <% if @product.advance_payment_percentage.present? %>
+                  <div style="color: #0c5460; font-weight: 600; margin-bottom: 8px;">
+                    💵 Trả trước: <span style="font-size: 18px;"><%= @product.advance_payment_percentage %>%</span>
+                  </div>
+                  <div style="color: #6c757d; font-size: 13px;">
+                    <strong>Số tiền trả trước:</strong>
+                    <span style="color: #0056b3; font-weight: bold;">
+                      <%= number_to_currency(@product.advance_payment_amount, unit: "₫", precision: 0) if @product.price %>
+                    </span><br>
+                    <strong>Còn lại (COD):</strong>
+                    <span style="color: #6c757d; font-weight: bold;">
+                      <%= number_to_currency(@product.remaining_payment_amount, unit: "₫", precision: 0) if @product.price %>
+                    </span>
+
+                    <% if @product.advance_payment_discount_percentage.present? && @product.advance_payment_discount_percentage > 0 %>
+                      <br><strong>Giảm giá khi trả trước:</strong>
+                      <span style="color: #28a745; font-weight: bold;"><%= @product.advance_payment_discount_percentage %>%</span>
+                      <br><strong>Tiết kiệm:</strong>
+                      <span style="color: #dc3545; font-weight: bold;">
+                        <%= number_to_currency(@product.advance_payment_amount * @product.advance_payment_discount_percentage / 100, unit: "₫", precision: 0) if @product.price %>
+                      </span>
+                    <% end %>
+                  </div>
+                <% else %>
+                  <div style="color: #dc3545; font-size: 13px;">
+                    ⚠️ Chưa cấu hình % trả trước
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+
+        <% else %>
+          <div style="text-align: center; padding: 30px; color: #6c757d;">
+            <div style="font-size: 48px; margin-bottom: 10px;">💳</div>
+            <div style="font-size: 16px; font-weight: 600;">Chưa cấu hình payment options</div>
+            <div style="font-size: 14px; margin-top: 5px;">
+              Sản phẩm này sử dụng phương thức thanh toán mặc định
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
     <!-- Description -->
     <% if @product.description.present? %>
       <div class="section" style="margin-bottom: 30px;">

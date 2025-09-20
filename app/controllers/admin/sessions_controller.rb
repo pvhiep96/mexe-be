@@ -4,9 +4,6 @@ module Admin
     
     # Override the destroy action to add custom logic
     def destroy
-      # Log the logout action
-      Rails.logger.info "Admin user #{current_admin_user&.email} is logging out"
-      
       # Call the parent destroy method
       super do
         # Custom logic after logout

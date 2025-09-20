@@ -58,7 +58,7 @@ module Api
             price: product.price,
             image_url: product.primary_image_url,
             brand_name: product.brand&.name
-          }
+          }.merge(product.payment_options_attributes)
         end
 
         render json: {

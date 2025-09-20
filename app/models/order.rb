@@ -60,7 +60,7 @@ class Order < ApplicationRecord
   ].freeze
 
   def self.ransackable_attributes(auth_object = nil)
-    %w[id order_number subtotal total_amount status payment_status payment_method delivery_type status_processed shipping_provider tracking_number shipping_name shipping_phone shipping_city shipping_district shipping_ward shipping_postal_code delivery_address guest_name guest_email guest_phone created_at updated_at]
+    %w[id order_number subtotal total_amount status payment_status payment_method delivery_type status_processed shipping_provider tracking_number shipping_name shipping_phone shipping_city shipping_district shipping_ward shipping_postal_code delivery_address guest_name guest_email guest_phone full_payment_transfer full_payment_discount_percentage partial_advance_payment advance_payment_percentage advance_payment_discount_percentage created_at updated_at]
   end
 
   def self.ransackable_associations(auth_object = nil)
@@ -120,6 +120,44 @@ class Order < ApplicationRecord
     # save
   end
 
+  # Payment calculation methods
+  def full_payment_amount
+    return total_amount unless full_payment_transfer?
+    discount = total_amount * (full_payment_discount_percentage / 100.0)
+    total_amount - discount
+  end
+
+  def advance_payment_amount
+    return 0 unless partial_advance_payment?
+    total_amount * (advance_payment_percentage / 100.0)
+  end
+
+  def advance_payment_with_discount
+    return advance_payment_amount unless partial_advance_payment?
+    discount = advance_payment_amount * (advance_payment_discount_percentage / 100.0)
+    advance_payment_amount - discount
+  end
+
+  def remaining_payment_amount
+    return 0 if full_payment_transfer?
+    return total_amount - advance_payment_with_discount if partial_advance_payment?
+    total_amount
+  end
+
+  def payment_summary
+    {
+      total_amount: total_amount,
+      full_payment_transfer: full_payment_transfer?,
+      full_payment_amount: full_payment_amount,
+      full_payment_discount: full_payment_transfer? ? total_amount - full_payment_amount : 0,
+      partial_advance_payment: partial_advance_payment?,
+      advance_payment_amount: advance_payment_amount,
+      advance_payment_with_discount: advance_payment_with_discount,
+      advance_payment_discount: partial_advance_payment? ? advance_payment_amount - advance_payment_with_discount : 0,
+      remaining_amount: remaining_payment_amount
+    }
+  end
+
   private
 
   def notify_clients_about_new_order
@@ -165,11 +203,9 @@ class Order < ApplicationRecord
       }
     )
     
-    Rails.logger.info("Created notification for client #{client.client_name}: #{title}")
-    
     # You can also send email notification here if needed
     # ClientOrderNotificationMailer.new_order(client, self).deliver_later
   rescue StandardError => e
-    Rails.logger.error("Failed to create notification for client #{client&.id}: #{e.message}")
+    # Silent fail for notification creation
   end
 end

@@ -115,10 +115,16 @@ module Admin
         product_videos_attributes: [:id, :url, :title, :description, :sort_order, :is_active, :_destroy]
       ]
 
+      # Payment options (available for all admin users)
+      permitted_attrs += [
+        :full_payment_transfer, :partial_advance_payment, :advance_payment_percentage,
+        :full_payment_discount_percentage, :advance_payment_discount_percentage
+      ]
+
       # Only allow Status & Flags for super_admin
       if current_admin_user&.super_admin?
         permitted_attrs += [
-          :is_active, :is_essential_accessories, :is_best_seller, :is_new, :is_hot, 
+          :is_active, :is_essential_accessories, :is_best_seller, :is_new, :is_hot,
           :is_preorder, :is_trending, :is_ending_soon, :is_arriving_soon
         ]
       end

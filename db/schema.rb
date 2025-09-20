@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_09_14_055503) do
+ActiveRecord::Schema[7.2].define(version: 2025_09_18_221608) do
   create_table "active_admin_comments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
@@ -241,7 +241,14 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_14_055503) do
     t.integer "status_processed", default: 0, null: false
     t.string "tracking_number"
     t.string "shipping_provider"
+    t.boolean "full_payment_transfer", default: false
+    t.decimal "full_payment_discount_percentage", precision: 5, scale: 2, default: "0.0"
+    t.boolean "partial_advance_payment", default: false
+    t.decimal "advance_payment_percentage", precision: 5, scale: 2, default: "0.0"
+    t.decimal "advance_payment_discount_percentage", precision: 5, scale: 2, default: "0.0"
+    t.index ["full_payment_transfer"], name: "index_orders_on_full_payment_transfer"
     t.index ["order_number"], name: "index_orders_on_order_number", unique: true
+    t.index ["partial_advance_payment"], name: "index_orders_on_partial_advance_payment"
     t.index ["status_processed"], name: "index_orders_on_status_processed"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
@@ -369,6 +376,11 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_14_055503) do
     t.boolean "is_arriving_soon", default: false
     t.bigint "client_id"
     t.boolean "is_best_seller", default: false
+    t.boolean "full_payment_transfer", default: false
+    t.boolean "partial_advance_payment", default: false
+    t.decimal "advance_payment_percentage", precision: 5, scale: 2
+    t.decimal "full_payment_discount_percentage", precision: 5, scale: 2
+    t.decimal "advance_payment_discount_percentage", precision: 5, scale: 2
     t.index ["brand_id"], name: "index_products_on_brand_id"
     t.index ["category_id"], name: "index_products_on_category_id"
     t.index ["client_id"], name: "index_products_on_client_id"
