@@ -38,6 +38,8 @@ gem "kaminari"
 gem "administrate"
 gem "devise"
 
+# Select2 loaded via CDN in admin layout
+
 # Image upload and processing
 gem "carrierwave"
 gem "mini_magick"

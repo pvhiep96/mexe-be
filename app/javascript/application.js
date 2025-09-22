@@ -4,3 +4,5 @@ import "controllers"
 
 // Font Awesome for Arctic Admin
 import "@fortawesome/fontawesome-free/css/all.css"
+
+// jQuery and Select2 loaded via CDN in admin layout

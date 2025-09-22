@@ -1,5 +1,5 @@
 class ProductSerializer < ActiveModel::Serializer
-  attributes :id, :name, :slug, :sku, :description, :short_description,
+  attributes :id, :name, :slug, :sku, :short_description,
   :price, :original_price, :discount_percent,
   :weight, :dimensions, :stock_quantity, :min_stock_alert,
   :is_active, :is_essential_accessories, :is_best_seller, :is_new, :is_hot, :is_preorder,

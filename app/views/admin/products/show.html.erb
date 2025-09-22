@@ -168,15 +168,6 @@
       </div>
     </div>
 
-    <!-- Description -->
-    <% if @product.description.present? %>
-      <div class="section" style="margin-bottom: 30px;">
-        <h3>Description</h3>
-        <div style="background: #f8f9fa; padding: 15px; border-radius: 4px;">
-          <%= simple_format(@product.description) %>
-        </div>
-      </div>
-    <% end %>
 
     <!-- Short Description -->
     <% if @product.short_description.present? %>

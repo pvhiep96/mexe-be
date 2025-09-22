@@ -25,8 +25,8 @@ module Api
                           .includes(:brand, :category, :images)
                           .joins("LEFT JOIN brands ON products.brand_id = brands.id")
                           .where(
-                            "products.name LIKE ? OR products.description LIKE ? OR products.short_description LIKE ? OR brands.name LIKE ?",
-                            search_term, search_term, search_term, search_term
+                            "products.name LIKE ? OR products.short_description LIKE ? OR brands.name LIKE ?",
+                            search_term, search_term, search_term
                           )
                           .limit(limit)
                           .order(Arel.sql("
@@ -44,8 +44,8 @@ module Api
         total_count = Product.active
                              .joins("LEFT JOIN brands ON products.brand_id = brands.id")
                              .where(
-                               "products.name LIKE ? OR products.description LIKE ? OR products.short_description LIKE ? OR brands.name LIKE ?",
-                               search_term, search_term, search_term, search_term
+                               "products.name LIKE ? OR products.short_description LIKE ? OR brands.name LIKE ?",
+                               search_term, search_term, search_term
                              )
                              .count
 

@@ -108,6 +108,9 @@ Rails.application.routes.draw do
       get 'users/favorites', to: 'users#favorites'
       get 'users/addresses', to: 'users#addresses'
 
+      # Contact routes
+      resources :contact_product_requests, only: [:create]
+
       # Revenue Reports API routes (Admin only)
       resources :revenue_reports, only: [:index, :show] do
         collection do

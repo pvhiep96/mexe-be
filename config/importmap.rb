@@ -8,3 +8,5 @@ pin_all_from "app/javascript/controllers", under: "controllers"
 
 # Font Awesome for Arctic Admin
 pin "@fortawesome/fontawesome-free", to: "https://ga.jspm.io/npm:@fortawesome/fontawesome-free@7.0.0/js/all.js"
+
+# jQuery and Select2 for admin forms - using CDN directly in layout

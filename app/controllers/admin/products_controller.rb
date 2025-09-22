@@ -83,7 +83,8 @@ module Admin
       if @product.save
         redirect_to admin_product_path(@product), notice: 'Product was successfully created.'
       else
-        render :new
+        @page_title = "Tạo Sản Phẩm Mới"
+        render :new, locals: { page: Administrate::Page::Form.new(dashboard, @product) }
       end
     end
 

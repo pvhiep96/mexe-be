@@ -10,6 +10,8 @@ services:
     environment:
       - RAILS_ENV=development
       - RAILS_MASTER_KEY="QdpQKkPGrP4+0c2xl1wBo5zG/jq68iG5jsZPCisf1IQ="
+      - ADMIN_EMAIL=admin@mexe.com
+      - FRONTEND_URL=http://localhost:3000
     depends_on:
       - db
     entrypoint: ["/rails/bin/docker-entrypoint"]
