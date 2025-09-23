@@ -623,6 +623,170 @@
       border-color: #545b62 !important;
       color: white !important;
     }
+
+    /* Hide CKEditor security warning banner */
+    .cke_notifications_area {
+      display: none !important;
+    }
+
+    .cke_notification {
+      display: none !important;
+    }
+
+    .cke_notification_info {
+      display: none !important;
+    }
+
+    .cke_notification_warning {
+      display: none !important;
+    }
+
+    .cke_notification_error {
+      display: none !important;
+    }
+
+    /* Hide any CKEditor version warning */
+    div[style*="background-color: red"],
+    div[style*="background: red"],
+    .cke_warning,
+    .cke_security_warning {
+      display: none !important;
+    }
+
+    /* Error styling for form validation - maintain layout */
+    .field_with_errors {
+      display: block;
+      width: 100%;
+    }
+
+    .field_with_errors input,
+    .field_with_errors textarea,
+    .field_with_errors select {
+      border: 2px solid #dc3545 !important;
+      box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+      width: 100% !important;
+      min-width: 100% !important;
+      max-width: 100% !important;
+      display: block !important;
+      box-sizing: border-box !important;
+    }
+
+    .field_with_errors input:focus,
+    .field_with_errors textarea:focus,
+    .field_with_errors select:focus {
+      border-color: #dc3545 !important;
+      box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+      outline: none !important;
+    }
+
+    /* Ensure field-unit maintains proper layout */
+    .field-unit {
+      display: block;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    .field-unit__label {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .field-unit__field {
+      display: block;
+      width: 100%;
+    }
+
+    /* Ensure text-field maintains full width */
+    .text-field {
+      width: 100% !important;
+      display: block !important;
+      box-sizing: border-box !important;
+    }
+
+    /* Error message styling */
+    .error-message {
+      color: #dc3545;
+      font-size: 12px;
+      margin-top: 4px;
+      display: block;
+      font-weight: 500;
+    }
+
+    .error-message::before {
+      content: "⚠️ ";
+      margin-right: 4px;
+    }
+
+    /* Hide default error messages */
+    .alert-danger {
+      display: none !important;
+    }
   </style>
+
+  <script>
+    // Simple CKEditor warning hide
+    setTimeout(function() {
+      var elements = document.querySelectorAll('.cke_notifications_area, .cke_notification, .cke_notification_warning, .cke_security_warning');
+      for (var i = 0; i < elements.length; i++) {
+        elements[i].style.display = 'none';
+      }
+    }, 500);
+
+    // Error display handling
+    document.addEventListener('DOMContentLoaded', function() {
+      // Hide default error messages
+      var defaultErrors = document.querySelectorAll('.alert-danger');
+      for (var i = 0; i < defaultErrors.length; i++) {
+        defaultErrors[i].style.display = 'none';
+      }
+
+      // Add error messages to field_with_errors
+      var fieldErrors = document.querySelectorAll('.field_with_errors');
+      for (var i = 0; i < fieldErrors.length; i++) {
+        var fieldError = fieldErrors[i];
+        var input = fieldError.querySelector('input, textarea, select');
+        if (input) {
+          var fieldUnit = input.closest('.field-unit') || fieldError;
+          var existingError = fieldUnit.querySelector('.error-message');
+          if (!existingError) {
+            var errorText = getFieldErrorText(input.name);
+            if (errorText) {
+              var errorDiv = document.createElement('div');
+              errorDiv.className = 'error-message';
+              errorDiv.textContent = errorText;
+              fieldUnit.appendChild(errorDiv);
+            }
+          }
+        }
+      }
+
+      // Clear errors when user starts typing
+      var inputs = document.querySelectorAll('input, textarea, select');
+      for (var i = 0; i < inputs.length; i++) {
+        inputs[i].addEventListener('input', function() {
+          var fieldUnit = this.closest('.field-unit');
+          if (fieldUnit && fieldUnit.classList.contains('field_with_errors')) {
+            fieldUnit.classList.remove('field_with_errors');
+            var errorMessage = fieldUnit.querySelector('.error-message');
+            if (errorMessage) {
+              errorMessage.remove();
+            }
+          }
+        });
+      }
+    });
+
+    function getFieldErrorText(fieldName) {
+      var errorMessages = {
+        'product[name]': 'Tên sản phẩm không được để trống',
+        'product[sku]': 'SKU không được để trống',
+        'product[price]': 'Giá sản phẩm không được để trống',
+        'product[brand_id]': 'Thương hiệu không được để trống',
+        'product[category_id]': 'Danh mục không được để trống',
+        'product[short_description]': 'Mô tả ngắn không được để trống'
+      };
+      return errorMessages[fieldName] || 'Trường này không hợp lệ';
+    }
+  </script>
 </body>
 </html>

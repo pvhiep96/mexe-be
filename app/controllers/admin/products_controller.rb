@@ -95,7 +95,7 @@ module Admin
       if @product.update(resource_params)
         redirect_to admin_product_path(@product), notice: 'Product was successfully updated.'
       else
-        render :edit
+        render :edit, locals: { page: Administrate::Page::Form.new(dashboard, @product) }
       end
     end
 
