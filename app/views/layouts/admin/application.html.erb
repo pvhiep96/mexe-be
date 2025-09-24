@@ -43,6 +43,13 @@
     }
   </script>
   
+  <!-- jQuery Validation -->
+  <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/additional-methods.min.js"></script>
+  <script>
+    console.log('jQuery Validation loaded:', typeof $.validator !== 'undefined');
+  </script>
+  
   <style>
     .admin-layout {
       display: flex;
@@ -689,6 +696,8 @@
     .field-unit__label {
       display: block;
       margin-bottom: 8px;
+      margin-left: 0px;
+      width: unset
     }
 
     .field-unit__field {
@@ -703,24 +712,194 @@
       box-sizing: border-box !important;
     }
 
-    /* Error message styling */
-    .error-message {
-      color: #dc3545;
-      font-size: 12px;
-      margin-top: 4px;
-      display: block;
-      font-weight: 500;
-    }
-
-    .error-message::before {
-      content: "⚠️ ";
-      margin-right: 4px;
-    }
 
     /* Hide default error messages */
     .alert-danger {
       display: none !important;
     }
+
+    /* jQuery Validation Styles */
+    .error {
+      color: #dc3545 !important;
+      font-size: 0.875rem !important;
+      margin-top: 0.25rem !important;
+      display: block !important;
+    }
+
+    .field_with_errors input,
+    .field_with_errors select,
+    .field_with_errors textarea {
+      border-color: #dc3545 !important;
+      box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    }
+
+    .field_with_errors input:focus,
+    .field_with_errors select:focus,
+    .field_with_errors textarea:focus {
+      border-color: #dc3545 !important;
+      box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    }
+
+    /* Validation error styling for Select2 */
+    .select2-container.error .select2-selection {
+      border-color: #dc3545 !important;
+      box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    }
+
+    /* Fix spacing for Product Descriptions Content field */
+    .field-unit label {
+      margin-bottom: 8px !important;
+    }
+
+    .field-unit__field {
+      margin-top: 0 !important;
+    }
+
+    /* Specific fix for CKEditor spacing */
+    .field-unit .ckeditor {
+      margin-top: 8px !important;
+    }
+
+    /* Fix for Product Descriptions nested field-unit */
+    .product-description-fields .field-unit {
+      margin-bottom: 15px !important;
+    }
+
+    .product-description-fields .field-unit label {
+      margin-bottom: 6px !important;
+      display: block !important;
+    }
+
+    .product-description-fields .field-unit__field {
+      margin-top: 0 !important;
+    }
+
+    /* Specific fix for CKEditor in Product Descriptions */
+    .product-description-fields .field-unit:has(.ckeditor) {
+      margin-bottom: 20px !important;
+    }
+
+    .product-description-fields .field-unit:has(.ckeditor) label {
+      margin-bottom: 4px !important;
+      font-weight: 500 !important;
+    }
+
+    .product-description-fields .field-unit:has(.ckeditor) .field-unit__field {
+      margin-top: 0 !important;
+      padding-top: 0 !important;
+    }
+
+    /* Alternative selector for browsers that don't support :has() */
+    .product-description-fields .field-unit .ckeditor {
+      margin-top: 4px !important;
+    }
+
+    /* Fix for CKEditor container spacing */
+    .cke_editor {
+      margin-top: 4px !important;
+    }
+
+    /* Hide CKEditor textarea completely */
+    .ckeditor {
+      display: none !important;
+      visibility: hidden !important;
+    }
+
+    /* Ensure CKEditor iframe is visible */
+    .cke_editor iframe {
+      display: block !important;
+      visibility: visible !important;
+    }
+
+    /* Fix Add Image button focus state */
+    #add-product-image {
+      white-space: nowrap !important;
+      overflow: visible !important;
+      width: auto !important;
+      display: inline-block !important;
+      padding: 12px 24px !important;
+      margin: 0 !important;
+      z-index: 10 !important;
+      position: relative !important;
+      font-size: 16px !important;
+      font-weight: 600 !important;
+      min-height: 48px !important;
+      border-radius: 8px !important;
+      transition: all 0.2s ease !important;
+    }
+
+    #add-product-image:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3) !important;
+    }
+
+    #add-product-image:focus {
+      outline: 2px solid #007bff !important;
+      outline-offset: 2px !important;
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25) !important;
+      transform: none !important;
+      width: auto !important;
+      height: auto !important;
+    }
+
+    #add-product-image:active {
+      transform: translateY(0) !important;
+      box-shadow: 0 2px 6px rgba(0, 123, 255, 0.2) !important;
+    }
+
+    /* Fix all buttons in product form */
+    .btn {
+      white-space: nowrap !important;
+      overflow: visible !important;
+      width: auto !important;
+      display: inline-block !important;
+      z-index: 10 !important;
+      position: relative !important;
+      padding: 10px 20px !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      min-height: 40px !important;
+      border-radius: 6px !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px) !important;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .btn:focus {
+      outline: 2px solid #007bff !important;
+      outline-offset: 2px !important;
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25) !important;
+      transform: none !important;
+      width: auto !important;
+      height: auto !important;
+    }
+
+    .btn:active {
+      transform: translateY(0) !important;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    /* Fix container for Add Image button */
+    div[style*="justify-content: flex-end"] {
+      overflow: visible !important;
+      padding: 10px !important;
+      margin: 10px 0 !important;
+    }
+
+    /* Ensure button container doesn't clip content */
+    .field-unit__field {
+      overflow: visible !important;
+    }
+
+    /* Fix for any parent containers that might clip buttons */
+    .sortable-container,
+    .nested-field-wrapper {
+      overflow: visible !important;
+    }
+
   </style>
 
   <script>
@@ -732,6 +911,23 @@
       }
     }, 500);
 
+    // Hide CKEditor textareas completely
+    function hideCKEditorTextareas() {
+      var textareas = document.querySelectorAll('.ckeditor');
+      for (var i = 0; i < textareas.length; i++) {
+        textareas[i].style.display = 'none';
+        textareas[i].style.visibility = 'hidden';
+        textareas[i].style.position = 'absolute';
+        textareas[i].style.left = '-9999px';
+      }
+    }
+
+    // Run immediately and after delays
+    hideCKEditorTextareas();
+    setTimeout(hideCKEditorTextareas, 100);
+    setTimeout(hideCKEditorTextareas, 500);
+    setTimeout(hideCKEditorTextareas, 1000);
+
     // Error display handling
     document.addEventListener('DOMContentLoaded', function() {
       // Hide default error messages
@@ -740,52 +936,173 @@
         defaultErrors[i].style.display = 'none';
       }
 
-      // Add error messages to field_with_errors
-      var fieldErrors = document.querySelectorAll('.field_with_errors');
-      for (var i = 0; i < fieldErrors.length; i++) {
-        var fieldError = fieldErrors[i];
-        var input = fieldError.querySelector('input, textarea, select');
-        if (input) {
-          var fieldUnit = input.closest('.field-unit') || fieldError;
-          var existingError = fieldUnit.querySelector('.error-message');
-          if (!existingError) {
-            var errorText = getFieldErrorText(input.name);
-            if (errorText) {
-              var errorDiv = document.createElement('div');
-              errorDiv.className = 'error-message';
-              errorDiv.textContent = errorText;
-              fieldUnit.appendChild(errorDiv);
-            }
-          }
-        }
-      }
 
-      // Clear errors when user starts typing
-      var inputs = document.querySelectorAll('input, textarea, select');
-      for (var i = 0; i < inputs.length; i++) {
-        inputs[i].addEventListener('input', function() {
-          var fieldUnit = this.closest('.field-unit');
-          if (fieldUnit && fieldUnit.classList.contains('field_with_errors')) {
-            fieldUnit.classList.remove('field_with_errors');
-            var errorMessage = fieldUnit.querySelector('.error-message');
-            if (errorMessage) {
-              errorMessage.remove();
-            }
-          }
-        });
-      }
+
+      // Initialize jQuery Validation for product forms
+      initializeProductValidation();
     });
 
-    function getFieldErrorText(fieldName) {
-      var errorMessages = {
-        'product[name]': 'Tên sản phẩm không được để trống',
-        'product[sku]': 'SKU không được để trống',
-        'product[price]': 'Giá sản phẩm không được để trống',
-        'product[brand_id]': 'Thương hiệu không được để trống',
-        'product[category_id]': 'Danh mục không được để trống',
-        'product[short_description]': 'Mô tả ngắn không được để trống'
-      };
-      return errorMessages[fieldName] || 'Trường này không hợp lệ';
+
+    // Initialize jQuery Validation for product forms
+    function initializeProductValidation() {
+      // Wait for jQuery and validation to be available
+      if (typeof $ === 'undefined' || typeof $.validator === 'undefined') {
+        setTimeout(initializeProductValidation, 100);
+        return;
+      }
+
+      var productForm = $('form[action*="/products"]');
+      if (productForm.length === 0) {
+        return;
+      }
+
+      // Configure validation rules
+      productForm.validate({
+        rules: {
+          'product[name]': {
+            required: true,
+            minlength: 2,
+            maxlength: 255
+          },
+          'product[price]': {
+            required: true,
+            number: true,
+            min: 0
+          },
+          'product[original_price]': {
+            number: true,
+            min: 0
+          },
+          'product[brand_id]': {
+            required: true
+          },
+          'product[category_id]': {
+            required: true
+          },
+          'product[short_description]': {
+            maxlength: 500
+          }
+        },
+        messages: {
+          'product[name]': {
+            required: 'Tên sản phẩm là bắt buộc',
+            minlength: 'Tên sản phẩm phải có ít nhất 2 ký tự',
+            maxlength: 'Tên sản phẩm không được quá 255 ký tự'
+          },
+          'product[price]': {
+            required: 'Giá sản phẩm là bắt buộc',
+            number: 'Giá sản phẩm phải là số',
+            min: 'Giá sản phẩm phải lớn hơn 0'
+          },
+          'product[original_price]': {
+            number: 'Giá gốc phải là số',
+            min: 'Giá gốc phải lớn hơn 0'
+          },
+          'product[brand_id]': {
+            required: 'Thương hiệu là bắt buộc'
+          },
+          'product[category_id]': {
+            required: 'Danh mục là bắt buộc'
+          },
+          'product[short_description]': {
+            maxlength: 'Mô tả ngắn không được quá 500 ký tự'
+          }
+        },
+        errorElement: 'span',
+        errorClass: 'error',
+        // Enable real-time validation
+        onkeyup: function(element, event) {
+          // Validate on keyup for text inputs
+          if (event.which === 9 && this.elementValue(element) === '') {
+            return;
+          } else if (element.name in this.submitted || element.name in this.invalid) {
+            this.element(element);
+          }
+        },
+        onfocusout: function(element) {
+          // Validate on focusout
+          this.element(element);
+        },
+        onclick: function(element) {
+          // Validate on click for checkboxes, radio buttons
+          if (element.name in this.submitted || element.name in this.invalid) {
+            this.element(element);
+          }
+        },
+        errorPlacement: function(error, element) {
+          // For Select2 elements
+          if (element.hasClass('select2-hidden-accessible')) {
+            error.insertAfter(element.next('.select2-container'));
+          } else {
+            error.insertAfter(element);
+          }
+        },
+        highlight: function(element, errorClass, validClass) {
+          $(element).addClass('error');
+          $(element).closest('.field-unit').addClass('field_with_errors');
+          
+          // Special handling for Select2
+          if ($(element).hasClass('select2-hidden-accessible')) {
+            $(element).next('.select2-container').addClass('error');
+          }
+        },
+        unhighlight: function(element, errorClass, validClass) {
+          $(element).removeClass('error');
+          $(element).closest('.field-unit').removeClass('field_with_errors');
+          
+          // Special handling for Select2
+          if ($(element).hasClass('select2-hidden-accessible')) {
+            $(element).next('.select2-container').removeClass('error');
+          }
+        },
+        submitHandler: function(form) {
+          // Clear any existing validation errors
+          $('.error').remove();
+          $('.field_with_errors').removeClass('field_with_errors');
+          $('.select2-container').removeClass('error');
+          
+          // Submit the form
+          form.submit();
+        }
+      });
+
+      // Custom validation for product images
+      $.validator.addMethod('minImages', function(value, element, param) {
+        var imageCount = $('.product-image-item').length;
+        return imageCount >= param;
+      }, 'Phải có ít nhất {0} hình ảnh sản phẩm');
+
+      // Add validation rule for product images
+      productForm.find('input[name*="product_images"]').each(function() {
+        $(this).rules('add', {
+          minImages: 1,
+          messages: {
+            minImages: 'Phải có ít nhất 1 hình ảnh sản phẩm'
+          }
+        });
+      });
+
+      // Add event listeners for Select2 to trigger validation
+      productForm.find('select').each(function() {
+        var select = $(this);
+        if (select.hasClass('select2-hidden-accessible')) {
+          select.on('change', function() {
+            // Trigger validation when Select2 value changes
+            productForm.validate().element(this);
+          });
+        }
+      });
+
+      // Add event listeners for all form inputs to trigger real-time validation
+      productForm.find('input, textarea, select').on('input change keyup', function() {
+        var element = this;
+        // Only validate if the element has been touched or is invalid
+        if (productForm.validate().submitted[element.name] || productForm.validate().invalid[element.name]) {
+          productForm.validate().element(element);
+        }
+      });
+
+      console.log('Product validation initialized with real-time checking');
     }
   </script>
 </body>
