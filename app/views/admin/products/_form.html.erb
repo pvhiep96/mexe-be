@@ -562,10 +562,12 @@
       </div>
       <div class="field-unit">
         <label>Content</label>
-        <textarea name="product[product_descriptions_attributes][NEW_RECORD][content]" 
-                  class="ckeditor text-field" 
-                  id="product_descriptions_content_NEW_RECORD"
-                  rows="10"></textarea>
+        <div class="field-unit__field" style="margin-left: 0;">
+          <textarea name="product[product_descriptions_attributes][NEW_RECORD][content]" 
+                    class="ckeditor text-field" 
+                    id="product_descriptions_content_NEW_RECORD"
+                    rows="10"></textarea>
+        </div>
       </div>
       <div class="field-unit">
         <label>Sort Order</label>
@@ -1013,6 +1015,24 @@
     
     // Add to container
     container.appendChild(newItem);
+    
+    // Initialize CKEditor for the new textarea
+    const textarea = newItem.querySelector('.ckeditor');
+    if (textarea && typeof CKEDITOR !== 'undefined') {
+      // Generate unique ID for the textarea
+      const uniqueId = 'product_descriptions_content_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      textarea.id = uniqueId;
+      textarea.name = textarea.name.replace('NEW_RECORD', nextSortOrder);
+      
+    // Initialize CKEditor using the shared initializer (ensures identical toolbar)
+    if (typeof window.initProductCkEditor === 'function') {
+      // For newly added item, hide Styles & Format dropdowns to match request
+      window.initProductCkEditor(uniqueId, { removeButtons: 'Styles,Format' });
+    } else if (typeof CKEDITOR !== 'undefined') {
+      // Fallback in case the layout script hasn't loaded yet
+      CKEDITOR.replace(uniqueId);
+    }
+    }
     
     // Update sort orders for all items
     updateSortOrdersForContainer(container);

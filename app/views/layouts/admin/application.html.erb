@@ -487,34 +487,54 @@
     }
     
     // Wait for both CKEDITOR and DOM to be ready
+    // Single source of truth for CKEditor config (2 toolbar rows)
+    window.initProductCkEditor = function(editorId, extraConfig) {
+      if (!editorId || typeof CKEDITOR === 'undefined') return;
+      if (CKEDITOR.instances[editorId]) {
+        try { CKEDITOR.instances[editorId].destroy(true); } catch (e) {}
+      }
+      var baseConfig = {
+        height: 300,
+        language: 'en',
+        // Remove all help/question-mark buttons
+        removeButtons: 'About,A11yHelp',
+        removePlugins: 'about,a11yhelp',
+        // Exactly TWO rows: one '/' line break
+        toolbar: [
+          { name: 'clipboard', items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo', '-', 'Scayt' ] },
+          { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
+          { name: 'insert', items: [ 'Image', 'Table', 'HorizontalRule', 'SpecialChar' ] },
+          { name: 'tools', items: [ 'Maximize', '-', 'Source' ] },
+          '/',
+          { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat' ] },
+          { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },
+          { name: 'editing', items: [ 'Find', 'Replace', '-', 'SelectAll' ] },
+          { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },
+          { name: 'colors', items: [ 'TextColor', 'BGColor' ] }
+        ],
+        filebrowserBrowseUrl: '/ckeditor/attachment_files',
+        filebrowserImageBrowseUrl: '/ckeditor/pictures',
+        filebrowserImageUploadUrl: '/ckeditor/pictures',
+        filebrowserUploadUrl: '/ckeditor/attachment_files'
+      };
+      var finalConfig = baseConfig;
+      if (extraConfig && typeof extraConfig === 'object') {
+        finalConfig = Object.assign({}, baseConfig, extraConfig);
+        // merge removeButtons if both provided
+        if (baseConfig.removeButtons && extraConfig.removeButtons) {
+          finalConfig.removeButtons = baseConfig.removeButtons + ',' + extraConfig.removeButtons;
+        }
+      }
+      CKEDITOR.replace(editorId, finalConfig);
+    };
+
     var initializeCKEditorWhenReady = function() {
       if (typeof CKEDITOR !== 'undefined' && document.readyState === 'complete') {
         setTimeout(function() {
           var textareas = document.querySelectorAll('textarea.ckeditor');
           textareas.forEach(function(textarea) {
             if (!CKEDITOR.instances[textarea.id]) {
-              CKEDITOR.replace(textarea.id, {
-                height: 400,
-                language: 'vi',
-                toolbar: [
-                  { name: 'document', items: [ 'Source', '-', 'NewPage', 'Preview', '-', 'Templates' ] },
-                  { name: 'clipboard', items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
-                  { name: 'editing', items: [ 'Find', 'Replace', '-', 'SelectAll' ] },
-                  '/',
-                  { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat' ] },
-                  { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },
-                  { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
-                  '/',
-                  { name: 'insert', items: [ 'Image', 'Table', 'HorizontalRule', 'SpecialChar' ] },
-                  { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },
-                  { name: 'colors', items: [ 'TextColor', 'BGColor' ] },
-                  { name: 'tools', items: [ 'Maximize' ] }
-                ],
-                filebrowserBrowseUrl: '/ckeditor/attachment_files',
-                filebrowserImageBrowseUrl: '/ckeditor/pictures',
-                filebrowserImageUploadUrl: '/ckeditor/pictures',
-                filebrowserUploadUrl: '/ckeditor/attachment_files'
-              });
+              window.initProductCkEditor(textarea.id);
             }
           });
         }, 100);
@@ -801,6 +821,12 @@
 
     /* Hide CKEditor textarea completely */
     .ckeditor {
+      display: none !important;
+      visibility: hidden !important;
+    }
+    
+    /* Hide newly added CKEditor textareas */
+    .product-description-fields .ckeditor {
       display: none !important;
       visibility: hidden !important;
     }
