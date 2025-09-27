@@ -124,6 +124,12 @@ Rails.application.routes.draw do
       # Contact routes
       post 'contacts', to: 'contacts#create'
 
+      # Address routes
+      get 'addresses/provinces', to: 'addresses#provinces'
+      get 'addresses/wards', to: 'addresses#wards'
+      get 'addresses/administrative_units', to: 'addresses#administrative_units'
+      get 'addresses/search', to: 'addresses#search'
+
       # Debug routes (only in development)
       if Rails.env.development?
         get 'debug/auth_test', to: 'debug#auth_test'

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_09_22_000002) do
+ActiveRecord::Schema[7.2].define(version: 2025_09_27_070330) do
   create_table "active_admin_comments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
@@ -68,6 +68,26 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_22_000002) do
     t.index ["email"], name: "index_admin_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
     t.index ["role"], name: "index_admin_users_on_role"
+  end
+
+  create_table "administrative_regions", id: :integer, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "name_en", null: false
+    t.string "code_name", null: false
+    t.string "code_name_en", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "administrative_units", id: :integer, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "full_name", null: false
+    t.string "full_name_en", null: false
+    t.string "short_name", null: false
+    t.string "short_name_en", null: false
+    t.string "code_name", null: false
+    t.string "code_name_en", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "article_images", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -129,20 +149,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_22_000002) do
     t.text "meta_description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "image_url"
     t.index ["parent_id"], name: "index_categories_on_parent_id"
     t.index ["slug"], name: "index_categories_on_slug", unique: true
-  end
-
-  create_table "ckeditor_assets", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.string "data_file_name", null: false
-    t.string "data_content_type"
-    t.integer "data_file_size"
-    t.string "data_fingerprint"
-    t.string "type", limit: 30
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["type"], name: "index_ckeditor_assets_on_type"
   end
 
   create_table "client_notifications", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -256,9 +264,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_22_000002) do
     t.decimal "coupon_discount", precision: 10, scale: 2, default: "0.0"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "tracking_url"
-    t.datetime "shipped_at"
-    t.datetime "delivered_at"
     t.string "shipping_name"
     t.string "shipping_phone"
     t.string "shipping_city"
@@ -414,6 +419,18 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_22_000002) do
     t.index ["slug"], name: "index_products_on_slug", unique: true
   end
 
+  create_table "provinces", primary_key: "code", id: { type: :string, limit: 20 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "name_en", null: false
+    t.string "full_name", null: false
+    t.string "full_name_en", null: false
+    t.string "code_name", null: false
+    t.integer "administrative_unit_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["administrative_unit_id"], name: "index_provinces_on_administrative_unit_id"
+  end
+
   create_table "revenue_reports", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "client_id", null: false
     t.date "report_date", null: false
@@ -515,6 +532,20 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_22_000002) do
     t.index ["password_digest"], name: "index_users_on_password_digest"
   end
 
+  create_table "wards", primary_key: "code", id: { type: :string, limit: 20 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "name_en", null: false
+    t.string "full_name", null: false
+    t.string "full_name_en", null: false
+    t.string "code_name", null: false
+    t.string "province_code", limit: 20, null: false
+    t.integer "administrative_unit_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["administrative_unit_id"], name: "index_wards_on_administrative_unit_id"
+    t.index ["province_code"], name: "index_wards_on_province_code"
+  end
+
   create_table "wishlists", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "product_id", null: false
@@ -552,9 +583,12 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_22_000002) do
   add_foreign_key "products", "admin_users", column: "client_id"
   add_foreign_key "products", "brands"
   add_foreign_key "products", "categories"
+  add_foreign_key "provinces", "administrative_units"
   add_foreign_key "revenue_reports", "admin_users", column: "client_id"
   add_foreign_key "user_addresses", "users"
   add_foreign_key "user_order_infos", "orders"
+  add_foreign_key "wards", "administrative_units"
+  add_foreign_key "wards", "provinces", column: "province_code", primary_key: "code"
   add_foreign_key "wishlists", "products"
   add_foreign_key "wishlists", "users"
 end
