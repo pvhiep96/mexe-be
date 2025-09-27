@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_09_27_070330) do
+ActiveRecord::Schema[7.2].define(version: 2025_09_27_093758) do
   create_table "active_admin_comments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
@@ -278,6 +278,13 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_27_070330) do
     t.boolean "partial_advance_payment", default: false
     t.decimal "advance_payment_percentage", precision: 5, scale: 2, default: "0.0"
     t.decimal "advance_payment_discount_percentage", precision: 5, scale: 2, default: "0.0"
+    t.string "shipping_province_code"
+    t.string "shipping_ward_code"
+    t.text "full_address"
+    t.integer "administrative_unit_id"
+    t.string "administrative_unit_name"
+    t.string "province_type"
+    t.boolean "is_municipality"
     t.index ["full_payment_transfer"], name: "index_orders_on_full_payment_transfer"
     t.index ["order_number"], name: "index_orders_on_order_number", unique: true
     t.index ["partial_advance_payment"], name: "index_orders_on_partial_advance_payment"

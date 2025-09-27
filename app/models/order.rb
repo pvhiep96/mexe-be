@@ -6,9 +6,9 @@ class Order < ApplicationRecord
   has_many :product_reviews, dependent: :destroy
   # has_many :coupon_usages, dependent: :destroy
 
-  # Quan hệ với địa chỉ chuẩn
-  belongs_to :shipping_province, foreign_key: 'shipping_province_code', primary_key: 'code', class_name: 'Province', optional: true
-  belongs_to :shipping_ward, foreign_key: 'shipping_ward_code', primary_key: 'code', class_name: 'Ward', optional: true
+  # Quan hệ với địa chỉ chuẩn - temporarily disabled until migration runs
+  # belongs_to :shipping_province, foreign_key: 'shipping_province_code', primary_key: 'code', class_name: 'Province', optional: true
+  # belongs_to :shipping_ward, foreign_key: 'shipping_ward_code', primary_key: 'code', class_name: 'Ward', optional: true
 
   validates :order_number, presence: true, uniqueness: true
   # validates :subtotal, presence: true, numericality: { greater_than_or_equal_to: 0 }
@@ -114,14 +114,24 @@ class Order < ApplicationRecord
   end
 
   def calculate_totals
-    self.subtotal = order_items.sum('quantity * unit_price')
-    self.payment_method = :cod
+    # Calculate subtotal from order_items (including unsaved ones)
+    if order_items.any?
+      if persisted?
+        # For saved orders, use database sum
+        self.subtotal = order_items.sum('quantity * unit_price')
+      else
+        # For new orders, calculate from memory
+        self.subtotal = order_items.sum { |item| (item.quantity || 0) * (item.unit_price || 0) }
+      end
+    else
+      self.subtotal = 0.0
+    end
+
+    self.payment_method = :cod if payment_method.blank?
     self.discount_amount ||= 0.0
     self.shipping_fee ||= 0.0
     self.tax_amount ||= 0.0
-    self.total_amount = 0
     self.total_amount = subtotal - discount_amount + shipping_fee + tax_amount
-    # save
   end
 
   # Payment calculation methods

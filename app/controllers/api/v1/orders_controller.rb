@@ -23,6 +23,10 @@ module Api
       end
 
       def create
+        # Debug: Log incoming parameters
+        Rails.logger.info "Incoming order params: #{params.inspect}"
+        puts "Incoming order params: #{params.inspect}"
+
         # Check if orders params exist
         unless params[:orders]
           render json: { error: 'Orders parameters are required' }, status: :bad_request
@@ -30,8 +34,10 @@ module Api
         end
 
         order_number = params[:orders][:order_number] || generate_order_number
+        puts "Order number: #{order_number}"
 
         order = Order.find_or_initialize_by(order_number: order_number)
+        puts "Order found/initialized: #{order.persisted?}"
 
         # Set user ID (use current_user if authenticated, otherwise allow guest orders)
         if current_user
@@ -70,29 +76,72 @@ module Api
           order.shipping_ward = shipping_info[:shipping_ward]
           order.shipping_postal_code = shipping_info[:shipping_postal_code]
           order.delivery_address = shipping_info[:delivery_address] || build_full_address(shipping_info)
+
+          # Set new address fields from database (with error handling)
+          # Store in delivery_address as fallback if new columns don't exist
+          begin
+            if order.respond_to?(:shipping_province_code=)
+              order.shipping_province_code = shipping_info[:province_code]
+              order.shipping_ward_code = shipping_info[:ward_code]
+              order.full_address = shipping_info[:full_address]
+              order.administrative_unit_id = shipping_info[:administrative_unit_id]
+              order.administrative_unit_name = shipping_info[:administrative_unit_name]
+              order.province_type = shipping_info[:province_type]
+              order.is_municipality = shipping_info[:is_municipality]
+              puts "✅ New address fields saved"
+            else
+              # Fallback: store structured address info in delivery_address
+              structured_address = {
+                detail: shipping_info[:delivery_address],
+                ward_code: shipping_info[:ward_code],
+                province_code: shipping_info[:province_code],
+                full_address: shipping_info[:full_address],
+                province_type: shipping_info[:province_type],
+                is_municipality: shipping_info[:is_municipality]
+              }
+              order.delivery_address = "#{shipping_info[:delivery_address]} | #{structured_address.to_json}"
+              puts "⚠️ Using fallback address storage (migration needed)"
+            end
+          rescue => e
+            Rails.logger.warn "Address field error: #{e.message}"
+            puts "Address field error: #{e.message}"
+          end
         end
 
         # Manually build order items
         if order_params[:order_items].present?
+          puts "Building order items: #{order_params[:order_items].count} items"
           order_params[:order_items].each do |item_params|
-            product = Product.find(item_params[:product_id])
-            order.order_items.build(
-              product_id: product.id,
-              product_name: product.name,
-              product_sku: product.sku,
-              quantity: item_params[:quantity],
-              unit_price: product.price,
-              total_price: product.price * item_params[:quantity]
-              # variant_info: item_params[:variant_id] ? ProductVariant.where(product_id: product.id, variant_value: item_params[:variant_id]).as_json : nil
-            )
+            puts "Finding product ID: #{item_params[:product_id]}"
+            begin
+              product = Product.find(item_params[:product_id])
+              puts "Product found: #{product.name}"
+              order.order_items.build(
+                product_id: product.id,
+                product_name: product.name,
+                product_sku: product.sku,
+                quantity: item_params[:quantity],
+                unit_price: product.price,
+                total_price: product.price * item_params[:quantity]
+                # variant_info: item_params[:variant_id] ? ProductVariant.where(product_id: product.id, variant_value: item_params[:variant_id]).as_json : nil
+              )
+            rescue ActiveRecord::RecordNotFound => e
+              puts "❌ Product not found: #{item_params[:product_id]}"
+              render json: { error: "Product with ID #{item_params[:product_id]} not found" }, status: :unprocessable_entity
+              return
+            end
           end
         end
 
         order.valid?
-        if order.save
-          order.calculate_totals
-          order.save
 
+        # Debug: Log validation errors
+        if order.errors.any?
+          Rails.logger.error "Order validation errors: #{order.errors.full_messages}"
+          puts "Order validation errors: #{order.errors.full_messages}"
+        end
+
+        if order.save
           # Always create user_order_info record to store buyer information from shipping form
           create_user_order_info(order)
 
@@ -101,11 +150,19 @@ module Api
 
           render json: OrderSerializer.new(order).to_json, status: :created
         else
+          Rails.logger.error "Failed to save order: #{order.errors.full_messages}"
+          puts "Failed to save order: #{order.errors.full_messages}"
           render json: { errors: order.errors.full_messages }, status: :unprocessable_entity
         end
-      rescue ActiveRecord::RecordNotFound
+      rescue ActiveRecord::RecordNotFound => e
+        puts "❌ RecordNotFound: #{e.message}"
+        Rails.logger.error "RecordNotFound: #{e.message}"
         render json: { error: 'Product or variant not found' }, status: :unprocessable_entity
       rescue StandardError => e
+        puts "❌ StandardError: #{e.message}"
+        puts "Backtrace: #{e.backtrace.first(5)}"
+        Rails.logger.error "StandardError: #{e.message}"
+        Rails.logger.error "Backtrace: #{e.backtrace.first(10)}"
         render json: { error: "Failed to create order: #{e.message}" }, status: :unprocessable_entity
       end
 
@@ -153,20 +210,29 @@ module Api
 
       def order_params
         params.require(:orders).permit(
-          :payment_method, :delivery_type, :delivery_address, :store_location,
+          :order_number, :payment_method, :delivery_type, :delivery_address, :store_location,
           :coupon_code, :guest_email, :guest_phone, :guest_name, :notes,
           # Payment options
           :full_payment_transfer, :full_payment_discount_percentage,
           :partial_advance_payment, :advance_payment_percentage, :advance_payment_discount_percentage,
           shipping_info: [
             :shipping_name, :shipping_phone, :shipping_city, :shipping_district,
-            :shipping_ward, :shipping_postal_code, :delivery_address
+            :shipping_ward, :shipping_postal_code, :delivery_address,
+            # New address fields from database
+            :province_code, :ward_code, :full_address,
+            :administrative_unit_id, :administrative_unit_name,
+            :province_type, :is_municipality
           ],
           buyer_info: [
             :buyer_name, :buyer_email, :buyer_phone, :buyer_address,
             :buyer_city, :notes
           ],
-          order_items: [:product_id, :variant_id, :quantity]
+          order_items: [
+            :product_id, :variant_id, :quantity,
+            # Payment options for items
+            :full_payment_transfer, :full_payment_discount_percentage,
+            :partial_advance_payment, :advance_payment_percentage, :advance_payment_discount_percentage
+          ]
         )
       end
 
