@@ -1,21 +1,20 @@
-class ProvinceSerializer
-  include JSONAPI::Serializer
-  
-  attributes :code, :name, :name_en, :full_name, :full_name_en, :code_name
-  
-  attribute :type do |province|
-    province.administrative_unit&.short_name
+class ProvinceSerializer < ActiveModel::Serializer
+  attributes :code, :name, :name_en, :full_name, :full_name_en, :code_name,
+             :type, :type_en, :is_municipality, :wards_count
+
+  def type
+    object.administrative_unit&.short_name
   end
-  
-  attribute :type_en do |province|
-    province.administrative_unit&.short_name_en
+
+  def type_en
+    object.administrative_unit&.short_name_en
   end
-  
-  attribute :is_municipality do |province|
-    province.is_municipality?
+
+  def is_municipality
+    object.is_municipality?
   end
-  
-  attribute :wards_count do |province|
-    province.wards.count
+
+  def wards_count
+    object.wards.count
   end
 end

@@ -6,6 +6,10 @@ class Order < ApplicationRecord
   has_many :product_reviews, dependent: :destroy
   # has_many :coupon_usages, dependent: :destroy
 
+  # Quan hệ với địa chỉ chuẩn
+  belongs_to :shipping_province, foreign_key: 'shipping_province_code', primary_key: 'code', class_name: 'Province', optional: true
+  belongs_to :shipping_ward, foreign_key: 'shipping_ward_code', primary_key: 'code', class_name: 'Ward', optional: true
+
   validates :order_number, presence: true, uniqueness: true
   # validates :subtotal, presence: true, numericality: { greater_than_or_equal_to: 0 }
   # validates :total_amount, presence: true, numericality: { greater_than_or_equal_to: 0 }
@@ -156,6 +160,28 @@ class Order < ApplicationRecord
       advance_payment_discount: partial_advance_payment? ? advance_payment_amount - advance_payment_with_discount : 0,
       remaining_amount: remaining_payment_amount
     }
+  end
+
+  # Helper methods cho địa chỉ
+  def shipping_province_name
+    shipping_province&.name || shipping_city
+  end
+
+  def shipping_ward_name
+    shipping_ward&.name || shipping_ward
+  end
+
+  def formatted_shipping_address
+    address_parts = []
+    address_parts << delivery_address if delivery_address.present?
+    address_parts << shipping_ward_name if shipping_ward_name.present?
+
+    if shipping_district.present?
+      address_parts << shipping_district
+    end
+
+    address_parts << shipping_province_name if shipping_province_name.present?
+    address_parts.compact.reject(&:blank?).join(', ')
   end
 
   private

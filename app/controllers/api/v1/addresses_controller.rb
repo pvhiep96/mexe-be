@@ -6,7 +6,7 @@ module Api
         provinces = Province.includes(:administrative_unit)
                            .order(:name)
 
-        render json: provinces.map { |province| ProvinceSerializer.new(province).serializable_hash[:data] }
+        render json: provinces, each_serializer: ProvinceSerializer
       end
 
       # GET /api/v1/addresses/wards?province_code=01
@@ -17,7 +17,7 @@ module Api
                    .where(province_code: params[:province_code])
                    .order(:name)
 
-        render json: wards.map { |ward| WardSerializer.new(ward).serializable_hash[:data] }
+        render json: wards, each_serializer: WardSerializer
       end
 
       # GET /api/v1/addresses/administrative_units
