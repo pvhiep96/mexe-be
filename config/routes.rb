@@ -90,6 +90,9 @@ Rails.application.routes.draw do
       resources :products, only: [:index, :show]
       resources :orders, only: [:index, :show, :create]
       post 'orders/completed', to: 'orders#completed'
+      
+      # Product videos routes
+      get 'product_videos/latest', to: 'product_videos#latest'
 
       # Search routes
       get 'search/products', to: 'search#products'
