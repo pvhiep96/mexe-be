@@ -99,9 +99,10 @@ Rails.application.configure do
   # config.hosts.clear
   # Enable DNS rebinding protection and other `Host` header attacks.
   config.hosts = [
-    "47.129.168.239",     # Allow requests from production IP
+    "admin.mexestore.vn",     # Allow requests from production IP
     "localhost",           # Allow localhost for development
-    "127.0.0.1"           # Allow localhost IP
+    "127.0.0.1",           # Allow localhost IP,
+    "mexestore.vn"
   ]
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
@@ -111,7 +112,10 @@ Rails.application.configure do
     allow do
       origins 'http://47.129.168.239', 'https://47.129.168.239',
               'http://47.129.168.239:80', 'http://47.129.168.239:3000',
-              'https://47.129.168.239:80', 'https://47.129.168.239:3000'
+              'https://47.129.168.239:80', 'https://47.129.168.239:3000',
+              "https://mexestore.vn", "http://mexestore.vn",
+              "https://www.mexestore.vn", "http://www.mexestore.vn"
+
 
       resource '*',
         headers: :any,
