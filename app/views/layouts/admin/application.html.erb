@@ -1099,14 +1099,14 @@
       }, 'Phải có ít nhất {0} hình ảnh sản phẩm');
 
       // Add validation rule for product images
-      productForm.find('input[name*="product_images"]').each(function() {
-        $(this).rules('add', {
-          minImages: 1,
-          messages: {
-            minImages: 'Phải có ít nhất 1 hình ảnh sản phẩm'
-          }
-        });
-      });
+      # productForm.find('input[name*="product_images"]').each(function() {
+      #   $(this).rules('add', {
+      #     minImages: 1,
+      #     messages: {
+      #       minImages: 'Phải có ít nhất 1 hình ảnh sản phẩm'
+      #     }
+      #   });
+      # });
 
       // Add event listeners for Select2 to trigger validation
       productForm.find('select').each(function() {
