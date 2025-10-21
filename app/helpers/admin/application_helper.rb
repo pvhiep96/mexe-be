@@ -11,5 +11,9 @@ module Admin
         end
       end
     end
+
+    def vietnamese_pluralize(count, singular)
+      "#{count} #{singular}"
+    end
   end
 end

@@ -28,6 +28,7 @@ class Product < ApplicationRecord
 
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true
+  validates :sku, uniqueness: { allow_blank: true, message: "đã tồn tại trong hệ thống" }
   validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :stock_quantity, numericality: { greater_than_or_equal_to: 0 }
 
