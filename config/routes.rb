@@ -11,7 +11,7 @@ Rails.application.routes.draw do
       resources :product_descriptions, except: [:show]
     end
     resources :product_images, only: [:index, :destroy]
-    resources :orders, only: [:index, :show] do
+    resources :orders, only: [:index, :show, :update] do
       member do
         patch :update_shipping
       end

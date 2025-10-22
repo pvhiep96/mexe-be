@@ -2,20 +2,20 @@
 
 <%= form_with(model: [:admin, page.resource], local: true, multipart: true) do |form| %>
   <%= render "admin/application/form_errors", resource: page.resource %>
-  
+
   <!-- Standard Product Fields -->
   <div class="field-unit">
     <%= form.label :name %>
     <%= form.text_field :name, class: "text-field" %>
   </div>
-  
+
   <!-- Two-column layout for short fields -->
   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
     <div class="field-unit">
       <%= form.label :slug %>
       <%= form.text_field :slug, class: "text-field" %>
     </div>
-    
+
     <div class="field-unit">
       <%= form.label :sku %>
       <%= form.text_field :sku, class: "text-field" %>
@@ -46,18 +46,18 @@
       <%= form.label :price %>
       <%= form.number_field :price, step: 0.01, class: "text-field" %>
     </div>
-    
+
     <div class="field-unit">
       <%= form.label :stock_quantity %>
       <%= form.number_field :stock_quantity, class: "text-field" %>
     </div>
-    
+
     <div class="field-unit">
       <%= form.label :warranty_period %>
       <%= form.text_field :warranty_period, class: "text-field" %>
     </div>
   </div>
-  
+
   <!-- Payment Options Section -->
   <div class="field-unit">
     <div class="field-unit__label">
@@ -201,7 +201,7 @@
         <% end %>
         <%= form.label :is_essential_accessories, "🔧 Essential Accessories (Phụ kiện thiết yếu)", class: "status-flag-label #{'disabled' unless current_admin_user&.super_admin?}" %>
       </div>
-      
+
       <div style="display: flex; align-items: center; gap: 8px;">
         <% if current_admin_user&.super_admin? %>
           <%= form.check_box :is_best_seller %>
@@ -210,7 +210,7 @@
         <% end %>
         <%= form.label :is_best_seller, "🏆 Best Seller (Bán chạy nhất)", class: "status-flag-label #{'disabled' unless current_admin_user&.super_admin?}" %>
       </div>
-      
+
       <div style="display: flex; align-items: center; gap: 8px;">
         <% if current_admin_user&.super_admin? %>
           <%= form.check_box :is_new %>
@@ -219,7 +219,7 @@
         <% end %>
         <%= form.label :is_new, "🆕 New (Mới)", class: "status-flag-label #{'disabled' unless current_admin_user&.super_admin?}" %>
       </div>
-      
+
       <div style="display: flex; align-items: center; gap: 8px;">
         <% if current_admin_user&.super_admin? %>
           <%= form.check_box :is_hot %>
@@ -228,7 +228,7 @@
         <% end %>
         <%= form.label :is_hot, "🔥 Hot (Thương Hiệu Mới - Ưu Đãi Đặc Biệt Nóng)", class: "status-flag-label #{'disabled' unless current_admin_user&.super_admin?}" %>
       </div>
-      
+
       <div style="display: flex; align-items: center; gap: 8px;">
         <% if current_admin_user&.super_admin? %>
           <%= form.check_box :is_preorder %>
@@ -237,7 +237,7 @@
         <% end %>
         <%= form.label :is_preorder, "📦 Preorder (Đặt trước)", class: "status-flag-label #{'disabled' unless current_admin_user&.super_admin?}" %>
       </div>
-      
+
       <div style="display: flex; align-items: center; gap: 8px;">
         <% if current_admin_user&.super_admin? %>
           <%= form.check_box :is_trending %>
@@ -246,7 +246,7 @@
         <% end %>
         <%= form.label :is_trending, "📈 Trending (Xu hướng)", class: "status-flag-label #{'disabled' unless current_admin_user&.super_admin?}" %>
       </div>
-      
+
       <div style="display: flex; align-items: center; gap: 8px;">
         <% if current_admin_user&.super_admin? %>
           <%= form.check_box :is_ending_soon %>
@@ -255,7 +255,7 @@
         <% end %>
         <%= form.label :is_ending_soon, "⏰ Ending Soon (Sắp kết thúc)", class: "status-flag-label #{'disabled' unless current_admin_user&.super_admin?}" %>
       </div>
-      
+
       <div style="display: flex; align-items: center; gap: 8px;">
         <% if current_admin_user&.super_admin? %>
           <%= form.check_box :is_arriving_soon %>
@@ -291,13 +291,13 @@
         <div id="bulk-preview-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 15px;"></div>
         <button type="button" id="add-bulk-images" class="btn btn-primary" style="margin-top: 10px; display: none;">📸 Add Selected Images</button>
       </div>
-      
+
       <div id="product-images-container" class="sortable-container">
         <%= form.fields_for :product_images do |image_form| %>
           <div class="nested-field-wrapper product-image-fields sortable-item" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; position: relative; cursor: move;" data-sort-order="<%= image_form.object.sort_order || 0 %>">
             <!-- Drag Handle -->
             <div class="drag-handle" style="position: absolute; top: 10px; right: 10px; cursor: grab; color: #666; font-size: 18px; z-index: 10;">⋮⋮</div>
-            
+
             <!-- Current Image Preview -->
             <% if image_form.object.image? %>
               <div class="current-image-preview" style="margin-bottom: 15px;">
@@ -307,12 +307,12 @@
                 </div>
               </div>
             <% end %>
-            
+
             <div class="field-unit">
               <label>Image</label>
               <%= image_form.file_field :image, accept: "image/jpeg,image/jpg,image/png,image/webp", class: "text-field image-upload", data: { preview_target: "image_preview_#{image_form.object.object_id}" } %>
             </div>
-            
+
             <!-- New Image Preview -->
             <div class="field-unit">
               <div id="image_preview_<%= image_form.object.object_id %>" class="image-preview" style="margin-top: 10px; display: none;">
@@ -350,7 +350,7 @@
           </div>
         <% end %>
       </div>
-      
+
       <div style="display: flex; justify-content: flex-end; margin-top: 15px;">
         <button type="button" id="add-product-image" class="btn btn-success">📸 Add Image</button>
       </div>
@@ -368,7 +368,7 @@
           <div class="nested-field-wrapper product-description-fields sortable-item" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; position: relative; cursor: move;" data-sort-order="<%= desc_form.object.sort_order || 0 %>">
             <!-- Drag Handle -->
             <div class="drag-handle" style="position: absolute; top: 10px; right: 10px; cursor: grab; color: #666; font-size: 18px; z-index: 10;">⋮⋮</div>
-            
+
             <div class="field-unit">
               <label>Title</label>
               <%= desc_form.text_field :title, class: "text-field" %>
@@ -394,7 +394,6 @@
           </div>
         <% end %>
       </div>
-      
       <div style="display: flex; justify-content: flex-end; margin-top: 15px;">
         <button type="button" id="add-product-description" class="btn btn-success">📝 Add Description</button>
       </div>
@@ -412,7 +411,7 @@
           <div class="nested-field-wrapper product-specification-fields sortable-item" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; position: relative; cursor: move;" data-sort-order="<%= spec_form.object.sort_order || 0 %>">
             <!-- Drag Handle -->
             <div class="drag-handle" style="position: absolute; top: 10px; right: 10px; cursor: grab; color: #666; font-size: 18px; z-index: 10;">⋮⋮</div>
-            
+
             <div class="field-unit">
               <label>Name</label>
               <%= spec_form.text_field :spec_name, class: "text-field" %>
@@ -459,7 +458,7 @@
           <div class="nested-field-wrapper product-video-fields sortable-item" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; position: relative; cursor: move;" data-sort-order="<%= video_form.object.sort_order || 0 %>">
             <!-- Drag Handle -->
             <div class="drag-handle" style="position: absolute; top: 10px; right: 10px; cursor: grab; color: #666; font-size: 18px; z-index: 10;">⋮⋮</div>
-            
+
             <div class="field-unit">
               <label>Video URL</label>
               <%= video_form.url_field :url, class: "text-field", placeholder: "https://www.youtube.com/watch?v=..." %>
@@ -502,7 +501,7 @@
           </div>
         <% end %>
       </div>
-      
+
       <div style="display: flex; justify-content: flex-end; margin-top: 15px;">
         <button type="button" id="add-product-video" class="btn btn-success">🎬 Add Video</button>
       </div>
@@ -614,7 +613,7 @@
     <div class="nested-field-wrapper product-video-fields sortable-item" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; position: relative; cursor: move;" data-sort-order="0">
       <!-- Drag Handle -->
       <div class="drag-handle" style="position: absolute; top: 10px; right: 10px; cursor: grab; color: #666; font-size: 18px; z-index: 10;">⋮⋮</div>
-      
+
       <div class="field-unit">
         <label>Video URL</label>
         <input type="url" name="product[product_videos_attributes][NEW_RECORD][url]" class="text-field" placeholder="https://www.youtube.com/watch?v=...">
@@ -670,19 +669,19 @@
       setTimeout(initializeCKEditorForProduct, 1000);
       return;
     }
-    
+
     if (!CKEDITOR.env) {
       setTimeout(initializeCKEditorForProduct, 500);
       return;
     }
-    
+
     var textareas = document.querySelectorAll('textarea.ckeditor');
-    
+
     if (textareas.length === 0) {
       setTimeout(initializeCKEditorForProduct, 500);
       return;
     }
-    
+
     textareas.forEach(function(textarea, index) {
       if (CKEDITOR.instances[textarea.id]) {
         return;
@@ -719,11 +718,11 @@
       }
     });
   }
-  
+
   function reinitializeCKEditor() {
     setTimeout(initializeCKEditorForProduct, 100);
   }
-  
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
       setTimeout(initializeCKEditorForProduct, 1000);
@@ -731,21 +730,21 @@
   } else {
     setTimeout(initializeCKEditorForProduct, 1000);
   }
-  
+
   window.addEventListener('load', function() {
     setTimeout(initializeCKEditorForProduct, 1500);
   });
-  
+
   document.addEventListener('visibilitychange', function() {
     if (!document.hidden) {
       setTimeout(initializeCKEditorForProduct, 500);
     }
   });
-  
+
   setTimeout(function() {
     initializeCKEditorForProduct();
   }, 3000);
-  
+
   // Image Upload and Preview Functionality
   function initializeImagePreview() {
     // Handle file input changes for image preview
@@ -753,37 +752,35 @@
       if (e.target.classList.contains('image-upload')) {
         handleImagePreview(e.target);
       }
-      
+
       if (e.target.id === 'bulk-image-upload') {
         handleBulkImagePreview(e.target);
       }
     });
-    
+
     // Handle remove preview buttons
     document.addEventListener('click', function(e) {
-      
-      
       if (e.target.classList.contains('remove-bulk-preview')) {
         removeBulkPreview(e.target);
       }
-      
+
       if (e.target.id === 'add-bulk-images') {
         addBulkImagesToForm();
       }
-      
+
       // Handle Add buttons for different sections
       if (e.target.id === 'add-product-description') {
         e.preventDefault();
         e.stopPropagation();
         addProductDescription();
       }
-      
+
       if (e.target.id === 'add-product-specification') {
         e.preventDefault();
         e.stopPropagation();
         addProductSpecification();
       }
-      
+
       if (e.target.id === 'add-product-video') {
         e.preventDefault();
         e.stopPropagation();
@@ -791,14 +788,12 @@
       }
     });
   }
-  
+
   function handleImagePreview(fileInput) {
     const file = fileInput.files[0];
     const previewTarget = fileInput.getAttribute('data-preview-target');
     const previewContainer = document.getElementById(previewTarget);
-    
     if (!file || !previewContainer) return;
-    
     // Validate file type
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     if (!validTypes.includes(file.type)) {
@@ -806,7 +801,7 @@
       fileInput.value = '';
       return;
     }
-    
+
     // Validate file size (max 5MB)
     const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
@@ -814,7 +809,7 @@
       fileInput.value = '';
       return;
     }
-    
+
     // Create preview
     const reader = new FileReader();
     reader.onload = function(e) {
@@ -824,21 +819,17 @@
     };
     reader.readAsDataURL(file);
   }
-  
-  
-  
+
   // Bulk image upload functions
   let bulkFiles = [];
-  
+
   function handleBulkImagePreview(fileInput) {
     const files = Array.from(fileInput.files);
     const previewContainer = document.getElementById('bulk-preview-container');
     const addButton = document.getElementById('add-bulk-images');
-    
     // Clear previous previews
     previewContainer.innerHTML = '';
     bulkFiles = [];
-    
     files.forEach((file, index) => {
       // Validate file type
       const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
@@ -846,16 +837,13 @@
         alert(`File "${file.name}" không đúng định dạng. Chỉ chấp nhận: JPG, PNG, WebP`);
         return;
       }
-      
       // Validate file size (max 5MB)
       const maxSize = 5 * 1024 * 1024;
       if (file.size > maxSize) {
         alert(`File "${file.name}" vượt quá 5MB`);
         return;
       }
-      
       bulkFiles.push(file);
-      
       // Create preview
       const reader = new FileReader();
       reader.onload = function(e) {
@@ -863,25 +851,22 @@
         previewDiv.className = 'bulk-preview-item';
         previewDiv.style.cssText = 'position: relative; border: 1px solid #ddd; border-radius: 4px; overflow: hidden; max-width: 100%;';
         previewDiv.dataset.fileIndex = index;
-        
         previewDiv.innerHTML = `
           <img src="${e.target.result}" style="max-width: 100%; height: 120px; object-fit: cover;">
           <div style="padding: 5px; font-size: 11px; background: #f8f9fa;">
             <div style="font-weight: bold; margin-bottom: 2px;">${file.name}</div>
             <div>${(file.size / 1024).toFixed(1)} KB</div>
           </div>
-          <button type="button" class="remove-bulk-preview" data-file-index="${index}" 
-                  style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; 
-                         border-radius: 50%; background: #dc3545; color: white; border: none; 
-                         cursor: pointer; font-size: 12px; display: flex; align-items: center; 
+          <button type="button" class="remove-bulk-preview" data-file-index="${index}"
+                  style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px;
+                         border-radius: 50%; background: #dc3545; color: white; border: none;
+                         cursor: pointer; font-size: 12px; display: flex; align-items: center;
                          justify-content: center;">×</button>
         `;
-        
         previewContainer.appendChild(previewDiv);
       };
       reader.readAsDataURL(file);
     });
-    
     if (bulkFiles.length > 0) {
       addButton.style.display = 'block';
       addButton.textContent = `Add ${bulkFiles.length} Image(s)`;
@@ -889,25 +874,25 @@
       addButton.style.display = 'none';
     }
   }
-  
+
   function removeBulkPreview(button) {
     const fileIndex = parseInt(button.dataset.fileIndex);
     const previewItem = button.closest('.bulk-preview-item');
     const addButton = document.getElementById('add-bulk-images');
-    
+
     // Remove from bulkFiles array
     bulkFiles = bulkFiles.filter((_, index) => index !== fileIndex);
-    
+
     // Remove preview element
     previewItem.remove();
-    
+
     // Update add button
     if (bulkFiles.length > 0) {
       addButton.textContent = `Add ${bulkFiles.length} Image(s)`;
     } else {
       addButton.style.display = 'none';
     }
-    
+
     // Update file indices for remaining previews
     const remainingPreviews = document.querySelectorAll('.bulk-preview-item');
     remainingPreviews.forEach((preview, newIndex) => {
@@ -916,62 +901,54 @@
       removeBtn.dataset.fileIndex = newIndex;
     });
   }
-  
+
   function addBulkImagesToForm() {
     const container = document.getElementById('product-images-container');
     const template = document.getElementById('product-image-template');
-    
+
     if (!container || !template || bulkFiles.length === 0) return;
-    
+
     // First, clean up any empty fields
     const emptyFields = container.querySelectorAll('.product-image-fields');
     emptyFields.forEach(field => {
       const fileInput = field.querySelector('.image-upload');
       const hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
       const hasCurrentImage = field.querySelector('.current-image-preview');
-      
+
       // If field has no file and no current image, remove it
       if (!hasFile && !hasCurrentImage) {
         field.remove();
       }
     });
-    
+
     // Get current number of existing image fields to calculate proper sort order
     const existingFields = container.querySelectorAll('.product-image-fields');
     let nextSortOrder = existingFields.length;
-    
+
     bulkFiles.forEach((file, index) => {
       const newIndex = Date.now() + index;
       let newField = template.innerHTML.replace(/NEW_RECORD/g, newIndex);
-      
       const wrapper = document.createElement('div');
       wrapper.innerHTML = newField;
       wrapper.className = 'nested-field-wrapper product-image-fields sortable-item';
       wrapper.setAttribute('data-sort-order', nextSortOrder + index);
-      
       container.appendChild(wrapper);
-      
       // Set the file to the file input
       const fileInput = wrapper.querySelector('.image-upload');
       const dataTransfer = new DataTransfer();
       dataTransfer.items.add(file);
       fileInput.files = dataTransfer.files;
-      
       // Set correct sort order
       const sortOrderField = wrapper.querySelector('.sort-order-field');
       if (sortOrderField) {
         sortOrderField.value = nextSortOrder + index;
       }
-      
       // Trigger preview for this field
       handleImagePreview(fileInput);
-      
       // Initialize event listeners for new field
       fileInput.addEventListener('change', function(e) {
         handleImagePreview(e.target);
       });
-      
-      
       // Add drag handle
       const dragHandle = document.createElement('div');
       dragHandle.className = 'drag-handle';
@@ -979,47 +956,40 @@
       dragHandle.style.cssText = 'position: absolute; top: 10px; right: 10px; cursor: grab; color: #666; font-size: 18px; z-index: 10;';
       wrapper.appendChild(dragHandle);
     });
-    
     // Update sort orders for all fields after adding new ones
     updateSortOrders();
-    
     // Clear bulk upload
     document.getElementById('bulk-image-upload').value = '';
     document.getElementById('bulk-preview-container').innerHTML = '';
     document.getElementById('add-bulk-images').style.display = 'none';
     bulkFiles = [];
   }
-  
+
   // Add Product Description
   function addProductDescription() {
     const container = document.getElementById('product-descriptions-container');
     const template = document.getElementById('product-description-template');
-    
+
     if (!container || !template) return;
-    
+
     // Prevent duplicate calls
     if (container.dataset.adding === 'true') return;
     container.dataset.adding = 'true';
-    
     // Get next sort order
     const existingItems = container.querySelectorAll('.sortable-item');
     const nextSortOrder = existingItems.length;
-    
     // Clone template
     const wrapper = document.createElement('div');
     wrapper.innerHTML = template.innerHTML;
     const newItem = wrapper.firstElementChild;
-    
     // Update sort order
     const sortOrderField = newItem.querySelector('.sort-order-field');
     if (sortOrderField) {
       sortOrderField.value = nextSortOrder;
     }
     newItem.setAttribute('data-sort-order', nextSortOrder);
-    
     // Add to container
     container.appendChild(newItem);
-    
     // Initialize CKEditor for the new textarea
     const textarea = newItem.querySelector('.ckeditor');
     if (textarea && typeof CKEDITOR !== 'undefined') {
@@ -1027,7 +997,7 @@
       const uniqueId = 'product_descriptions_content_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
       textarea.id = uniqueId;
       textarea.name = textarea.name.replace('NEW_RECORD', nextSortOrder);
-      
+
     // Initialize CKEditor using the shared initializer (ensures identical toolbar)
     if (typeof window.initProductCkEditor === 'function') {
       // For newly added item, hide Styles & Format dropdowns to match request
@@ -1037,115 +1007,116 @@
       CKEDITOR.replace(uniqueId);
     }
     }
-    
+
     // Update sort orders for all items
     updateSortOrdersForContainer(container);
-    
+
     // Reset flag
     setTimeout(() => {
       container.dataset.adding = 'false';
     }, 100);
   }
-  
   // Add Product Specification
   function addProductSpecification() {
     const container = document.getElementById('product-specifications-container');
     const template = document.getElementById('product-specification-template');
-    
     if (!container || !template) return;
-    
     // Prevent duplicate calls
     if (container.dataset.adding === 'true') return;
     container.dataset.adding = 'true';
-    
+
     // Get next sort order
     const existingItems = container.querySelectorAll('.sortable-item');
     const nextSortOrder = existingItems.length;
-    
-    // Generate unique index using timestamp
-    const uniqueIndex = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    
-    // Clone template and replace NEW_RECORD with unique index
+
+    // Clone template
     const wrapper = document.createElement('div');
-    wrapper.innerHTML = template.innerHTML.replace(/NEW_RECORD/g, uniqueIndex);
+    wrapper.innerHTML = template.innerHTML;
     const newItem = wrapper.firstElementChild;
-    
+
     // Update sort order
     const sortOrderField = newItem.querySelector('.sort-order-field');
     if (sortOrderField) {
       sortOrderField.value = nextSortOrder;
     }
     newItem.setAttribute('data-sort-order', nextSortOrder);
-    
+
     // Add to container
     container.appendChild(newItem);
-    
+
+    // Update form field names to use sequential indices
+    updateFormFieldNames(container);
+
     // Update sort orders for all items
     updateSortOrdersForContainer(container);
-    
     // Reset flag
     setTimeout(() => {
       container.dataset.adding = 'false';
     }, 100);
   }
-  
   // Add Product Video
   function addProductVideo() {
     const container = document.getElementById('product-videos-container');
     const template = document.getElementById('product-video-template');
-    
     if (!container || !template) return;
-    
     // Prevent duplicate calls
     if (container.dataset.adding === 'true') return;
     container.dataset.adding = 'true';
-    
     // Get next sort order
     const existingItems = container.querySelectorAll('.sortable-item');
     const nextSortOrder = existingItems.length;
-    
-    // Generate unique index using timestamp
-    const uniqueIndex = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    
-    // Clone template and replace NEW_RECORD with unique index
+    // Clone template
     const wrapper = document.createElement('div');
-    wrapper.innerHTML = template.innerHTML.replace(/NEW_RECORD/g, uniqueIndex);
+    wrapper.innerHTML = template.innerHTML;
     const newItem = wrapper.firstElementChild;
-    
     // Update sort order
     const sortOrderField = newItem.querySelector('.sort-order-field');
     if (sortOrderField) {
       sortOrderField.value = nextSortOrder;
     }
     newItem.setAttribute('data-sort-order', nextSortOrder);
-    
     // Add to container
     container.appendChild(newItem);
-    
+    // Update form field names to use sequential indices
+    updateFormFieldNames(container);
     // Update sort orders for all items
     updateSortOrdersForContainer(container);
-    
     // Reset flag
     setTimeout(() => {
       container.dataset.adding = 'false';
     }, 100);
   }
-  
+
+  // Update form field names to use sequential indices
+  function updateFormFieldNames(container) {
+    const items = container.querySelectorAll('.sortable-item');
+    items.forEach((item, index) => {
+      // Update all input fields within this item
+      const inputs = item.querySelectorAll('input, textarea, select');
+      inputs.forEach(input => {
+        if (input.name) {
+          // Replace NEW_RECORD with sequential index
+          input.name = input.name.replace('NEW_RECORD', index);
+        }
+      });
+    });
+  }
+
   // Update sort orders for a specific container
   function updateSortOrdersForContainer(container) {
     const items = container.querySelectorAll('.sortable-item');
     let validIndex = 0;
-    
+
     items.forEach((item, index) => {
       // For images, check if they have files or current images
       const fileInput = item.querySelector('.image-upload');
       const hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
       const hasCurrentImage = item.querySelector('.current-image-preview');
-      
+
       // For other sections, always update sort order
       const isImageSection = container.id === 'product-images-container';
       const shouldUpdate = isImageSection ? (hasFile || hasCurrentImage) : true;
-      
+
       if (shouldUpdate) {
         const sortOrderField = item.querySelector('.sort-order-field');
         if (sortOrderField) {
@@ -1156,24 +1127,24 @@
       }
     });
   }
-  
+
   // Drag & Drop functionality
   function initializeDragAndDrop() {
     const containers = [
       'product-images-container',
-      'product-descriptions-container', 
+      'product-descriptions-container',
       'product-specifications-container',
       'product-videos-container'
     ];
-    
+
     containers.forEach(containerId => {
       const container = document.getElementById(containerId);
       if (!container) return;
-      
+
       initializeContainerDragAndDrop(container);
     });
   }
-  
+
   function initializeContainerDragAndDrop(container) {
 
     let draggedElement = null;
@@ -1218,16 +1189,16 @@
       if (!draggedElement) return;
 
       draggedIndex = Array.from(container.children).indexOf(draggedElement);
-      
+
       // Calculate offset from mouse to element
       const rect = draggedElement.getBoundingClientRect();
       dragOffset.x = e.clientX - rect.left;
       dragOffset.y = e.clientY - rect.top;
-      
+
       // Store original size
       originalSize.width = rect.width;
       originalSize.height = rect.height;
-      
+
       isDragging = true;
       draggedElement.classList.add('dragging');
 
@@ -1239,11 +1210,11 @@
       if (!draggedElement || !isDragging) return;
 
       e.preventDefault();
-      
+
       // Move the element to follow mouse cursor
       const newX = e.clientX - dragOffset.x;
       const newY = e.clientY - dragOffset.y;
-      
+
       draggedElement.style.position = 'fixed';
       draggedElement.style.left = newX + 'px';
       draggedElement.style.top = newY + 'px';
@@ -1253,14 +1224,11 @@
       draggedElement.style.height = originalSize.height + 'px';
 
       const items = Array.from(container.children);
-      
       // Find the item we're hovering over
       const mouseY = e.clientY;
       let hoveredItem = null;
-      
       // Clear all drag-over classes first
       items.forEach(item => item.classList.remove('drag-over'));
-      
       // Sort items by position to handle overlapping correctly
       const sortedItems = items
         .filter(item => item !== draggedElement)
@@ -1269,18 +1237,15 @@
           rect: item.getBoundingClientRect()
         }))
         .sort((a, b) => a.rect.top - b.rect.top);
-      
       // Find the closest item
       for (let i = 0; i < sortedItems.length; i++) {
         const item = sortedItems[i];
         const itemCenter = item.rect.top + item.rect.height / 2;
-        
         if (mouseY < itemCenter) {
           hoveredItem = item.element;
           break;
         }
       }
-      
       // Add visual feedback
       if (hoveredItem) {
         hoveredItem.classList.add('drag-over');
@@ -1292,7 +1257,7 @@
       if (!draggedElement || !isDragging) return;
 
       e.preventDefault();
-      
+
       // First, reset element position to get accurate measurements
       draggedElement.style.position = '';
       draggedElement.style.left = '';
@@ -1301,49 +1266,49 @@
       draggedElement.style.pointerEvents = '';
       draggedElement.style.width = '';
       draggedElement.style.height = '';
-      
+
       // Force reflow to ensure element is back in normal flow
       draggedElement.offsetHeight;
-      
+
       // Now get fresh measurements
       const items = Array.from(container.children);
-      
+
       // Find the target position based on mouse position
       let targetIndex = -1;
       const mouseY = e.clientY;
-      
+
       // Get all items except the dragged one
       const otherItems = items.filter(item => item !== draggedElement);
-      
+
       // Find the item that the mouse is closest to
       let closestItem = null;
       let minDistance = Infinity;
-      
+
       otherItems.forEach(item => {
         const rect = item.getBoundingClientRect();
         const itemCenter = rect.top + rect.height / 2;
         const distance = Math.abs(mouseY - itemCenter);
-        
+
         if (distance < minDistance) {
           minDistance = distance;
           closestItem = item;
         }
       });
-      
+
       if (closestItem) {
         // Find the original index of the closest item
         targetIndex = Array.from(container.children).indexOf(closestItem);
-        
+
         // If mouse is above the center of the closest item, insert before it
         // If mouse is below the center, insert after it
         const rect = closestItem.getBoundingClientRect();
         const itemCenter = rect.top + rect.height / 2;
-        
+
         if (mouseY > itemCenter) {
           targetIndex += 1; // Insert after the closest item
         }
       }
-      
+
       // If no target found, move to end
       if (targetIndex === -1) {
         targetIndex = items.length - 1;
@@ -1353,16 +1318,16 @@
       if (targetIndex !== draggedIndex) {
         // Remove the dragged element from its current position
         container.removeChild(draggedElement);
-        
+
         // Get the updated items array (without the dragged element)
         const updatedItems = Array.from(container.children);
-        
+
         // Adjust target index after removal
         let adjustedTargetIndex = targetIndex;
         if (targetIndex > draggedIndex) {
           adjustedTargetIndex = targetIndex - 1; // Items after dragged element shift up
         }
-        
+
         if (adjustedTargetIndex >= updatedItems.length) {
           // Moving to the end
           container.appendChild(draggedElement);
@@ -1371,7 +1336,7 @@
           const targetElement = updatedItems[adjustedTargetIndex];
           container.insertBefore(draggedElement, targetElement);
         }
-        
+
         // Update sort order values
         updateSortOrders();
       }
@@ -1395,17 +1360,17 @@
     function updateSortOrders() {
       const items = container.querySelectorAll('.sortable-item');
       let validIndex = 0;
-      
+
       items.forEach((item, index) => {
         // For images, check if they have files or current images
         const fileInput = item.querySelector('.image-upload');
         const hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
         const hasCurrentImage = item.querySelector('.current-image-preview');
-        
+
         // For other sections, always update sort order
         const isImageSection = container.id === 'product-images-container';
         const shouldUpdate = isImageSection ? (hasFile || hasCurrentImage) : true;
-        
+
         if (shouldUpdate) {
           const sortOrderField = item.querySelector('.sort-order-field');
           if (sortOrderField) {
@@ -1415,7 +1380,7 @@
           validIndex++;
         }
       });
-      
+
       // Ensure drag handles are properly managed after sort order update
       ensureDragHandlesVisible();
     }
@@ -1427,18 +1392,18 @@
         // Remove ALL existing drag handles first to avoid duplicates
         const existingHandles = item.querySelectorAll('.drag-handle');
         existingHandles.forEach(handle => handle.remove());
-        
+
         // Create a single new drag handle
         const dragHandle = document.createElement('div');
         dragHandle.className = 'drag-handle';
         dragHandle.innerHTML = '⋮⋮';
         dragHandle.style.cssText = 'position: absolute; top: 10px; right: 10px; cursor: grab; color: #666; font-size: 18px; z-index: 10;';
-        
+
         // Ensure the item has relative positioning for absolute positioning to work
         if (getComputedStyle(item).position === 'static') {
           item.style.position = 'relative';
         }
-        
+
         // Append the drag handle to the item
         item.appendChild(dragHandle);
       });
@@ -1452,19 +1417,19 @@
   function cleanupEmptyImageFields() {
     const container = document.getElementById('product-images-container');
     if (!container) return;
-    
+
     const emptyFields = container.querySelectorAll('.product-image-fields');
     emptyFields.forEach(field => {
       const fileInput = field.querySelector('.image-upload');
       const hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
       const hasCurrentImage = field.querySelector('.current-image-preview');
-      
+
       // If field has no file and no current image, remove it
       if (!hasFile && !hasCurrentImage) {
         field.remove();
       }
     });
-    
+
     // Update sort orders after cleanup
     updateSortOrders();
   }
@@ -1474,15 +1439,15 @@
 
   // Initialize drag & drop functionality
   initializeDragAndDrop();
-  
+
   // Clean up empty fields on page load
   cleanupEmptyImageFields();
-  
+
   // Function to clean up orphaned drag handles
   function cleanupOrphanedDragHandles() {
     const container = document.getElementById('product-images-container');
     if (!container) return;
-    
+
     // Find all drag handles that are not inside sortable items
     const allDragHandles = document.querySelectorAll('.drag-handle');
     allDragHandles.forEach(handle => {
@@ -1492,12 +1457,12 @@
       }
     });
   }
-  
+
   // Monitor DOM changes to ensure drag handles are always visible
   function initializeDragHandleMonitor() {
     const container = document.getElementById('product-images-container');
     if (!container) return;
-    
+
     const observer = new MutationObserver(function(mutations) {
       mutations.forEach(function(mutation) {
         if (mutation.type === 'childList' || mutation.type === 'attributes') {
@@ -1509,7 +1474,7 @@
         }
       });
     });
-    
+
     observer.observe(container, {
       childList: true,
       subtree: true,
@@ -1517,7 +1482,7 @@
       attributeFilter: ['class', 'style']
     });
   }
-  
+
   // Initialize drag handle monitor
   initializeDragHandleMonitor();
 
@@ -1543,7 +1508,6 @@
               }
             }
           });
-          
           // Update current label
           if (toggle.checked) {
             label.textContent = 'Hình ảnh chính';
@@ -1559,7 +1523,6 @@
     existingToggles.forEach(function(toggle) {
       const labelId = 'image-primary-label-' + toggle.id.split('_').pop();
       const label = document.getElementById(labelId);
-      
       if (label) {
         if (toggle.checked) {
           label.textContent = 'Hình ảnh chính';
@@ -1581,56 +1544,56 @@
     line-height: 1.2;
     border-radius: 3px;
   }
-  
+
   .image-upload {
     border: 2px dashed #ddd;
     padding: 10px;
     border-radius: 4px;
     transition: border-color 0.3s;
   }
-  
+
   .image-upload:hover {
     border-color: #007bff;
   }
-  
+
   .image-preview {
     background: #f8f9fa;
     padding: 10px;
     border-radius: 4px;
     border: 1px solid #e9ecef;
   }
-  
+
   .current-image-preview {
     background: #f8f9fa;
     padding: 10px;
     border-radius: 4px;
     border: 1px solid #e9ecef;
   }
-  
-  
+
+
   .preview-image {
     display: block;
     margin: 5px 0;
   }
-  
+
   .bulk-upload-section {
     transition: all 0.3s ease;
   }
-  
+
   .bulk-upload-section:hover {
     border-color: #0056b3 !important;
     background: #e7f3ff !important;
   }
-  
+
   .bulk-preview-item {
     transition: transform 0.2s ease;
   }
-  
+
   .bulk-preview-item:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   }
-  
+
   .remove-bulk-preview {
     border-radius: 50% !important;
     width: 20px !important;
@@ -1642,12 +1605,12 @@
     justify-content: center !important;
     line-height: 1 !important;
   }
-  
+
   .remove-bulk-preview:hover {
     background: #c82333 !important;
     transform: scale(1.1);
   }
-  
+
   #bulk-image-upload {
     width: 100%;
     max-width: 100%;
@@ -1657,11 +1620,11 @@
     border-radius: 4px;
     cursor: pointer;
   }
-  
+
   #bulk-image-upload:hover {
     border-color: #007bff;
   }
-  
+
   #add-bulk-images {
     background: #28a745;
     border-color: #28a745;
@@ -1672,13 +1635,13 @@
     cursor: pointer;
     transition: all 0.3s ease;
   }
-  
+
   #add-bulk-images:hover {
     background: #218838;
     border-color: #218838;
     transform: translateY(-1px);
   }
-  
+
   /* Custom Select Box Styling */
   .select {
     appearance: none;
@@ -1700,35 +1663,35 @@
     min-height: 48px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   }
-  
+
   .select:hover {
     border-color: #007bff;
     box-shadow: 0 4px 8px rgba(0, 123, 255, 0.1);
     transform: translateY(-1px);
   }
-  
+
   .select:focus {
     outline: none;
     border-color: #007bff;
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
     transform: translateY(-1px);
   }
-  
+
   .select option {
     padding: 8px 12px;
     color: #495057;
     background: white;
   }
-  
+
   .select option:hover {
     background: #f8f9fa;
   }
-  
+
   .select option:checked {
     background: #007bff;
     color: white;
   }
-  
+
   /* Label styling for select boxes */
   .field-unit label {
     font-weight: 600;
