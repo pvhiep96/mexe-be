@@ -21,17 +21,17 @@
       <h1>Mexe Store</h1>
       <p>Cảm ơn bạn đã đặt hàng!</p>
     </div>
-    
+
     <div class="content">
       <h2>Xin chào <%= @user_order_info&.buyer_name || @order.guest_name %>!</h2>
       <p>Cảm ơn bạn đã đặt hàng tại Mexe Store. Đơn hàng của bạn đã được tiếp nhận và đang được xử lý.</p>
-      
+
       <div class="order-info">
         <h3>Thông tin đơn hàng</h3>
         <p><strong>Mã đơn hàng:</strong> #<%= @order.order_number %></p>
         <p><strong>Ngày đặt:</strong> <%= @order.created_at.strftime("%d/%m/%Y %H:%M") %></p>
         <p><strong>Trạng thái:</strong> <%= @order.status.humanize %></p>
-        <p><strong>Phương thức thanh toán:</strong> 
+        <p><strong>Phương thức thanh toán:</strong>
           <%= @order.payment_method == 'cod' ? 'Thanh toán khi nhận hàng (COD)' : @order.payment_method %>
         </p>
       </div>
@@ -94,7 +94,7 @@
       <p>Chúng tôi sẽ liên hệ với bạn sớm nhất để xác nhận đơn hàng và thông báo thời gian giao hàng.</p>
       <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua email này hoặc số điện thoại hỗ trợ.</p>
     </div>
-    
+
     <div class="footer">
       <p>Cảm ơn bạn đã tin tướng Mexe Store!</p>
       <p>© 2025 Mexe Store. All rights reserved.</p>

@@ -17,6 +17,7 @@ class Order < ApplicationRecord
 
   before_validation :calculate_totals, on: :create
   after_create :notify_clients_about_new_order
+  before_validation :full_tracking_url
 
   enum status: {
     pending: 'pending',
@@ -47,7 +48,7 @@ class Order < ApplicationRecord
   }
 
   attribute :status_processed, :integer, default: 0
-  
+
   enum status_processed: {
     not_processed: 0,
     shipped_to_carrier: 1,
@@ -58,7 +59,7 @@ class Order < ApplicationRecord
 
   SHIPPING_PROVIDERS = [
     ['Giao Hàng Nhanh', 'ghn'],
-    ['Giao Hàng Tiết Kiệm', 'ghtk'], 
+    ['Giao Hàng Tiết Kiệm', 'ghtk'],
     ['Viettel Post', 'viettel_post'],
     ['Tự nhập thủ công', 'manual']
   ].freeze
@@ -98,10 +99,10 @@ class Order < ApplicationRecord
 
   # Generate tracking URL based on provider
   def full_tracking_url
-    return tracking_url if tracking_url.present?
+    # return tracking_url if tracking_url.present?
     return nil unless tracking_number.present?
 
-    case shipping_provider
+    self.tracking_url = case shipping_provider
     when 'ghn'
       "https://5sao.ghn.dev/?order_code=#{tracking_number}"
     when 'ghtk'
@@ -112,6 +113,7 @@ class Order < ApplicationRecord
       nil
     end
   end
+
 
   def calculate_totals
     # Calculate subtotal from order_items (including unsaved ones)
@@ -199,11 +201,11 @@ class Order < ApplicationRecord
   def notify_clients_about_new_order
     # Get all clients who have products in this order
     client_ids = products.pluck(:client_id).compact.uniq
-    
+
     client_ids.each do |client_id|
       client = AdminUser.find_by(id: client_id)
       next unless client&.client?
-      
+
       # Create notification for this client
       create_client_notification(client)
     end
@@ -212,18 +214,18 @@ class Order < ApplicationRecord
   def create_client_notification(client)
     buyer_name = user_order_info&.buyer_name || guest_name || (user&.full_name) || 'Khách hàng'
     client_products = products.where(client_id: client.id)
-    
+
     title = "Đơn hàng mới ##{order_number}"
     message = "Bạn có đơn hàng mới từ #{buyer_name}. "
     message += "Đơn hàng bao gồm: #{client_products.pluck(:name).join(', ')}. "
-    
+
     # Calculate total amount for client's products only
     client_total = order_items.joins(:product)
                              .where(products: { client_id: client.id })
                              .sum('order_items.quantity * order_items.unit_price')
-    
+
     message += "Tổng giá trị sản phẩm của bạn: #{client_total.to_i}₫"
-    
+
     # Create notification record
     ClientNotification.create!(
       admin_user: client,
@@ -238,7 +240,7 @@ class Order < ApplicationRecord
         client_total: client_total
       }
     )
-    
+
     # You can also send email notification here if needed
     # ClientOrderNotificationMailer.new_order(client, self).deliver_later
   rescue StandardError => e

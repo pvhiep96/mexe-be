@@ -30,6 +30,7 @@ class Product < ApplicationRecord
   validates :slug, presence: true, uniqueness: true
   validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :stock_quantity, numericality: { greater_than_or_equal_to: 0 }
+  validates :sku, uniqueness: true
 
   # Payment option validations
   validates :advance_payment_percentage,
@@ -44,7 +45,7 @@ class Product < ApplicationRecord
 
   # Custom validation for Status & Flags fields - only Super Admin can edit
   validate :can_update_status_flags?, if: :status_flags_changed?
-  
+
   # Product approval workflow
   before_save :set_client_if_needed
   after_create :create_approval_request, if: :created_by_client?
@@ -59,7 +60,7 @@ class Product < ApplicationRecord
   scope :filter_by_brand, ->(brand_id) { where(brand_id: brand_id) if brand_id.present? }
   scope :search_by_query, ->(query) {
     return all if query.blank?
-    
+
     search_term = "%#{sanitize_sql_like(query)}%"
     joins("LEFT JOIN brands ON products.brand_id = brands.id")
       .where(
@@ -163,7 +164,7 @@ class Product < ApplicationRecord
     return false unless client_id.present?
     return false unless current_admin&.client?
     return false if current_admin.id == client_id
-    
+
     # Check if important fields were changed
     important_fields = %w[name description price stock_quantity brand_id category_id]
     (changed & important_fields).any?

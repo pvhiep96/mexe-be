@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_09_27_093758) do
+ActiveRecord::Schema[7.2].define(version: 2025_10_21_190522) do
   create_table "active_admin_comments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
@@ -285,6 +285,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_27_093758) do
     t.string "administrative_unit_name"
     t.string "province_type"
     t.boolean "is_municipality"
+    t.datetime "shipped_at"
+    t.string "tracking_url"
     t.index ["full_payment_transfer"], name: "index_orders_on_full_payment_transfer"
     t.index ["order_number"], name: "index_orders_on_order_number", unique: true
     t.index ["partial_advance_payment"], name: "index_orders_on_partial_advance_payment"
@@ -349,8 +351,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_27_093758) do
     t.string "spec_name", null: false
     t.text "spec_value", null: false
     t.integer "sort_order", default: 0
-    t.string "unit"
-    t.string "active", default: "1"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["product_id"], name: "index_product_specifications_on_product_id"
