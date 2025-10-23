@@ -40,7 +40,7 @@ module Api
         puts "Order found/initialized: #{order.persisted?}"
 
         # Set user ID (use current_user if authenticated, otherwise allow guest orders)
-        if @token && authenticate_user_from_token && current_user
+        if extract_token_from_header && authenticate_user_from_token && current_user
           order.user_id = current_user.id
         else
           # For guest orders, save guest information
