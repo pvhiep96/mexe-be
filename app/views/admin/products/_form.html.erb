@@ -1036,44 +1036,51 @@
     }, 100);
   }
 
-  // Add Product Specification
-  function addProductSpecification() {
-    const container = document.getElementById('product-specifications-container');
-    const template = document.getElementById('product-specification-template');
+// Add Product Specification
+function addProductSpecification() {
+  const container = document.getElementById('product-specifications-container');
+  const template = document.getElementById('product-specification-template');
 
-    if (!container || !template) return;
+  if (!container || !template) return;
 
-    // Prevent duplicate calls
-    if (container.dataset.adding === 'true') return;
-    container.dataset.adding = 'true';
+  // Prevent duplicate calls
+  if (container.dataset.adding === 'true') return;
+  container.dataset.adding = 'true';
 
-    // Get next sort order
-    const existingItems = container.querySelectorAll('.sortable-item');
-    const nextSortOrder = existingItems.length;
+  // Get next sort order
+  const existingItems = container.querySelectorAll('.sortable-item');
+  const nextSortOrder = existingItems.length;
 
-    // Clone template
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = template.innerHTML;
-    const newItem = wrapper.firstElementChild;
+  // Clone template
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = template.innerHTML.trim();
+  const newItem = wrapper.firstElementChild;
 
-    // Update sort order
-    const sortOrderField = newItem.querySelector('.sort-order-field');
-    if (sortOrderField) {
-      sortOrderField.value = nextSortOrder;
-    }
-    newItem.setAttribute('data-sort-order', nextSortOrder);
+  // 🔥 Replace NEW_RECORD with a unique key (timestamp)
+  const uniqueId = new Date().getTime();
+  newItem.innerHTML = newItem.innerHTML.replace(/NEW_RECORD/g, uniqueId);
 
-    // Add to container
-    container.appendChild(newItem);
-
-    // Update sort orders for all items
-    updateSortOrdersForContainer(container);
-
-    // Reset flag
-    setTimeout(() => {
-      container.dataset.adding = 'false';
-    }, 100);
+  // Update sort order
+  const sortOrderField = newItem.querySelector('.sort-order-field');
+  if (sortOrderField) {
+    sortOrderField.value = nextSortOrder;
   }
+  newItem.setAttribute('data-sort-order', nextSortOrder);
+
+  // Add to container
+  container.appendChild(newItem);
+
+  // Update sort orders for all items
+  if (typeof updateSortOrdersForContainer === 'function') {
+    updateSortOrdersForContainer(container);
+  }
+
+  // Reset flag
+  setTimeout(() => {
+    container.dataset.adding = 'false';
+  }, 100);
+}
+
 
   // Add Product Video
   function addProductVideo() {

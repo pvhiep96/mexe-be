@@ -36,7 +36,7 @@ class OrderConfirmationMailer < ApplicationMailer
       if product.full_payment_transfer?
         # Full payment with discount
         discounted_price = product.full_payment_price
-        item_total = discounted_price * quantity
+        item_total =  @order.full_payment_discount_percentage.to_f > 0 ? discounted_price * quantity : 0
         item_discount = original_item_total - item_total
 
         @payment_details << {
@@ -45,7 +45,7 @@ class OrderConfirmationMailer < ApplicationMailer
           original_price: product.price,
           payment_type: :full_payment,
           discounted_price: discounted_price,
-          discount_percentage: product.full_payment_discount_percentage,
+          discount_percentage: @order.full_payment_discount_percentage,
           item_total: item_total,
           item_discount: item_discount
         }
@@ -55,6 +55,7 @@ class OrderConfirmationMailer < ApplicationMailer
         advance_amount = product.advance_payment_amount * quantity
         remaining_amount = product.remaining_payment_amount * quantity
         item_total = advance_amount + remaining_amount
+        item_total = @order.full_payment_discount_percentage.to_f ? advance_amount + remaining_amount : 0
         item_discount = original_item_total - item_total
 
         @payment_details << {
@@ -62,10 +63,10 @@ class OrderConfirmationMailer < ApplicationMailer
           quantity: quantity,
           original_price: product.price,
           payment_type: :partial_advance,
-          advance_percentage: product.advance_payment_percentage,
+          advance_percentage: @order.advance_payment_percentage,
           advance_amount: advance_amount,
           remaining_amount: remaining_amount,
-          advance_discount_percentage: product.advance_payment_discount_percentage,
+          advance_discount_percentage: @order.advance_payment_discount_percentage,
           item_total: item_total,
           item_discount: item_discount
         }

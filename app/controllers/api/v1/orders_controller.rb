@@ -40,7 +40,7 @@ module Api
         puts "Order found/initialized: #{order.persisted?}"
 
         # Set user ID (use current_user if authenticated, otherwise allow guest orders)
-        if current_user
+        if @token && authenticate_user_from_token && current_user
           order.user_id = current_user.id
         else
           # For guest orders, save guest information
@@ -297,6 +297,24 @@ module Api
         end
       rescue StandardError => e
         # Silent fail for email sending
+      end
+
+      def extract_token_from_header
+        auth_header = request.headers['Authorization']
+        return nil unless auth_header
+
+        # Extract token from "Bearer TOKEN" format
+        @token = auth_header.split(' ').last if auth_header.start_with?('Bearer ')
+      end
+
+      def authenticate_user_from_token
+        return unless @token
+
+        user_id = JwtService.extract_user_id(@token)
+        Rails.logger.debug "User ID from token: #{user_id}"
+
+        @current_user = User.find_by(id: user_id) if user_id
+        Rails.logger.debug "Current user found: #{@current_user ? @current_user.email : 'None'}"
       end
     end
   end
