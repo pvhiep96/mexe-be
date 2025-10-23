@@ -33,7 +33,7 @@ class OrderConfirmationMailer < ApplicationMailer
       @original_amount += original_item_total
 
       # Determine payment option for this product
-      if product.full_payment_transfer?
+      if @order.full_payment_transfer?
         # Full payment with discount
         discounted_price = product.full_payment_price
         item_total =  @order.full_payment_discount_percentage.to_f > 0 ? discounted_price * quantity : 0
@@ -50,7 +50,7 @@ class OrderConfirmationMailer < ApplicationMailer
           item_discount: item_discount
         }
 
-      elsif product.partial_advance_payment?
+      elsif @order.partial_advance_payment?
         # Partial advance payment
         advance_amount = product.advance_payment_amount * quantity
         remaining_amount = product.remaining_payment_amount * quantity
