@@ -35,7 +35,7 @@ module Api
         params.merge!(test_order_params)
         create
       rescue StandardError => e
-        render json: { 
+        render json: {
           error: "Test order creation failed: #{e.message}",
           debug_info: {
             products_count: Product.count,
@@ -46,8 +46,6 @@ module Api
 
       private
 
-      # Inherit order_params from parent class
-      include Api::V1::OrdersController
     end
   end
 end

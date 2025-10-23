@@ -46,7 +46,7 @@
                 <% client_products = order.products.where(client_id: current_admin_user.id) %>
                 <% client_products.each do |product| %>
                   <div style="margin-bottom: 5px;">
-                    <%= product.name %> 
+                    <%= product.name %>
                     <small>(SL: <%= order.order_items.find_by(product: product)&.quantity %>)</small>
                   </div>
                 <% end %>
@@ -64,12 +64,17 @@
               <strong><%= number_to_currency(order.total_amount, unit: "₫", precision: 0) %></strong>
             </td>
             <td style="padding: 15px;">
-              <span class="badge badge-<%= order.status == 'pending' ? 'warning' : order.status == 'delivered' ? 'success' : 'info' %>">
+              <span
+                class="badge badge-<%= order.status == 'pending' ? 'warning' : order.status == 'delivered' ? 'success' : 'info' %>"
+                  data-toggle="modal" data-target="#changeStatusModal-<%= order.id %>"
+                >
                 <%= order.status.humanize %>
               </span>
             </td>
             <td style="padding: 15px;">
-              <span class="badge badge-<%= order.processing_not_processed? ? 'danger' : order.processing_processing_delivered? ? 'success' : 'warning' %>">
+              <span class="badge badge-<%= order.processing_not_processed? ? 'danger' : order.processing_processing_delivered? ? 'success' : 'warning' %>"
+               data-toggle="modal2" data-target="#changeStatusModal2-<%= order.id %>"
+              >
                 <%= order.processing_status_text %>
               </span>
               <% if order.respond_to?(:tracking_number) && order.tracking_number.present? %>
@@ -83,10 +88,52 @@
               <%= link_to "Xem chi tiết", admin_order_path(order), class: "btn btn-sm btn-primary" %>
             </td>
           </tr>
+
+          <div class="modal" id="changeStatusModal-<%= order.id %>" style="display: none;">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5>Change Status for Order #<%= order.id %></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+              </div>
+              <div class="modal-body">
+                  <%= form_with model: order, url: admin_order_path(order), method: :patch, local: true do |form| %>
+                  <div class="form-group">
+                    <%= form.label :status, "Select New Status" %>
+                    <%= form.select :status, options_for_select(Order.statuses, order.status), {}, class: "width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" %>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <%= form.submit "Change Status", class: "btn btn-primary" %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal2" id="changeStatusModal2-<%= order.id %>" style="display: none;">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5>Change Status for Order #<%= order.id %></h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <%= form_with model: order, url: admin_order_path(order), method: :patch, local: true do |form| %>
+                <div class="form-group">
+                  <%= form.label :status, "Select New Status" %>
+                  <%= form.select :status_processed, options_for_select([['Chưa xử lý', 'not_processed' ], ['Đã giao đơn vị vận chuyển', 'shipped_to_carrier'], ['Đã giao hàng', 'processing_delivered']], order.status_processed), {}, class: "form-control"  %>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                  <%= form.submit "Change Status", class: "btn btn-primary" %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
         <% end %>
       </tbody>
     </table>
-    
+
     <% if @orders.empty? %>
       <div style="padding: 40px; text-align: center; color: #666;">
         <% if current_admin_user.client? %>
@@ -108,13 +155,13 @@
     font-weight: bold;
     text-transform: uppercase;
   }
-  
+
   .badge-success { background: #28a745; color: white; }
   .badge-danger { background: #dc3545; color: white; }
   .badge-warning { background: #ffc107; color: black; }
   .badge-info { background: #17a2b8; color: white; }
   .badge-primary { background: #007bff; color: white; }
-  
+
   .btn {
     display: inline-block;
     padding: 6px 12px;
@@ -126,14 +173,162 @@
     border: 1px solid #007bff;
     font-size: 12px;
   }
-  
+
   .btn:hover {
     background: #0056b3;
     border-color: #0056b3;
   }
-  
+
   .btn-sm {
     padding: 4px 8px;
     font-size: 11px;
   }
 </style>
+
+
+<style>
+  /* Modal styles */
+  .modal, .modal2 {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
+  }
+
+  .modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .modal-header,
+  .modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .modal-header h5 {
+    margin: 0;
+  }
+
+  .close {
+    cursor: pointer;
+    font-size: 1.5rem;
+    border: none;
+    background: none;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .btn-primary {
+    background: #007bff;
+    color: #fff;
+  }
+
+  .btn-secondary {
+    background: #6c757d;
+    color: #fff;
+  }
+
+  .btn:hover {
+    opacity: 0.9;
+  }
+  .form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    font-size: 16px;
+    color: #333;
+    appearance: none; /* Remove default browser styles */
+    -webkit-appearance: none; /* For Safari */
+    -moz-appearance: none; /* For Firefox */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns%3D%22http%3A//www.w3.org/2000/svg%22 width%3D%2210%22 height%3D%225%22 viewBox%3D%220 0 10 5%22%3E%3Cpath fill%3D%22%23333%22 d%3D%22M0 0l5 5 5-5z%22/%3E%3C/svg%3E');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px 5px;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+
+  /* Add padding to the dropdown container */
+  .form-group {
+    margin-bottom: 20px;
+  }
+</style>
+
+
+<script>
+  // JavaScript to handle modal open/close
+  document.addEventListener('DOMContentLoaded', () => {
+    const modals = document.querySelectorAll('.modal');
+    const buttons = document.querySelectorAll('[data-toggle="modal"]');
+
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        const target = button.getAttribute('data-target');
+        const modal = document.querySelector(target);
+        modal.style.display = 'block';
+      });
+    });
+
+    modals.forEach(modal => {
+      const closeButton = modal.querySelector('.close');
+      closeButton.addEventListener('click', () => {
+        modal.style.display = 'none';
+      });
+
+      window.addEventListener('click', (event) => {
+        if (event.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+    });
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const modals = document.querySelectorAll('.modal2');
+    const buttons = document.querySelectorAll('[data-toggle="modal2"]');
+
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        const target = button.getAttribute('data-target');
+        const modal = document.querySelector(target);
+        modal.style.display = 'block';
+      });
+    });
+
+    modals.forEach(modal => {
+      const closeButton = modal.querySelector('.close');
+      closeButton.addEventListener('click', () => {
+        modal.style.display = 'none';
+      });
+
+      window.addEventListener('click', (event) => {
+        if (event.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+    });
+  });
+</script>

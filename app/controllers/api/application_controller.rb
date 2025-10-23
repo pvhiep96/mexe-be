@@ -20,9 +20,9 @@ module Api
       # Extract and verify token
       token = extract_token_from_header
       Rails.logger.debug "Auth Header Token: #{token ? 'Present' : 'Missing'}"
-      
+
       unless token
-        render json: { 
+        render json: {
           error: 'Unauthorized',
           message: 'Token không được cung cấp'
         }, status: :unauthorized
@@ -40,12 +40,12 @@ module Api
         }, status: :unauthorized
         return
       end
-      
+
       @current_user = User.find_by(id: user_id)
       Rails.logger.debug "Current user found: #{@current_user ? @current_user.email : 'None'}"
-      
+
       unless @current_user
-        render json: { 
+        render json: {
           error: 'Unauthorized',
           message: 'Người dùng không tồn tại'
         }, status: :unauthorized

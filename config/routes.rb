@@ -11,7 +11,7 @@ Rails.application.routes.draw do
       resources :product_descriptions, except: [:show]
     end
     resources :product_images, only: [:index, :destroy]
-    resources :orders, only: [:index, :show] do
+    resources :orders, only: [:index, :show, :update] do
       member do
         patch :update_shipping
       end
@@ -90,7 +90,7 @@ Rails.application.routes.draw do
       resources :products, only: [:index, :show]
       resources :orders, only: [:index, :show, :create]
       post 'orders/completed', to: 'orders#completed'
-      
+
       # Product videos routes
       get 'product_videos/latest', to: 'product_videos#latest'
 

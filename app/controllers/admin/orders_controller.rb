@@ -1,6 +1,6 @@
 module Admin
   class OrdersController < Admin::ApplicationController
-    before_action :set_order, only: [:show, :update_shipping]
+    before_action :set_order, only: [:show, :update_shipping, :update]
 
     def index
       authorize_resource(Order)
@@ -30,7 +30,19 @@ module Admin
       end
     end
 
+    def update
+      if @order.update(order_params)
+        redirect_to admin_order_path(@order), notice: 'Order status updated successfully.'
+      else
+        redirect_to admin_order_path(@order), alert: 'Failed to update order status.'
+      end
+    end
+
     private
+
+    def order_params
+      params.require(:order).permit(:status, :status_processed)
+    end
 
     def set_order
       @order = filtered_orders.find(params[:id])
@@ -47,9 +59,9 @@ module Admin
 
     def can_update_shipping_info?(order)
       return true if current_admin_user.super_admin?
-      
+
       # Client chỉ có thể cập nhật nếu order chứa sản phẩm của họ và chưa được xử lý
-      order.contains_products_from_client?(current_admin_user) && 
+      order.contains_products_from_client?(current_admin_user) &&
       order.processing_not_processed?
     end
 

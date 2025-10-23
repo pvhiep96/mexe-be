@@ -1,10 +1,10 @@
 class Api::V1::OrderTrackingController < Api::ApplicationController
   before_action :authenticate_user!, except: [:track_by_number]
-  
+
   def my_orders
     orders = current_user.orders.includes(:products, :order_items)
                           .order(created_at: :desc)
-    
+
     render json: {
       success: true,
       data: orders.map { |order| serialize_order(order) }
@@ -13,7 +13,7 @@ class Api::V1::OrderTrackingController < Api::ApplicationController
 
   def show
     order = current_user.orders.find_by(id: params[:id])
-    
+
     if order
       render json: {
         success: true,
@@ -30,7 +30,7 @@ class Api::V1::OrderTrackingController < Api::ApplicationController
   # Track order by order number (for guest users)
   def track_by_number
     order = Order.find_by(order_number: params[:order_number])
-    
+
     if order && (order.guest_email == params[:email] || order.user&.email == params[:email])
       render json: {
         success: true,
@@ -82,7 +82,7 @@ class Api::V1::OrderTrackingController < Api::ApplicationController
       notes: order.notes,
       created_at: order.created_at,
       updated_at: order.updated_at,
-      
+
       # Shipping information
       shipping_info: {
         provider: order.shipping_provider_name,
@@ -91,7 +91,7 @@ class Api::V1::OrderTrackingController < Api::ApplicationController
         shipped_at: order.shipped_at,
         delivered_at: order.delivered_at
       },
-      
+
       # Products
       items: order.order_items.includes(:product).map do |item|
         {
@@ -111,7 +111,7 @@ class Api::V1::OrderTrackingController < Api::ApplicationController
           }
         }
       end,
-      
+
       # Timeline
       timeline: build_order_timeline(order)
     }
@@ -119,7 +119,7 @@ class Api::V1::OrderTrackingController < Api::ApplicationController
 
   def build_order_timeline(order)
     timeline = []
-    
+
     # Order created
     timeline << {
       status: 'created',
@@ -128,7 +128,7 @@ class Api::V1::OrderTrackingController < Api::ApplicationController
       timestamp: order.created_at,
       completed: true
     }
-    
+
     # Processing
     if order.status != 'pending'
       timeline << {
@@ -139,7 +139,7 @@ class Api::V1::OrderTrackingController < Api::ApplicationController
         completed: true
       }
     end
-    
+
     # Shipped to carrier
     if order.processing_shipped_to_carrier? || order.processing_processing_delivered?
       timeline << {
@@ -155,7 +155,7 @@ class Api::V1::OrderTrackingController < Api::ApplicationController
         }
       }
     end
-    
+
     # Delivered
     if order.processing_processing_delivered?
       timeline << {
@@ -166,7 +166,7 @@ class Api::V1::OrderTrackingController < Api::ApplicationController
         completed: true
       }
     end
-    
+
     timeline
   end
 end
