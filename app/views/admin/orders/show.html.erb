@@ -335,3 +335,47 @@
     border-color: #6c757d;
   }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const shippingProviderSelect = document.querySelector('select[name="order[shipping_provider]"]');
+  const trackingNumberInput = document.querySelector('input[name="order[tracking_number]"]');
+  const trackingUrlInput = document.querySelector('input[name="order[tracking_url]"]');
+
+  function updateTrackingUrl() {
+    const provider = shippingProviderSelect.value;
+    const trackingNumber = trackingNumberInput.value.trim();
+
+    if (!provider || !trackingNumber) {
+      return;
+    }
+
+    let trackingUrl = '';
+    switch(provider) {
+      case 'ghn':
+        trackingUrl = `https://donhang.ghn.vn/?order_code=${trackingNumber}`;
+        break;
+      case 'ghtk':
+        trackingUrl = `https://i.ghtk.vn/${trackingNumber}`;
+        break;
+      case 'viettel_post':
+        trackingUrl = `https://viettelpost.vn/tra-cuu-hanh-trinh-don-hang?ma-don-hang=${trackingNumber}`;
+        break;
+      default:
+        return; // Không auto-fill cho manual
+    }
+
+    trackingUrlInput.value = trackingUrl;
+  }
+
+  // Auto-fill khi thay đổi đơn vị vận chuyển
+  if (shippingProviderSelect) {
+    shippingProviderSelect.addEventListener('change', updateTrackingUrl);
+  }
+
+  // Auto-fill khi nhập mã vận đơn
+  if (trackingNumberInput) {
+    trackingNumberInput.addEventListener('input', updateTrackingUrl);
+  }
+});
+</script>

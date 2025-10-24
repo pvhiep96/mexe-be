@@ -103,9 +103,9 @@ class Order < ApplicationRecord
 
     case shipping_provider
     when 'ghn'
-      "https://5sao.ghn.dev/?order_code=#{tracking_number}"
+      "https://donhang.ghn.vn/?order_code=#{tracking_number}"
     when 'ghtk'
-      "https://khachhang.giaohangtietkiem.vn/khach-hang/tra-cuu-don-hang?bill_code=#{tracking_number}"
+      "https://i.ghtk.vn/#{tracking_number}"
     when 'viettel_post'
       "https://viettelpost.vn/tra-cuu-hanh-trinh-don-hang?ma-don-hang=#{tracking_number}"
     else
