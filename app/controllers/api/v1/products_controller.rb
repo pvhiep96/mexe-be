@@ -51,7 +51,7 @@ module Api
               per_page: per_page,
               total_pages: products.total_pages
             }
-          }
+          }.to_json
         end
         render json: cached_response
       rescue => e

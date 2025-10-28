@@ -3,7 +3,7 @@ module Api
     class HomeController < ApplicationController
       def index
         cache_key = "home_index_response"
-        cached_response = Rails.cache.fetch(cache_key, expires_in: 1.day) do
+        @cached = Rails.cache.fetch(cache_key, expires_in: 1.day) do
           categories = get_categories
           best_sellers = get_products_by_flag(:is_best_seller)
           early_order_products = get_early_order_products
@@ -20,7 +20,7 @@ module Api
           else
             Rails.logger.info "⚠️  NO BEST SELLERS FOUND!"
           end
-          {
+          data = {
             success: true,
             data: {
               categories: categories,
@@ -30,9 +30,10 @@ module Api
               essential_accessories: essential_accessories
             }
           }
+          data.to_json
         end
 
-        render json: cached_response
+        render json: @cached
       end
 
       def get_early_order_products
