@@ -25,12 +25,17 @@ class Product < ApplicationRecord
   accepts_nested_attributes_for :product_descriptions, allow_destroy: true, reject_if: proc { |attr| attr['title'].blank? && attr['content'].blank? }
   accepts_nested_attributes_for :product_specifications, allow_destroy: true, reject_if: proc { |attr| attr['spec_name'].blank? && attr['spec_value'].blank? }
   accepts_nested_attributes_for :product_videos, allow_destroy: true, reject_if: proc { |attr| attr['url'].blank? && attr['title'].blank? }
+  accepts_nested_attributes_for :product_variants, allow_destroy: true, reject_if: proc { |attr| attr['variant_name'].blank? && attr['variant_value'].blank? }
 
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true
   validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :stock_quantity, numericality: { greater_than_or_equal_to: 0 }
   validates :sku, uniqueness: true
+  validates :short_description, length: { 
+    maximum: 255, 
+    message: "quá dài (tối đa 255 ký tự)" 
+  }, allow_blank: true
 
   # Payment option validations
   validates :advance_payment_percentage,

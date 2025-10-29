@@ -9,8 +9,8 @@ module Api
       end
 
       def orders
-        orders = current_user.orders.includes(:order_items).order(created_at: :desc)
-        render json: orders.map { |order| OrderSerializer.new(order).serializable_hash[:data] }
+        orders = current_user.orders.includes(order_items: :product).order(created_at: :desc)
+        render json: orders.map { |order| OrderSerializer.new(order, include: [:order_items]).as_json }
       end
 
       def favorites

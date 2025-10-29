@@ -6,18 +6,18 @@ module Api
       def index
         # Remove binding.pry
         orders = current_user.orders
-                            .includes(:order_items)
+                            .includes(order_items: :product)
                             .where(params[:status] ? { status: params[:status] } : {})
                             .order(created_at: :desc)
                             .page(params[:page]).per(params[:per_page] || 20)
 
-        render json: orders.map { |order| OrderSerializer.new(order).as_json }
+        render json: orders.map { |order| OrderSerializer.new(order, include: [:order_items]).as_json }
       end
 
       def show
         # order = current_user.orders.find_by(id: params[:id]) || current_user.orders.find_by!(order_number: params[:id])
-        order = Order.find_by(id: params[:id]) || Order.find_by(order_number: params[:id])
-        render json: OrderSerializer.new(order).to_json
+        order = Order.includes(order_items: :product).find_by(id: params[:id]) || Order.includes(order_items: :product).find_by(order_number: params[:id])
+        render json: OrderSerializer.new(order, include: [:order_items]).as_json
       rescue ActiveRecord::RecordNotFound
         render json: { error: 'Order not found' }, status: :not_found
       end
@@ -116,14 +116,36 @@ module Api
             begin
               product = Product.find(item_params[:product_id])
               puts "Product found: #{product.name}"
+
+              # Check if variant is specified
+              variant = nil
+              unit_price = product.price
+              variant_info_json = nil
+
+              if item_params[:variant_id].present?
+                variant = ProductVariant.find_by(id: item_params[:variant_id], product_id: product.id)
+                if variant
+                  puts "Variant found: #{variant.variant_name} - #{variant.variant_value}"
+                  unit_price = product.price + (variant.price_adjustment || 0)
+                  variant_info_json = {
+                    variant_id: variant.id,
+                    variant_name: variant.variant_name,
+                    variant_value: variant.variant_value,
+                    variant_sku: variant.sku,
+                    price_adjustment: variant.price_adjustment,
+                    final_price: unit_price
+                  }
+                end
+              end
+
               order.order_items.build(
                 product_id: product.id,
                 product_name: product.name,
-                product_sku: product.sku,
+                product_sku: variant ? variant.sku : product.sku,
                 quantity: item_params[:quantity],
-                unit_price: product.price,
-                total_price: product.price * item_params[:quantity]
-                # variant_info: item_params[:variant_id] ? ProductVariant.where(product_id: product.id, variant_value: item_params[:variant_id]).as_json : nil
+                unit_price: unit_price,
+                total_price: unit_price * item_params[:quantity],
+                variant_info: variant_info_json
               )
             rescue ActiveRecord::RecordNotFound => e
               puts "❌ Product not found: #{item_params[:product_id]}"

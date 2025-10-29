@@ -177,15 +177,35 @@
           <tbody>
             <% @order.order_items.includes(:product).each do |item| %>
               <% if current_admin_user.super_admin? || item.product.client_id == current_admin_user.id %>
+                <% variant_info = item.variant_info.is_a?(Hash) ? item.variant_info : (JSON.parse(item.variant_info) rescue nil) %>
                 <tr>
                   <td style="padding: 12px; border-bottom: 1px solid #f8f9fa;">
                     <strong><%= item.product.name %></strong><br>
+                    <% if variant_info %>
+                      <span style="display: inline-block; background: #e3f2fd; color: #1976d2; padding: 2px 8px; border-radius: 3px; font-size: 12px; margin-top: 4px;">
+                        <%= variant_info['variant_name'] %>: <%= variant_info['variant_value'] %>
+                        <% if variant_info['variant_sku'] %>
+                          (<%= variant_info['variant_sku'] %>)
+                        <% end %>
+                      </span><br>
+                    <% end %>
                     <small><%= item.product.brand&.name %></small>
                   </td>
-                  <td style="padding: 12px; border-bottom: 1px solid #f8f9fa;"><%= item.product.sku %></td>
+                  <td style="padding: 12px; border-bottom: 1px solid #f8f9fa;">
+                    <%= variant_info ? variant_info['variant_sku'] : item.product.sku %>
+                  </td>
                   <td style="padding: 12px; border-bottom: 1px solid #f8f9fa; text-align: center;"><%= item.quantity %></td>
                   <td style="padding: 12px; border-bottom: 1px solid #f8f9fa; text-align: right;">
                     <%= number_to_currency(item.unit_price, unit: "₫", precision: 0) %>
+                    <% if variant_info && variant_info['price_adjustment'] %>
+                      <% price_adj = variant_info['price_adjustment'].to_f %>
+                      <% if price_adj != 0 %>
+                        <br>
+                        <small style="color: <%= price_adj > 0 ? '#d32f2f' : '#388e3c' %>;">
+                          (<%= price_adj > 0 ? '+' : '' %><%= number_to_currency(price_adj, unit: "₫", precision: 0) %>)
+                        </small>
+                      <% end %>
+                    <% end %>
                   </td>
                   <td style="padding: 12px; border-bottom: 1px solid #f8f9fa; text-align: right;">
                     <strong><%= number_to_currency(item.quantity * item.unit_price, unit: "₫", precision: 0) %></strong>
@@ -200,6 +220,38 @@
             <% end %>
           </tbody>
         </table>
+      </div>
+
+      <!-- Order Summary -->
+      <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px;">
+        <div style="max-width: 400px; margin-left: auto;">
+          <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #dee2e6;">
+            <span>Tổng tiền hàng:</span>
+            <strong><%= number_to_currency(@order.subtotal, unit: "₫", precision: 0) %></strong>
+          </div>
+          <% if @order.discount_amount && @order.discount_amount > 0 %>
+            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #dee2e6; color: #dc3545;">
+              <span>Giảm giá:</span>
+              <strong>-<%= number_to_currency(@order.discount_amount, unit: "₫", precision: 0) %></strong>
+            </div>
+          <% end %>
+          <% if @order.shipping_fee && @order.shipping_fee > 0 %>
+            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #dee2e6;">
+              <span>Phí vận chuyển:</span>
+              <strong><%= number_to_currency(@order.shipping_fee, unit: "₫", precision: 0) %></strong>
+            </div>
+          <% end %>
+          <% if @order.tax_amount && @order.tax_amount > 0 %>
+            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #dee2e6;">
+              <span>Thuế:</span>
+              <strong><%= number_to_currency(@order.tax_amount, unit: "₫", precision: 0) %></strong>
+            </div>
+          <% end %>
+          <div style="display: flex; justify-content: space-between; padding: 12px 0; font-size: 18px; border-top: 2px solid #007bff; margin-top: 8px;">
+            <span><strong>Tổng đơn hàng:</strong></span>
+            <strong style="color: #007bff;"><%= number_to_currency(@order.total_amount, unit: "₫", precision: 0) %></strong>
+          </div>
+        </div>
       </div>
     </div>
 

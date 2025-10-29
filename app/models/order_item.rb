@@ -12,10 +12,11 @@ class OrderItem < ApplicationRecord
   private
 
   def set_product_details
-    self.product_name = product.name
-    self.product_sku = product.sku
-    self.unit_price = product.price
-    self.total_price = 0
+    # Only set default values if not already set (to preserve variant prices from controller)
+    self.product_name ||= product.name
+    self.product_sku ||= product.sku
+    self.unit_price ||= product.price
+    self.total_price ||= 0
     # self.total_price = unit_price * quantity
   end
 end

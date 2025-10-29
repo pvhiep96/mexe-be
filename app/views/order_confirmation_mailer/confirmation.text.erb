@@ -13,7 +13,8 @@ Phương thức thanh toán: <%= @order.payment_method == 'cod' ? 'Thanh toán k
 === SẢN PHẨM ĐÃ ĐẶT ===
 <% @payment_details.each do |detail| %>
 - <%= detail[:product_name] %>
-  Số lượng: <%= detail[:quantity] %> x <%= number_to_currency(detail[:original_price], unit: "đ", format: "%n %u") %>
+<% if detail[:variant_display].present? %>  <%= detail[:variant_display] %>
+<% end %>  Số lượng: <%= detail[:quantity] %> x <%= number_to_currency(detail[:original_price], unit: "đ", format: "%n %u") %>
 <% if detail[:payment_type] == :full_payment %>
 <% if detail[:discount_percentage].present? && detail[:discount_percentage] > 0 %>
   Giảm giá chuyển khoản toàn bộ: <%= detail[:discount_percentage] %>%

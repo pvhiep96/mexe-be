@@ -251,6 +251,114 @@
       </div>
     <% end %>
 
+    <!-- Product Variants -->
+    <% if @product.product_variants.any? %>
+      <div class="section" style="margin-bottom: 30px;">
+        <h3>🎨 Product Variants (<%= @product.product_variants.count %>)</h3>
+        <div style="background: white; border-radius: 4px; overflow: hidden; border: 1px solid #ddd;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead style="background: #f8f9fa;">
+              <tr>
+                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd; width: 10%;">ID</th>
+                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd; width: 20%;">Variant Name</th>
+                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd; width: 20%;">Variant Value</th>
+                <th style="padding: 12px; text-align: right; border-bottom: 2px solid #ddd; width: 15%;">Price Adjustment</th>
+                <th style="padding: 12px; text-align: right; border-bottom: 2px solid #ddd; width: 15%;">Final Price</th>
+                <th style="padding: 12px; text-align: center; border-bottom: 2px solid #ddd; width: 10%;">Stock</th>
+                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd; width: 10%;">SKU</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @product.product_variants.each do |variant| %>
+                <tr style="<%= 'background: #f8f9fa;' if variant.stock_quantity <= 0 %>">
+                  <td style="padding: 12px; border-bottom: 1px solid #f8f9fa;">
+                    <code>#<%= variant.id %></code>
+                  </td>
+                  <td style="padding: 12px; border-bottom: 1px solid #f8f9fa;">
+                    <strong><%= variant.variant_name %></strong>
+                  </td>
+                  <td style="padding: 12px; border-bottom: 1px solid #f8f9fa;">
+                    <span style="display: inline-block; padding: 4px 12px; background: #e3f2fd; color: #1976d2; border-radius: 12px; font-size: 13px; font-weight: 500;">
+                      <%= variant.variant_value %>
+                    </span>
+                  </td>
+                  <td style="padding: 12px; border-bottom: 1px solid #f8f9fa; text-align: right;">
+                    <% if variant.price_adjustment && variant.price_adjustment != 0 %>
+                      <span style="color: <%= variant.price_adjustment > 0 ? '#dc3545' : '#28a745' %>; font-weight: 600;">
+                        <%= variant.price_adjustment > 0 ? '+' : '' %><%= number_to_currency(variant.price_adjustment, unit: "₫", precision: 0) %>
+                      </span>
+                    <% else %>
+                      <span style="color: #6c757d;">—</span>
+                    <% end %>
+                  </td>
+                  <td style="padding: 12px; border-bottom: 1px solid #f8f9fa; text-align: right;">
+                    <strong style="color: #1976d2; font-size: 15px;">
+                      <%= number_to_currency((@product.price || 0) + (variant.price_adjustment || 0), unit: "₫", precision: 0) %>
+                    </strong>
+                  </td>
+                  <td style="padding: 12px; border-bottom: 1px solid #f8f9fa; text-align: center;">
+                    <% if variant.stock_quantity && variant.stock_quantity > 0 %>
+                      <span style="display: inline-block; padding: 4px 8px; background: #d4edda; color: #155724; border-radius: 4px; font-size: 13px; font-weight: 600;">
+                        <%= variant.stock_quantity %>
+                      </span>
+                    <% else %>
+                      <span style="display: inline-block; padding: 4px 8px; background: #f8d7da; color: #721c24; border-radius: 4px; font-size: 13px; font-weight: 600;">
+                        Out of stock
+                      </span>
+                    <% end %>
+                  </td>
+                  <td style="padding: 12px; border-bottom: 1px solid #f8f9fa;">
+                    <% if variant.sku.present? %>
+                      <code style="background: #e9ecef; padding: 2px 6px; border-radius: 3px; font-size: 12px;">
+                        <%= variant.sku %>
+                      </code>
+                    <% else %>
+                      <span style="color: #6c757d; font-style: italic;">N/A</span>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Variant Summary -->
+        <div style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 4px; border: 1px solid #dee2e6;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+            <div>
+              <div style="color: #6c757d; font-size: 13px; margin-bottom: 5px;">Total Variants</div>
+              <div style="font-size: 24px; font-weight: 700; color: #1976d2;">
+                <%= @product.product_variants.count %>
+              </div>
+            </div>
+            <div>
+              <div style="color: #6c757d; font-size: 13px; margin-bottom: 5px;">Total Stock (All Variants)</div>
+              <div style="font-size: 24px; font-weight: 700; color: #28a745;">
+                <%= @product.product_variants.sum(:stock_quantity) %>
+              </div>
+            </div>
+            <div>
+              <div style="color: #6c757d; font-size: 13px; margin-bottom: 5px;">Price Range</div>
+              <div style="font-size: 16px; font-weight: 600; color: #333;">
+                <% prices = @product.product_variants.map { |v| (@product.price || 0) + (v.price_adjustment || 0) } %>
+                <% if prices.any? %>
+                  <%= number_to_currency(prices.min, unit: "₫", precision: 0) %> - <%= number_to_currency(prices.max, unit: "₫", precision: 0) %>
+                <% else %>
+                  N/A
+                <% end %>
+              </div>
+            </div>
+            <div>
+              <div style="color: #6c757d; font-size: 13px; margin-bottom: 5px;">Available Variants</div>
+              <div style="font-size: 24px; font-weight: 700; color: <%= @product.product_variants.where('stock_quantity > 0').count > 0 ? '#28a745' : '#dc3545' %>;">
+                <%= @product.product_variants.where('stock_quantity > 0').count %> / <%= @product.product_variants.count %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
     <!-- Product Videos -->
     <% if @product.product_videos.any? %>
       <div class="section" style="margin-bottom: 30px;">

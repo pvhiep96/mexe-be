@@ -62,6 +62,7 @@ module Admin
       resource.product_descriptions.build
       resource.product_specifications.build
       resource.product_videos.build
+      resource.product_variants.build
       authorize_resource(resource)
       @page_title = "Tạo Sản Phẩm Mới"
       render locals: { page: Administrate::Page::Form.new(dashboard, resource) }
@@ -81,8 +82,10 @@ module Admin
       authorize_resource(@product)
 
       if @product.save
-        redirect_to admin_product_path(@product), notice: 'Product was successfully created.'
+        redirect_to admin_product_path(@product), notice: 'Sản phẩm đã được tạo thành công.'
       else
+        # Add flash message for validation errors
+        flash.now[:alert] = build_error_message(@product)
         @page_title = "Tạo Sản Phẩm Mới"
         render :new, locals: { page: Administrate::Page::Form.new(dashboard, @product) }
       end
@@ -93,8 +96,10 @@ module Admin
       authorize_resource(@product)
 
       if @product.update(resource_params)
-        redirect_to admin_product_path(@product), notice: 'Product was successfully updated.'
+        redirect_to admin_product_path(@product), notice: 'Sản phẩm đã được cập nhật thành công.'
       else
+        # Add flash message for validation errors
+        flash.now[:alert] = build_error_message(@product)
         render :edit, locals: { page: Administrate::Page::Form.new(dashboard, @product) }
       end
     end
@@ -113,7 +118,8 @@ module Admin
         product_images_attributes: [:id, :image, :alt_text, :sort_order, :is_primary, :_destroy],
         product_descriptions_attributes: [:id, :title, :content, :sort_order, :_destroy],
         product_specifications_attributes: [:id, :spec_name, :spec_value, :unit, :sort_order, :_destroy],
-        product_videos_attributes: [:id, :url, :title, :description, :sort_order, :is_active, :_destroy]
+        product_videos_attributes: [:id, :url, :title, :description, :sort_order, :is_active, :_destroy],
+        product_variants_attributes: [:id, :variant_name, :variant_value, :price_adjustment, :stock_quantity, :sku, :_destroy]
       ]
 
       # Payment options (available for all admin users)
@@ -135,6 +141,58 @@ module Admin
 
     def set_current_admin_user
       Thread.current[:current_admin_user] = current_admin_user
+    end
+
+    def build_error_message(product)
+      errors = []
+      
+      # Handle product errors
+      product.errors.each do |error|
+        case error.attribute.to_s
+        when 'short_description'
+          if error.type == :too_long
+            errors << "Mô tả ngắn quá dài (tối đa 255 ký tự)"
+          else
+            errors << "Mô tả ngắn #{error.message}"
+          end
+        when 'name'
+          errors << "Tên sản phẩm #{error.message}"
+        when 'price'
+          errors << "Giá sản phẩm #{error.message}"
+        when 'slug'
+          errors << "Đường dẫn (slug) #{error.message}"
+        when 'sku'
+          errors << "Mã sản phẩm (SKU) #{error.message}"
+        when 'base'
+          errors << error.message
+        else
+          errors << "#{error.attribute.to_s.humanize} #{error.message}"
+        end
+      end
+
+      # Handle nested product_descriptions errors
+      product.product_descriptions.each_with_index do |desc, index|
+        desc.errors.each do |error|
+          case error.attribute.to_s
+          when 'content'
+            if error.type == :too_long
+              errors << "Nội dung mô tả #{index + 1} quá dài (tối đa 65,000 ký tự)"
+            else
+              errors << "Nội dung mô tả #{index + 1} #{error.message}"
+            end
+          when 'title'
+            errors << "Tiêu đề mô tả #{index + 1} #{error.message}"
+          else
+            errors << "Mô tả #{index + 1} - #{error.attribute.to_s.humanize} #{error.message}"
+          end
+        end
+      end
+
+      if errors.any?
+        "Có lỗi xảy ra khi lưu sản phẩm: #{errors.join(', ')}"
+      else
+        "Có lỗi xảy ra khi lưu sản phẩm. Vui lòng kiểm tra lại thông tin."
+      end
     end
   end
 end
