@@ -99,6 +99,7 @@ class ProductDashboard < Administrate::BaseDashboard
     partial_advance_payment
     advance_payment_percentage
     advance_payment_discount_percentage
+    product_variants
     created_at
     updated_at
   ].freeze
@@ -133,6 +134,7 @@ class ProductDashboard < Administrate::BaseDashboard
     partial_advance_payment
     advance_payment_percentage
     advance_payment_discount_percentage
+    product_variants
   ].freeze
 
   # COLLECTION_FILTERS

@@ -15,7 +15,7 @@ class Order < ApplicationRecord
   # validates :total_amount, presence: true, numericality: { greater_than_or_equal_to: 0 }
   # validates :payment_method, presence: true
 
-  before_validation :calculate_totals, on: :create
+  before_validation :calculate_totals
   after_create :notify_clients_about_new_order
   before_validation :full_tracking_url
 
@@ -213,20 +213,34 @@ class Order < ApplicationRecord
 
   def create_client_notification(client)
     buyer_name = user_order_info&.buyer_name || guest_name || (user&.full_name) || 'Khách hàng'
-    client_products = products.where(client_id: client.id)
+
+    # Get order items with their products for this client
+    client_order_items = order_items.joins(:product).where(products: { client_id: client.id })
 
     title = "Đơn hàng mới ##{order_number}"
     message = "Bạn có đơn hàng mới từ #{buyer_name}. "
-    message += "Đơn hàng bao gồm: #{client_products.pluck(:name).join(', ')}. "
 
-    # Calculate total amount for client's products only
-    client_total = order_items.joins(:product)
-                             .where(products: { client_id: client.id })
-                             .sum('order_items.quantity * order_items.unit_price')
+    # Build product list with variant info
+    product_details = client_order_items.map do |item|
+      detail = item.product_name
+      if item.variant_info.present?
+        variant_info = item.variant_info.is_a?(Hash) ? item.variant_info : (JSON.parse(item.variant_info) rescue nil)
+        if variant_info
+          detail += " (#{variant_info['variant_name']}: #{variant_info['variant_value']})"
+        end
+      end
+      detail += " x#{item.quantity}"
+      detail
+    end
+
+    message += "Đơn hàng bao gồm: #{product_details.join(', ')}. "
+
+    # Calculate total amount for client's products only (using unit_price which includes variant price)
+    client_total = client_order_items.sum('order_items.quantity * order_items.unit_price')
 
     message += "Tổng giá trị sản phẩm của bạn: #{client_total.to_i}₫"
 
-    # Create notification record
+    # Create notification record with detailed product info
     ClientNotification.create!(
       admin_user: client,
       order: self,
@@ -236,7 +250,15 @@ class Order < ApplicationRecord
       data: {
         order_number: order_number,
         buyer_name: buyer_name,
-        client_products: client_products.pluck(:name),
+        client_products: client_order_items.map { |item|
+          {
+            name: item.product_name,
+            quantity: item.quantity,
+            unit_price: item.unit_price,
+            total_price: item.total_price,
+            variant_info: item.variant_info
+          }
+        },
         client_total: client_total
       }
     )

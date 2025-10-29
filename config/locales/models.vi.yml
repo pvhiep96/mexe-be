@@ -25,6 +25,8 @@ vi:
       product_variants: "Biến thể sản phẩm"
       product_image: "Hình ảnh sản phẩm"
       product_images: "Hình ảnh sản phẩm"
+      product_description: "Mô tả sản phẩm"
+      product_descriptions: "Mô tả sản phẩm"
       product_review: "Đánh giá sản phẩm"
       product_reviews: "Đánh giá sản phẩm"
       user_address: "Địa chỉ người dùng"
@@ -167,14 +169,21 @@ vi:
         created_at: "Ngày tạo"
         updated_at: "Ngày cập nhật"
       
+      product_description:
+        product: "Sản phẩm"
+        title: "Tiêu đề"
+        content: "Nội dung"
+        sort_order: "Thứ tự sắp xếp"
+        created_at: "Ngày tạo"
+        updated_at: "Ngày cập nhật"
+      
       product_variant:
         product: "Sản phẩm"
-        name: "Tên biến thể"
+        variant_name: "Tên biến thể"
+        variant_value: "Giá trị biến thể"
         sku: "Mã SKU"
-        price: "Giá"
-        original_price: "Giá gốc"
+        price_adjustment: "Điều chỉnh giá"
         stock_quantity: "Số lượng tồn kho"
-        is_active: "Kích hoạt"
         created_at: "Ngày tạo"
         updated_at: "Ngày cập nhật"
       

@@ -79,7 +79,16 @@ function setupNestedFormHandlers() {
       addProductVideo();
     });
   }
-  
+
+  // Add variant button handler
+  var addVariantBtn = document.getElementById('add-product-variant');
+  if (addVariantBtn) {
+    addVariantBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      addProductVariant();
+    });
+  }
+
   // Remove button handlers
   document.addEventListener('click', function(e) {
     if (e.target.classList.contains('remove-nested-field')) {
@@ -229,15 +238,31 @@ function addProductSpecification() {
 function addProductVideo() {
   var container = document.getElementById('product-videos-container');
   var template = document.getElementById('product-video-template');
-  
+
   if (container && template) {
     var newIndex = Date.now(); // Use timestamp as unique index
     var newField = template.innerHTML.replace(/NEW_RECORD/g, newIndex);
-    
+
     var wrapper = document.createElement('div');
     wrapper.innerHTML = newField;
     wrapper.className = 'nested-field-wrapper';
-    
+
+    container.appendChild(wrapper);
+  }
+}
+
+function addProductVariant() {
+  var container = document.getElementById('product-variants-container');
+  var template = document.getElementById('product-variant-template');
+
+  if (container && template) {
+    var newIndex = Date.now(); // Use timestamp as unique index
+    var newField = template.innerHTML.replace(/NEW_RECORD/g, newIndex);
+
+    var wrapper = document.createElement('div');
+    wrapper.innerHTML = newField;
+    wrapper.className = 'nested-field-wrapper';
+
     container.appendChild(wrapper);
   }
 }

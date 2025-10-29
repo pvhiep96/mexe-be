@@ -9,6 +9,7 @@ Rails.application.routes.draw do
     resources :products do
       resources :product_images, except: [:show]
       resources :product_descriptions, except: [:show]
+      resources :product_variants, except: [:show]
     end
     resources :product_images, only: [:index, :destroy]
     resources :orders, only: [:index, :show, :update] do

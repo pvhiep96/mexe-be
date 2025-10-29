@@ -438,6 +438,53 @@
     </div>
   </div>
 
+  <!-- Product Variants Section -->
+  <div class="field-unit">
+    <div class="field-unit__label">
+      <label>Product Variants</label>
+    </div>
+    <div class="field-unit__field">
+      <div style="margin-bottom: 15px; padding: 10px; background: #fff3cd; border-radius: 4px; font-size: 14px;">
+        🎨 <strong>Biến thể sản phẩm:</strong> Thêm các biến thể như màu sắc, kích thước, v.v. Mỗi biến thể có giá riêng và tồn kho riêng.
+      </div>
+
+      <div id="product-variants-container" class="sortable-container">
+        <%= form.fields_for :product_variants do |variant_form| %>
+          <div class="nested-field-wrapper product-variant-fields" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; position: relative;">
+            <div class="field-unit">
+              <label>Tên biến thể (VD: Màu sắc, Kích thước)</label>
+              <%= variant_form.text_field :variant_name, class: "text-field", placeholder: "Màu sắc" %>
+            </div>
+            <div class="field-unit">
+              <label>Giá trị biến thể (VD: Đỏ, Size M)</label>
+              <%= variant_form.text_field :variant_value, class: "text-field", placeholder: "Đỏ" %>
+            </div>
+            <div class="field-unit">
+              <label>Điều chỉnh giá (VD: +50000 hoặc -10000)</label>
+              <%= variant_form.number_field :price_adjustment, value: variant_form.object.price_adjustment || 0, class: "text-field", step: "0.01" %>
+            </div>
+            <div class="field-unit">
+              <label>Số lượng tồn kho</label>
+              <%= variant_form.number_field :stock_quantity, value: variant_form.object.stock_quantity || 0, class: "text-field" %>
+            </div>
+            <div class="field-unit">
+              <label>SKU (Mã hàng - Optional)</label>
+              <%= variant_form.text_field :sku, class: "text-field", placeholder: "PROD-001-RED" %>
+            </div>
+            <div class="field-unit" style="display: flex; justify-content: flex-end; margin-top: 15px;">
+              <%= variant_form.hidden_field :_destroy %>
+              <button type="button" class="remove-nested-field btn btn-outline-danger btn-sm">🗑️ Remove Variant</button>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 15px;">
+        <button type="button" id="add-product-variant" class="btn btn-success">🎨 Add Variant</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Product Videos Section -->
   <div class="field-unit">
     <div class="field-unit__label">
@@ -595,6 +642,34 @@
       </div>
       <div class="field-unit" style="display: flex; justify-content: flex-end; margin-top: 15px;">
         <button type="button" class="remove-nested-field btn btn-outline-danger btn-sm">🗑️ Remove Specification</button>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/template" id="product-variant-template">
+    <div class="nested-field-wrapper product-variant-fields" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; position: relative;">
+      <div class="field-unit">
+        <label>Tên biến thể (VD: Màu sắc, Kích thước)</label>
+        <input type="text" name="product[product_variants_attributes][NEW_RECORD][variant_name]" class="text-field" placeholder="Màu sắc">
+      </div>
+      <div class="field-unit">
+        <label>Giá trị biến thể (VD: Đỏ, Size M)</label>
+        <input type="text" name="product[product_variants_attributes][NEW_RECORD][variant_value]" class="text-field" placeholder="Đỏ">
+      </div>
+      <div class="field-unit">
+        <label>Điều chỉnh giá (VD: +50000 hoặc -10000)</label>
+        <input type="number" name="product[product_variants_attributes][NEW_RECORD][price_adjustment]" value="0" class="text-field" step="0.01">
+      </div>
+      <div class="field-unit">
+        <label>Số lượng tồn kho</label>
+        <input type="number" name="product[product_variants_attributes][NEW_RECORD][stock_quantity]" value="0" class="text-field">
+      </div>
+      <div class="field-unit">
+        <label>SKU (Mã hàng - Optional)</label>
+        <input type="text" name="product[product_variants_attributes][NEW_RECORD][sku]" class="text-field" placeholder="PROD-001-RED">
+      </div>
+      <div class="field-unit" style="display: flex; justify-content: flex-end; margin-top: 15px;">
+        <button type="button" class="remove-nested-field btn btn-outline-danger btn-sm">🗑️ Remove Variant</button>
       </div>
     </div>
   </script>
@@ -1081,6 +1156,34 @@ function addProductSpecification() {
   }, 100);
 }
 
+  // Add Product Variant
+  function addProductVariant() {
+    const container = document.getElementById('product-variants-container');
+    const template = document.getElementById('product-variant-template');
+
+    if (!container || !template) return;
+
+    // Prevent duplicate calls
+    if (container.dataset.adding === 'true') return;
+    container.dataset.adding = 'true';
+
+    // Clone template
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = template.innerHTML.trim();
+    const newItem = wrapper.firstElementChild;
+
+    // Replace NEW_RECORD with a unique key (timestamp)
+    const uniqueId = new Date().getTime();
+    newItem.innerHTML = newItem.innerHTML.replace(/NEW_RECORD/g, uniqueId);
+
+    // Add to container
+    container.appendChild(newItem);
+
+    // Reset flag
+    setTimeout(() => {
+      container.dataset.adding = 'false';
+    }, 100);
+  }
 
   // Add Product Video
   function addProductVideo() {

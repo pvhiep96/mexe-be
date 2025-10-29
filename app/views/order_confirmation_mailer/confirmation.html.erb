@@ -41,6 +41,9 @@
         <% @payment_details.each do |detail| %>
           <div class="item">
             <p><strong><%= detail[:product_name] %></strong></p>
+            <% if detail[:variant_display].present? %>
+              <p style="color: #666; font-size: 14px;"><%= detail[:variant_display] %></p>
+            <% end %>
             <p>Số lượng: <%= detail[:quantity] %> x <%= number_to_currency(detail[:original_price], unit: "đ", format: "%n %u") %></p>
 
             <% if detail[:payment_type] == :full_payment %>
