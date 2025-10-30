@@ -16,8 +16,7 @@ elsif Rails.env.production? || ENV['USE_CLOUD_STORAGE'] == 'true'
       region:                ENV['AWS_REGION'], # e.g. "ap-southeast-1"
     }
     config.fog_directory  = ENV['AWS_BUCKET']
-    config.fog_public     = false  # false = private files
-    config.fog_attributes = { cache_control: "public, max-age=3600" }
+    config.fog_public     = true  # false = private files
   end
 else
   CarrierWave.configure do |config|
