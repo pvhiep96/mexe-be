@@ -4,7 +4,8 @@ module Api
       def index
         page = (params[:page] || 1).to_i
         per_page = (params[:per_page] || 20).to_i
-        cache_key = "products_index_response_#{params[:search]}_#{params[:category_id]}_#{params[:brand_id]}_#{page}_#{per_page}"
+        # Include all filter and sort params in cache key to ensure correct caching
+        cache_key = "products_index_response_#{params[:search]}_#{params[:category_id]}_#{params[:brand_id]}_#{params[:is_new]}_#{params[:is_hot]}_#{params[:is_featured]}_#{params[:sort]}_#{page}_#{per_page}"
 
         cached_response = Rails.cache.fetch(cache_key, expires_in: 1.day) do
           products = Product.active.includes(:brand, :category, :images, :variants, :specifications)
